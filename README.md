@@ -1,5 +1,26 @@
 # Habitsheet
 
+## Development
+
+Install dependencies:
+
+1. Erlang
+2. Elixir
+3. Docker (or Postgresql)
+
+Then run:
+
+```bash
+# Run a postgres server (Or you can install one w/o using Docker)
+docker run -d -p 5432:5432 --name habitsheetpg -e POSTGRES_PASSWORD=postgres postgres:15 
+
+mix deps.get
+mix ecto.setup
+mix phx.server
+```
+
+## Original content
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
