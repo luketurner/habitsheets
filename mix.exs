@@ -20,7 +20,7 @@ defmodule Habitsheet.MixProject do
   def application do
     [
       mod: {Habitsheet.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon]
+      extra_applications: [:logger, :runtime_tools] ++ if(Mix.env() == :dev, do: [], else: [:os_mon])
     ]
   end
 
