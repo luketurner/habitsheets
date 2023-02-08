@@ -14,13 +14,13 @@
       <td><%= habit.name %></td>
 
       <td>
-        <span><%= link "Show", to: Routes.habit_path(@conn, :show, habit) %></span>
-        <span><%= link "Edit", to: Routes.habit_path(@conn, :edit, habit) %></span>
-        <span><%= link "Delete", to: Routes.habit_path(@conn, :delete, habit), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        <span><%= link "Show", to: Routes.sheet_habit_path(@conn, :show, @sheet_id, habit) %></span>
+        <span><%= link "Edit", to: Routes.sheet_habit_path(@conn, :edit, @sheet_id, habit) %></span>
+        <span><%= link "Delete", to: Routes.sheet_habit_path(@conn, :delete, @sheet_id, habit), method: :delete, data: [confirm: "Are you sure?"] %></span>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "New Habit", to: Routes.habit_path(@conn, :new) %></span>
+<span><%= link "New Habit", to: Routes.sheet_habit_path(@conn, :new, @sheet_id) %></span>

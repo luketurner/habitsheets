@@ -2,9 +2,12 @@ defmodule Habitsheet.Sheets.Sheet do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Habitsheet.Sheets.Habit
+
   schema "sheets" do
     field :title, :string
 
+    has_many :habit, Habit
     timestamps()
   end
 

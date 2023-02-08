@@ -1,5 +1,5 @@
 <h1>Edit Habit</h1>
 
-<%= render "form.html", Map.put(assigns, :action, Routes.habit_path(@conn, :update, @habit)) %>
+<%= render "form.html", Map.put(assigns, :action, Routes.sheet_habit_path(@conn, :update, @sheet_id, @habit)) %>
 
-<span><%= link "Back", to: Routes.habit_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.sheet_habit_path(@conn, :index, @sheet_id) %></span>

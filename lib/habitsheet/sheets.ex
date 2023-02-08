@@ -113,8 +113,12 @@ defmodule Habitsheet.Sheets do
       [%Habit{}, ...]
 
   """
-  def list_habits do
-    Repo.all(Habit)
+  def list_habits(sheet_id) do
+    Repo.all(
+      from habit in Habit,
+      select: habit,
+      where: habit.sheet_id == ^sheet_id
+    )
   end
 
   @doc """
