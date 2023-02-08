@@ -1,0 +1,13 @@
+<h1>Show Habit</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @habit.name %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.habit_path(@conn, :edit, @habit) %></span> |
+<span><%= link "Back", to: Routes.habit_path(@conn, :index) %></span>

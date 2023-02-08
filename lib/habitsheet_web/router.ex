@@ -20,6 +20,7 @@ defmodule HabitsheetWeb.Router do
     get "/", PageController, :index
 
     resources "/sheets", SheetController
+    resources "/habits", HabitController
   end
 
   # Other scopes may use custom stacks.

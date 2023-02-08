@@ -17,4 +17,18 @@ defmodule Habitsheet.SheetsFixtures do
 
     sheet
   end
+
+  @doc """
+  Generate a habit.
+  """
+  def habit_fixture(attrs \\ %{}) do
+    {:ok, habit} =
+      attrs
+      |> Enum.into(%{
+        name: "some name"
+      })
+      |> Habitsheet.Sheets.create_habit()
+
+    habit
+  end
 end
