@@ -1,0 +1,5 @@
+<h1>Edit Sheet</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.sheet_path(@conn, :update, @sheet)) %>
+
+<span><%= link "Back", to: Routes.sheet_path(@conn, :index) %></span>

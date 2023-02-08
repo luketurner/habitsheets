@@ -1,0 +1,13 @@
+<h1>Show Sheet</h1>
+
+<ul>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @sheet.title %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.sheet_path(@conn, :edit, @sheet) %></span> |
+<span><%= link "Back", to: Routes.sheet_path(@conn, :index) %></span>

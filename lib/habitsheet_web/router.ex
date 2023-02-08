@@ -18,6 +18,8 @@ defmodule HabitsheetWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+
+    resources "/sheets", SheetController
   end
 
   # Other scopes may use custom stacks.
