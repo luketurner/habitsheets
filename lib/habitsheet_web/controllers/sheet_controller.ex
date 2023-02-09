@@ -28,7 +28,12 @@ defmodule HabitsheetWeb.SheetController do
 
   def show(conn, %{"id" => id}) do
     sheet = Sheets.get_sheet!(id)
-    render(conn, "show.html", sheet: sheet)
+    habits = Sheets.list_habits(id)
+    render(conn, "show.html",
+      sheet: sheet,
+      habits: habits,
+      days: ["M", "T", "W", "T", "F", "S", "S"]
+    )
   end
 
   def edit(conn, %{"id" => id}) do

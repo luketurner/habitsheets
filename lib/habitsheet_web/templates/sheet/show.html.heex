@@ -6,28 +6,23 @@
       <a href={Routes.sheet_path @conn, :edit, @sheet.id} class="text-blue-600 underline pr-4">edit sheet</a>
     </div>
   </div>
-  <div class="mx-4 w-12 text-center">Mon</div>
-  <div class="mx-4 w-12 text-center">Tues</div>
-  <div class="mx-4 w-12 text-center">Wed</div>
-  <div class="mx-4 w-12 text-center">Thurs</div>
-  <div class="mx-4 w-12 text-center">Fri</div>
-  <div class="mx-4 w-12 text-center">Sat</div>
-  <div class="mx-4 w-12 text-center">Sun</div>
+  <%= for day <- @days do %>
+    <div class="mx-4 w-12 text-center"><%= day %></div>
+  <% end %>
 </div>
-<div class="p-2 flex flex-row flex-nowrap border-slate-400 hover:border rounded cursor-move items-center">
-  <div class="w-8 text-slate-400">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-    </svg>
+<%= for habit <- @habits do %>
+  <div class="p-2 flex flex-row flex-nowrap border-slate-400 hover:border rounded cursor-move items-center">
+    <div class="w-8 text-slate-400">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+      </svg>
+    </div>
+    <div class="w-40 text-right pr-4">
+      <a href="" class="text-blue-600 underline"><%= habit.name %></a>
+    </div>
+    <%= for _day <- @days do %>
+      <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>
+    <% end %>
   </div>
-  <div class="w-40 text-right pr-4">
-    <a href="" class="text-blue-600 underline">Tasky the First</a>
-  </div>
-  <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>
-  <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>
-  <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>
-  <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>
-  <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>
-  <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>
-  <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>
-</div>
+<% end %>
+<a class="p-2 text-blue-600 underline" href={Routes.sheet_habit_path(@conn, :new, @sheet.id)}>New habit...</a>
