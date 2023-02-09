@@ -1,26 +1,19 @@
-<h1>Listing Sheets</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
+<div class="p-2 flex flex-row flex-nowrap items-end">
+  <div class="w-48 pr-4 flex flex-col flex-nowrap">
+    <h1 class="font-bold">All Sheets</h1>
+  </div>
+</div>
 <%= for sheet <- @sheets do %>
-    <tr>
-      <td><%= sheet.title %></td>
-
-      <td>
-        <span><%= link "Show", to: Routes.sheet_path(@conn, :show, sheet) %></span>
-        <span><%= link "Edit", to: Routes.sheet_path(@conn, :edit, sheet) %></span>
-        <span><%= link "Delete", to: Routes.sheet_path(@conn, :delete, sheet), method: :delete, data: [confirm: "Are you sure?"] %></span>
-      </td>
-    </tr>
+  <div class="p-2 flex flex-row flex-nowrap items-center">
+    <div class="w-40 text-right pr-4">
+      <a href={Routes.sheet_path @conn, :show, sheet} class="text-blue-600 underline"><%= sheet.title %></a>
+    </div>
+    <div class="mx-4 w-8 text-center">
+      <%= link "Edit", to: Routes.sheet_path(@conn, :edit, sheet), class: "text-blue-600 underline" %>
+    </div>
+    <div class="mx-4 w-8 text-center">
+      <%= link "Delete", to: Routes.sheet_path(@conn, :delete, sheet), method: :delete, data: [confirm: "Are you sure?"], class: "text-blue-600 underline" %>
+    </div>
+  </div>
 <% end %>
-  </tbody>
-</table>
-
-<span><%= link "New Sheet", to: Routes.sheet_path(@conn, :new) %></span>
+<a class="p-2 text-blue-600 underline" href={Routes.sheet_path(@conn, :new)}>New sheet...</a>

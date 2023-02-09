@@ -1,9 +1,10 @@
 <div class="p-2 flex flex-row flex-nowrap items-end">
   <div class="w-48 pr-4 flex flex-col flex-nowrap">
     <h1 class="font-bold">HabitSheet</h1>
-    <div class="flex flex-row flex-wrap">
-      <a href={Routes.sheet_path @conn, :new} class="text-blue-600 underline pr-4">new sheet</a>
-      <a href={Routes.sheet_path @conn, :edit, @sheet.id} class="text-blue-600 underline pr-4">edit sheet</a>
+    <div class="flex flex-col">
+      <a href={Routes.sheet_path @conn, :new} class="text-blue-600 underline pr-4">new sheet...</a>
+      <a href={Routes.sheet_path @conn, :edit, @sheet.id} class="text-blue-600 underline pr-4">edit sheet...</a>
+      <a href={Routes.sheet_path @conn, :index} class="text-blue-600 underline pr-4">all sheets...</a>
     </div>
   </div>
   <%= for day <- @days do %>
