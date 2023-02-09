@@ -18,7 +18,7 @@
       </svg>
     </div>
     <div class="w-40 text-right pr-4">
-      <a href="" class="text-blue-600 underline"><%= habit.name %></a>
+      <a href={Routes.sheet_habit_path @conn, :show, @sheet.id, habit} class="text-blue-600 underline"><%= habit.name %></a>
     </div>
     <%= for _day <- @days do %>
       <div class="mx-4 w-12 text-center"><input class="p-3 rounded text-blue-400" type="checkbox"></div>

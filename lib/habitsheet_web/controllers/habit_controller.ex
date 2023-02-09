@@ -4,11 +4,6 @@ defmodule HabitsheetWeb.HabitController do
   alias Habitsheet.Sheets
   alias Habitsheet.Sheets.Habit
 
-  def index(conn, %{"sheet_id" => sheet_id}) do
-    habits = Sheets.list_habits(sheet_id)
-    render(conn, "index.html", habits: habits, sheet_id: sheet_id)
-  end
-
   def new(conn, %{"sheet_id" => sheet_id}) do
     changeset = Sheets.change_habit(%Habit{}, %{ sheet_id: sheet_id })
     render(conn, "new.html", changeset: changeset, sheet_id: sheet_id)

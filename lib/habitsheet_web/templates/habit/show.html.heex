@@ -10,4 +10,4 @@
 </ul>
 
 <span><%= link "Edit", to: Routes.sheet_habit_path(@conn, :edit, @sheet_id, @habit) %></span> |
-<span><%= link "Back", to: Routes.sheet_habit_path(@conn, :index, @sheet_id) %></span>
+<span><%= link "Back", to: Routes.sheet_path(@conn, :show, @sheet_id) %></span>

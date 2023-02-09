@@ -20,7 +20,7 @@ defmodule HabitsheetWeb.Router do
     get "/", PageController, :index
 
     resources "/sheets", SheetController do
-      resources "/habits", HabitController
+      resources "/habits", HabitController, except: [:index]
     end
   end
 

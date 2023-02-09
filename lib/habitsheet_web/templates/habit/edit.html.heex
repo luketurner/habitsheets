@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.sheet_habit_path(@conn, :update, @sheet_id, @habit)) %>
 
-<span><%= link "Back", to: Routes.sheet_habit_path(@conn, :index, @sheet_id) %></span>
+<span><%= link "Back", to: Routes.sheet_path(@conn, :show, @sheet_id) %></span>
