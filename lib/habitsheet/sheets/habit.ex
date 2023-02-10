@@ -3,11 +3,13 @@ defmodule Habitsheet.Sheets.Habit do
   import Ecto.Changeset
 
   alias Habitsheet.Sheets.Sheet
+  alias Habitsheet.Statistics.HabitStatistic
 
   schema "habits" do
     field :name, :string
 
     belongs_to :sheet, Sheet
+    has_many :statistic, HabitStatistic
     timestamps()
   end
 

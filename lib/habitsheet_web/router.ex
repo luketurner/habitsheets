@@ -22,6 +22,13 @@ defmodule HabitsheetWeb.Router do
     resources "/sheets", SheetController do
       resources "/habits", HabitController, except: [:index]
     end
+
+    live "/habit_statistics", HabitStatisticLive.Index, :index
+    live "/habit_statistics/new", HabitStatisticLive.Index, :new
+    live "/habit_statistics/:id/edit", HabitStatisticLive.Index, :edit
+
+    live "/habit_statistics/:id", HabitStatisticLive.Show, :show
+    live "/habit_statistics/:id/show/edit", HabitStatisticLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.

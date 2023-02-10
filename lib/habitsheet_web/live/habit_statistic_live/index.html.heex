@@ -1,0 +1,37 @@
+<h1>Listing Habit statistics</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.habit_statistic_index_path(@socket, :index)}>
+    <.live_component
+      module={HabitsheetWeb.HabitStatisticLive.FormComponent}
+      id={@habit_statistic.id || :new}
+      title={@page_title}
+      action={@live_action}
+      habit_statistic={@habit_statistic}
+      return_to={Routes.habit_statistic_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="habit_statistics">
+    <%= for habit_statistic <- @habit_statistics do %>
+      <tr id={"habit_statistic-#{habit_statistic.id}"}>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.habit_statistic_show_path(@socket, :show, habit_statistic) %></span>
+          <span><%= live_patch "Edit", to: Routes.habit_statistic_index_path(@socket, :edit, habit_statistic) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: habit_statistic.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Habit statistic", to: Routes.habit_statistic_index_path(@socket, :new) %></span>
