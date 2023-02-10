@@ -31,7 +31,7 @@ erDiagram
     enum value_type "(R) task | count | measure"
     enum range "(R) day | week | month | year"
     date start "(R) inclusive"
-    date end "(R) exclusive"
+    date end "(R) inclusive"
     int value_count "num. values recorded in the range" 
     int value_sum "sum of recorded values"
     int value_mean "mean of recorded values"
