@@ -2,7 +2,6 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
   use HabitsheetWeb, :live_component
 
   alias Habitsheet.Sheets
-  alias Habitsheet.Sheets.Sheet
 
   @impl true
   def update(%{sheet: sheet} = assigns, socket) do

@@ -3,7 +3,6 @@ defmodule HabitsheetWeb.SheetLive.Index do
 
   alias Habitsheet.Sheets
   alias Habitsheet.Sheets.Sheet
-  alias Habitsheet.Sheets.Habit
 
   @impl true
   def mount(_params, _session, socket) do

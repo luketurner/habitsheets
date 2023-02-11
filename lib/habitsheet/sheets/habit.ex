@@ -8,7 +8,7 @@ defmodule Habitsheet.Sheets.Habit do
   schema "habits" do
     field :name, :string
 
-    belongs_to :sheet, Sheet
+    belongs_to :sheet, Sheet, type: :binary_id
     has_many :entry, HabitEntry
 
     timestamps()

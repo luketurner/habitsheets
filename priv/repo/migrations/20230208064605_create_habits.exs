@@ -4,7 +4,7 @@ defmodule Habitsheet.Repo.Migrations.CreateHabits do
   def change do
     create table(:habits) do
       add :name, :string
-      add :sheet_id, references(:sheets, on_delete: :delete_all), null: false
+      add :sheet_id, references(:sheets, on_delete: :delete_all, type: :binary), null: false
 
       timestamps()
     end

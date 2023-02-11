@@ -4,6 +4,9 @@ defmodule Habitsheet.Sheets.Sheet do
 
   alias Habitsheet.Sheets.Habit
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
+
   schema "sheets" do
     field :title, :string
 
