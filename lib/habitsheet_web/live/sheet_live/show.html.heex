@@ -16,12 +16,18 @@
   <div class="w-48 pr-4">
     <h1 class="font-bold inline-block">HabitSheet</h1> :: <%= @sheet.title %>
   </div>
-  <%= for day <- @days do %>
+  <div class="mx-4 w-4">
+    <button phx-click="prev_week"><%= "<<" %></button>
+  </div>
+  <%= for day <- @date_range do %>
     <div class="mx-4 w-12 text-center">
       <span><%= short_date(day) %></span>
       <%= day_of_week(day) %>
     </div>
   <% end %>
+  <div class="mx-4 w-4">
+    <button phx-click="next_week">>></button>
+  </div>
 </div>
 <%= for habit <- @habits do %>
   <div class="p-2 flex flex-row flex-nowrap border-slate-400 hover:border rounded cursor-move items-center">
@@ -33,7 +39,7 @@
     <div class="w-40 text-right pr-4">
       <a href={} class="text-blue-600 underline"><%= habit.name %></a>
     </div>
-    <%= for day <- @days do %>
+    <%= for day <- @date_range do %>
       <div class="mx-4 w-12 text-center">
         <input
           class="p-3 rounded text-blue-400"

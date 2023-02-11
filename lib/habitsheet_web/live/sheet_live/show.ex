@@ -6,12 +6,13 @@ defmodule HabitsheetWeb.SheetLive.Show do
 
   @impl true
   def mount(%{ "id" => id }, _session, socket) do
+    date_range = Sheets.get_week_range(Date.utc_today())
     {:ok, socket
       |> assign(:id, id)
       |> assign(:sheet, Sheets.get_sheet!(id))
       |> assign(:habits, list_habits(id))
-      |> assign(:days, Sheets.get_week_days())
-      |> assign(:habit_entries, all_habit_entries(id))
+      |> assign(:date_range, date_range)
+      |> assign(:habit_entries, all_habit_entries(id, date_range))
     }
   end
 
@@ -49,28 +50,46 @@ defmodule HabitsheetWeb.SheetLive.Show do
   @impl true
   def handle_event("toggle_day", %{"value" => _value, "date" => date, "habit" => habit_id}, socket) do
     Sheets.update_habit_entry_for_date(habit_id, date, 1)
-    {:noreply, assign(socket, :habit_entries, all_habit_entries(socket.assigns.id))}
+    {:noreply, assign(socket, :habit_entries, all_habit_entries(socket.assigns.id, socket.assigns.date_range))}
   end
 
   @impl true
   def handle_event("toggle_day", %{"date" => date, "habit" => habit_id}, socket) do
     Sheets.update_habit_entry_for_date(habit_id, date, 0)
-    {:noreply, assign(socket, :habit_entries, all_habit_entries(socket.assigns.id))}
+    {:noreply, assign(socket, :habit_entries, all_habit_entries(socket.assigns.id, socket.assigns.date_range))}
+  end
+
+  @impl true
+  def handle_event("prev_week", _params, socket) do
+    prev_week = Sheets.get_week_range(Date.add(socket.assigns.date_range.first, -1))
+    {:noreply, socket
+      |> assign(:date_range, prev_week)
+      |> assign(:habit_entries, all_habit_entries(socket.assigns.id, prev_week))
+    }
+  end
+
+  @impl true
+  def handle_event("next_week", _params, socket) do
+    next_week = Sheets.get_week_range(Date.add(socket.assigns.date_range.last, 1))
+    {:noreply, socket
+      |> assign(:date_range, next_week)
+      |> assign(:habit_entries, all_habit_entries(socket.assigns.id, next_week))
+    }
   end
 
   defp list_habits(sheet_id) do
     Sheets.list_habits(sheet_id)
   end
 
-  defp all_habit_entries(sheet_id) do
+  defp all_habit_entries(sheet_id, days) do
     Map.new(list_habits(sheet_id), fn habit -> {
       habit.id,
-      entries_for_habit(habit.id)
+      entries_for_habit(habit.id, days)
     } end)
   end
 
-  defp entries_for_habit(habit_id) do
-    Sheets.get_habit_entry_value_map_for_week(habit_id)
+  defp entries_for_habit(habit_id, days) do
+    Sheets.get_habit_entry_value_map(habit_id, days)
   end
 
   defp get_habit_entry_for_date(habit_entries, habit_id, date) do

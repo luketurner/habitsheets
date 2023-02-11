@@ -215,26 +215,24 @@ defmodule Habitsheet.Sheets do
     |> Repo.insert!(on_conflict: :replace_all, conflict_target: [:habit_id, :date])
   end
 
-  def get_habit_entries_for_week(habit_id) do
-    today = Date.utc_today()
+  def get_habit_entries(habit_id, date_range) do
     Repo.all(
       from entry in HabitEntry,
       select: entry,
       where: entry.habit_id == ^habit_id
-         and entry.date >= ^Date.beginning_of_week(today)
-         and entry.date <= ^Date.end_of_week(today)
+         and entry.date >= ^date_range.first
+         and entry.date <= ^date_range.last
       )
   end
 
-  def get_habit_entry_value_map_for_week(habit_id) do
-    Map.new(get_habit_entries_for_week(habit_id), fn entry -> { entry.date, entry.value } end)
+  def get_habit_entry_value_map(habit_id, date_range) do
+    Map.new(get_habit_entries(habit_id, date_range), fn entry -> { entry.date, entry.value } end)
   end
 
-  def get_week_days() do
-    today = Date.utc_today()
+  def get_week_range(date) do
     Date.range(
-      Date.beginning_of_week(today),
-      Date.end_of_week(today)
+      Date.beginning_of_week(date),
+      Date.end_of_week(date)
     )
   end
 end
