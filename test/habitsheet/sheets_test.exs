@@ -110,4 +110,60 @@ defmodule Habitsheet.SheetsTest do
       assert %Ecto.Changeset{} = Sheets.change_habit(habit)
     end
   end
+
+  describe "habit_entries" do
+    alias Habitsheet.Sheets.HabitEntry
+
+    import Habitsheet.SheetsFixtures
+
+    @invalid_attrs %{date: nil, value: nil}
+
+    test "list_habit_entries/0 returns all habit_entries" do
+      habit_entry = habit_entry_fixture()
+      assert Sheets.list_habit_entries() == [habit_entry]
+    end
+
+    test "get_habit_entry!/1 returns the habit_entry with given id" do
+      habit_entry = habit_entry_fixture()
+      assert Sheets.get_habit_entry!(habit_entry.id) == habit_entry
+    end
+
+    test "create_habit_entry/1 with valid data creates a habit_entry" do
+      valid_attrs = %{date: ~D[2023-02-10], value: 42}
+
+      assert {:ok, %HabitEntry{} = habit_entry} = Sheets.create_habit_entry(valid_attrs)
+      assert habit_entry.date == ~D[2023-02-10]
+      assert habit_entry.value == 42
+    end
+
+    test "create_habit_entry/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Sheets.create_habit_entry(@invalid_attrs)
+    end
+
+    test "update_habit_entry/2 with valid data updates the habit_entry" do
+      habit_entry = habit_entry_fixture()
+      update_attrs = %{date: ~D[2023-02-11], value: 43}
+
+      assert {:ok, %HabitEntry{} = habit_entry} = Sheets.update_habit_entry(habit_entry, update_attrs)
+      assert habit_entry.date == ~D[2023-02-11]
+      assert habit_entry.value == 43
+    end
+
+    test "update_habit_entry/2 with invalid data returns error changeset" do
+      habit_entry = habit_entry_fixture()
+      assert {:error, %Ecto.Changeset{}} = Sheets.update_habit_entry(habit_entry, @invalid_attrs)
+      assert habit_entry == Sheets.get_habit_entry!(habit_entry.id)
+    end
+
+    test "delete_habit_entry/1 deletes the habit_entry" do
+      habit_entry = habit_entry_fixture()
+      assert {:ok, %HabitEntry{}} = Sheets.delete_habit_entry(habit_entry)
+      assert_raise Ecto.NoResultsError, fn -> Sheets.get_habit_entry!(habit_entry.id) end
+    end
+
+    test "change_habit_entry/1 returns a habit_entry changeset" do
+      habit_entry = habit_entry_fixture()
+      assert %Ecto.Changeset{} = Sheets.change_habit_entry(habit_entry)
+    end
+  end
 end

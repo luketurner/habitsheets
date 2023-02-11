@@ -17,18 +17,14 @@ defmodule HabitsheetWeb.Router do
   scope "/", HabitsheetWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    live "/", SheetLive.Index, :index
+    live "/sheet/new", SheetLive.Index, :new
+    live "/sheet/:id/edit", SheetLive.Index, :edit
 
-    resources "/sheets", SheetController do
-      resources "/habits", HabitController, except: [:index]
-    end
+    live "/sheet/:id", SheetLive.Show, :show
+    live "/sheet/:id/habit/new", SheetLive.Show, :new_habit
+    live "/sheet/:id/habit/:habit_id/edit", SheetLive.Show, :edit_habit
 
-    live "/habit_statistics", HabitStatisticLive.Index, :index
-    live "/habit_statistics/new", HabitStatisticLive.Index, :new
-    live "/habit_statistics/:id/edit", HabitStatisticLive.Index, :edit
-
-    live "/habit_statistics/:id", HabitStatisticLive.Show, :show
-    live "/habit_statistics/:id/show/edit", HabitStatisticLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.

@@ -121,6 +121,8 @@ defmodule Habitsheet.Sheets do
     )
   end
 
+
+
   @doc """
   Gets a single habit.
 
@@ -200,5 +202,135 @@ defmodule Habitsheet.Sheets do
   """
   def change_habit(%Habit{} = habit, attrs \\ %{}) do
     Habit.changeset(habit, attrs)
+  end
+
+  alias Habitsheet.Sheets.HabitEntry
+
+  @doc """
+  Returns the list of habit_entries.
+
+  ## Examples
+
+      iex> list_habit_entries()
+      [%HabitEntry{}, ...]
+
+  """
+  def list_habit_entries do
+    Repo.all(HabitEntry)
+  end
+
+  @doc """
+  Gets a single habit_entry.
+
+  Raises `Ecto.NoResultsError` if the Habit entry does not exist.
+
+  ## Examples
+
+      iex> get_habit_entry!(123)
+      %HabitEntry{}
+
+      iex> get_habit_entry!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_habit_entry!(id), do: Repo.get!(HabitEntry, id)
+
+  @doc """
+  Creates a habit_entry.
+
+  ## Examples
+
+      iex> create_habit_entry(%{field: value})
+      {:ok, %HabitEntry{}}
+
+      iex> create_habit_entry(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_habit_entry(attrs \\ %{}) do
+    %HabitEntry{}
+    |> HabitEntry.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a habit_entry.
+
+  ## Examples
+
+      iex> update_habit_entry(habit_entry, %{field: new_value})
+      {:ok, %HabitEntry{}}
+
+      iex> update_habit_entry(habit_entry, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_habit_entry(%HabitEntry{} = habit_entry, attrs) do
+    habit_entry
+    |> HabitEntry.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a habit_entry.
+
+  ## Examples
+
+      iex> delete_habit_entry(habit_entry)
+      {:ok, %HabitEntry{}}
+
+      iex> delete_habit_entry(habit_entry)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_habit_entry(%HabitEntry{} = habit_entry) do
+    Repo.delete(habit_entry)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking habit_entry changes.
+
+  ## Examples
+
+      iex> change_habit_entry(habit_entry)
+      %Ecto.Changeset{data: %HabitEntry{}}
+
+  """
+  def change_habit_entry(%HabitEntry{} = habit_entry, attrs \\ %{}) do
+    HabitEntry.changeset(habit_entry, attrs)
+  end
+
+  def update_habit_entry_for_date(habit_id, date, value) do
+    # TODO -- need to update rollup statistics as well
+    %HabitEntry{}
+    |> HabitEntry.changeset(%{
+      habit_id: habit_id,
+      date: date,
+      value: value
+    })
+    |> Repo.insert!(on_conflict: :replace_all, conflict_target: [:habit_id, :date])
+  end
+
+  def get_habit_entries_for_week(habit_id) do
+    today = Date.utc_today()
+    Repo.all(
+      from entry in HabitEntry,
+      select: entry,
+      where: entry.habit_id == ^habit_id
+         and entry.date >= ^Date.beginning_of_week(today)
+         and entry.date <= ^Date.end_of_week(today)
+      )
+  end
+
+  def get_habit_entry_value_map_for_week(habit_id) do
+    Map.new(get_habit_entries_for_week(habit_id), fn entry -> { entry.date, entry.value } end)
+  end
+
+  def get_week_days() do
+    today = Date.utc_today()
+    Date.range(
+      Date.beginning_of_week(today),
+      Date.end_of_week(today)
+    )
   end
 end

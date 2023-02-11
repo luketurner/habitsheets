@@ -31,4 +31,19 @@ defmodule Habitsheet.SheetsFixtures do
 
     habit
   end
+
+  @doc """
+  Generate a habit_entry.
+  """
+  def habit_entry_fixture(attrs \\ %{}) do
+    {:ok, habit_entry} =
+      attrs
+      |> Enum.into(%{
+        date: ~D[2023-02-10],
+        value: 42
+      })
+      |> Habitsheet.Sheets.create_habit_entry()
+
+    habit_entry
+  end
 end

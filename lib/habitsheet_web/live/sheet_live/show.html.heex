@@ -1,0 +1,50 @@
+<%= if @live_action in [:new_habit, :edit_habit] do %>
+  <.modal return_to={Routes.sheet_show_path(@socket, :show, @id)}>
+    <.live_component
+      module={HabitsheetWeb.SheetLive.HabitEditor}
+      id={@habit.id || :new_habit}
+      title={@page_title}
+      action={@live_action}
+      habit={@habit}
+      sheet_id={@id}
+      return_to={Routes.sheet_show_path(@socket, :show, @id)}
+    />
+  </.modal>
+<% end %>
+
+<div class="p-2 flex flex-row flex-nowrap items-end">
+  <div class="w-48 pr-4">
+    <h1 class="font-bold inline-block">HabitSheet</h1> :: <%= @sheet.title %>
+  </div>
+  <%= for day <- @days do %>
+    <div class="mx-4 w-12 text-center">
+      <span><%= short_date(day) %></span>
+      <%= day_of_week(day) %>
+    </div>
+  <% end %>
+</div>
+<%= for habit <- @habits do %>
+  <div class="p-2 flex flex-row flex-nowrap border-slate-400 hover:border rounded cursor-move items-center">
+    <div class="w-8 text-slate-400">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+      </svg>
+    </div>
+    <div class="w-40 text-right pr-4">
+      <a href={} class="text-blue-600 underline"><%= habit.name %></a>
+    </div>
+    <%= for day <- @days do %>
+      <div class="mx-4 w-12 text-center">
+        <input
+          class="p-3 rounded text-blue-400"
+          type="checkbox"
+          phx-click="toggle_day"
+          phx-value-date={day}
+          phx-value-habit={habit.id}
+          checked={get_habit_entry_for_date(@habit_entries, habit.id, day) == 1}
+        >
+      </div>
+    <% end %>
+  </div>
+<% end %>
+<%= live_patch "New habit...", to: Routes.sheet_show_path(@socket, :new_habit, @id) %>

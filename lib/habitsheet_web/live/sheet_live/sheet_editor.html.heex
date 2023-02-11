@@ -4,11 +4,15 @@
   <.form
     let={f}
     for={@changeset}
-    id="habit_statistic-form"
+    id="sheet-form"
     phx-target={@myself}
     phx-change="validate"
     phx-submit="save">
-  
+
+    <%= label f, :title %>
+    <%= text_input f, :title %>
+    <%= error_tag f, :title %>
+
     <div>
       <%= submit "Save", phx_disable_with: "Saving..." %>
     </div>

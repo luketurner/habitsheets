@@ -1,0 +1,32 @@
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.sheet_index_path(@socket, :index)}>
+    <.live_component
+      module={HabitsheetWeb.SheetLive.SheetEditor}
+      id={@sheet.id || :new}
+      title={@page_title}
+      action={@live_action}
+      sheet={@sheet}
+      return_to={Routes.sheet_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<div class="p-2 flex flex-row flex-nowrap items-end">
+  <div class="w-48 pr-4">
+    <h1 class="font-bold inline-block">HabitSheet</h1> :: All Sheets
+  </div>
+</div>
+<%= for sheet <- @sheets do %>
+  <div class="p-2 flex flex-row flex-nowrap items-center">
+    <div class="w-40 text-right pr-4">
+      <%= live_redirect sheet.title, to: Routes.sheet_show_path(@socket, :show, sheet.id) %>
+    </div>
+    <div class="mx-4 w-12 text-center">
+      <%= live_patch "Edit...", to: Routes.sheet_index_path(@socket, :edit, sheet.id) %>
+    </div>
+    <div class="mx-4 w-12 text-center">
+      <%= link "Delete", to: "#", phx_click: "delete", phx_value_id: sheet.id, data: [confirm: "Are you sure?"] %>
+    </div>
+  </div>
+<% end %>
+<%= live_patch "New sheet...", to: Routes.sheet_index_path(@socket, :new) %>
