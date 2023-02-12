@@ -14,7 +14,7 @@
 
 <div class="p-2 flex flex-row flex-nowrap items-end">
   <div class="w-48 pr-4 flex flex-col flex-nowrap items-end flex-grow-0 flex-shrink-0">
-    <h1 class="font-bold">HabitSheet :: <%= @sheet.title %></h1>
+    <h1 class="font-bold"><%= @sheet.title %></h1>
     <button class="text-blue-600 underline" phx-click="prev_week"><%= "<<" %></button>
   </div>
   <%= for day <- @date_range do %>

@@ -10,9 +10,28 @@
     <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
   </head>
   <body>
-    <%= render "_user_menu.html", assigns %>
-    <main class="container mx-auto">
-      <%= @inner_content %>
-    </main>
+    <div class="container mx-auto max-w-5xl min-h-screen flex flex-col flex-nowrap">
+      <nav class="flex flex-row flex-nowrap py-4 px-8">
+        <h1 class="font-bold pr-4">
+          <%= link "HabitSheets", to: Routes.home_path(@conn, :index) %>
+        </h1>
+        <%= link "All Sheets", to: Routes.sheet_index_path(@conn, :index), class: "text-blue-500 underline" %>
+        <div class="flex-grow"></div>
+        <%= if @current_user do %>
+          <div class="pr-4"><%= @current_user.email %></div>
+          <div class="pr-4"><%= link "Settings", to: Routes.user_settings_path(@conn, :edit), class: "text-blue-500 underline" %></div>
+          <div><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete, class: "text-blue-500 underline" %></div>
+        <% else %>
+          <div class="pr-4"><%= link "Register", to: Routes.user_registration_path(@conn, :new), class: "text-blue-500 underline" %></div>
+          <div><%= link "Log in", to: Routes.user_session_path(@conn, :new), class: "text-blue-500 underline" %></div>
+        <% end %>
+      </nav>
+      <main class="py-4 px-8 flex-grow self-start">
+        <%= @inner_content %>
+      </main>
+      <footer class="flex flex-row flex-nowrap py-4 px-8 justify-center">
+        Copyright 2023 Luke Turner -&nbsp;<a class="text-blue-500 underline" href="https://github.com/luketurner/habitsheets">Github</a>
+      </footer>
+    </div>
   </body>
 </html>

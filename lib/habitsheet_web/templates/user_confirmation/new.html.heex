@@ -1,15 +1,10 @@
-<h1>Resend confirmation instructions</h1>
+<h1 class="text-xl font-bold pb-4">Resend confirmation instructions</h1>
 
 <.form let={f} for={:user} action={Routes.user_confirmation_path(@conn, :create)}>
-  <%= label f, :email %>
+  <%= label f, :email, class: "w-48 inline-block text-right p-4" %>
   <%= email_input f, :email, required: true %>
 
-  <div>
-    <%= submit "Resend confirmation instructions" %>
+  <div class="w-48 p-4 text-right">
+    <%= submit "Resend confirmation instructions", class: "text-blue-500 underline" %>
   </div>
 </.form>
-
-<p>
-  <%= link "Register", to: Routes.user_registration_path(@conn, :new) %> |
-  <%= link "Log in", to: Routes.user_session_path(@conn, :new) %>
-</p>
