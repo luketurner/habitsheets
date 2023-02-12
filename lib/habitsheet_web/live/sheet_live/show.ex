@@ -23,19 +23,25 @@ defmodule HabitsheetWeb.SheetLive.Show do
 
   defp apply_action(socket, :edit_habit, %{"habit_id" => habit_id}) do
     socket
-    |> assign(:page_title, "Edit habit...")
+    |> assign(:page_title, "Edit habit")
     |> assign(:habit, Sheets.get_habit!(habit_id))
   end
 
   defp apply_action(socket, :new_habit, _params) do
     socket
-    |> assign(:page_title, "New habit...")
+    |> assign(:page_title, "New habit")
     |> assign(:habit, %Habit{})
   end
 
   defp apply_action(socket, :show, _params) do
     socket
     |> assign(:page_title, "Sheet")
+    |> assign(:habit, nil)
+  end
+
+  defp apply_action(socket, :share, _params) do
+    socket
+    |> assign(:page_title, "Share Sheet")
     |> assign(:habit, nil)
   end
 

@@ -9,6 +9,7 @@ defmodule Habitsheet.Sheets.Sheet do
 
   schema "sheets" do
     field :title, :string
+    field :share_id, :binary_id
 
     belongs_to :user, User
     has_many :habit, Habit
@@ -19,7 +20,7 @@ defmodule Habitsheet.Sheets.Sheet do
   @doc false
   def changeset(sheet, attrs) do
     sheet
-    |> cast(attrs, [:title, :user_id])
+    |> cast(attrs, [:title, :user_id, :share_id])
     |> validate_required([:title, :user_id])
   end
 end

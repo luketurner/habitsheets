@@ -23,7 +23,6 @@ defmodule HabitsheetWeb.Router do
     get "/", HomeController, :index
 
     scope "/sheets" do
-
       live_session :user, on_mount: HabitsheetWeb.UserLiveAuth do
         pipe_through :require_authenticated_user
         live "/", SheetLive.Index, :index
@@ -31,11 +30,14 @@ defmodule HabitsheetWeb.Router do
         live "/:id/edit", SheetLive.Index, :edit
 
         live "/:id", SheetLive.Show, :show
+        live "/:id/share", SheetLive.Show, :share
         live "/:id/habits/new", SheetLive.Show, :new_habit
         live "/:id/habits/:habit_id/edit", SheetLive.Show, :edit_habit
       end
+    end
 
-
+    scope "/share" do
+      get "/:id", SharedSheetController, :show
     end
 
   end

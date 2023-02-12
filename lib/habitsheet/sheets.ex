@@ -43,6 +43,9 @@ defmodule Habitsheet.Sheets do
   """
   def get_sheet!(id), do: Repo.get!(Sheet, id)
 
+  def get_sheet_by_share_id!(id), do: Repo.get_by!(Sheet, share_id: id)
+
+
   @doc """
   Creates a sheet.
 
@@ -77,6 +80,18 @@ defmodule Habitsheet.Sheets do
     sheet
     |> Sheet.changeset(attrs)
     |> Repo.update()
+  end
+
+  def share_sheet(%Sheet{} = sheet) do
+    update_sheet(sheet, %{
+      share_id: Ecto.UUID.generate()
+    })
+  end
+
+  def unshare_sheet(%Sheet{} = sheet) do
+    update_sheet(sheet, %{
+      share_id: nil
+    })
   end
 
   @doc """

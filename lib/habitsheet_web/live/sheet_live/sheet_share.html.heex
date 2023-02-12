@@ -1,0 +1,35 @@
+<div>
+  <h2 class="text-lg font-bold pb-4"><%= @title %></h2>
+
+  <%= if @sheet.share_id do %>
+    <div class="form-control w-full max-w-xs">
+      <div class="input-group">
+        <input type="text" class="input input-bordered" readonly value={@share_url} placeholder="No sharing URL">
+        <button class="btn" onclick={"navigator.clipboard.writeText('#{@share_url}')"}>Copy</button>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="py-4">
+    <%= link if(@sheet.share_id, do: "Regenerate URL", else: "Get Public URL"),
+      to: "#",
+      phx_target: @myself,
+      phx_click: "share",
+      class: "btn btn-primary mr-4"
+      #data: if(@sheet.share_id, do: [confirm: "Your previous share link will stop working. Are you sure?"])
+    %>
+    <%= if @sheet.share_id do %>
+      <%= link "Unshare",
+        to: "#",
+        phx_target: @myself,
+        phx_click: "unshare",
+        class: "btn btn"
+        #data: [confirm: "All share links for this sheet will stop working. Are you sure?"]
+      %>
+    <% end %>
+  </div>
+
+  <div class="modal-action">
+    <%= live_patch "OK", to: @return_to, class: "btn" %>
+  </div>
+</div>
