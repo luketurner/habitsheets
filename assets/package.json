@@ -1,0 +1,15 @@
+{
+  "name": "assets",
+  "version": "0.0.0",
+  "description": "",
+  "main": "js/app.js",
+  "dependencies": {
+    "daisyui": "^2.50.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luke Turner",
+  "license": "MIT"
+}
