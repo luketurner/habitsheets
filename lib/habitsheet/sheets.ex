@@ -19,8 +19,12 @@ defmodule Habitsheet.Sheets do
       [%Sheet{}, ...]
 
   """
-  def list_sheets do
-    Repo.all(Sheet)
+  def list_sheets(user_id) do
+    Repo.all(
+      from s in Sheet,
+      select: s,
+      where: s.user_id == ^user_id
+    )
   end
 
   @doc """

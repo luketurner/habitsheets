@@ -41,7 +41,9 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
   end
 
   defp save_sheet(socket, :new, sheet_params) do
-    case Sheets.create_sheet(sheet_params) do
+    case Sheets.create_sheet(
+      Map.put(sheet_params, "user_id", socket.assigns.user_id)
+    ) do
       {:ok, _sheet} ->
         {:noreply,
          socket

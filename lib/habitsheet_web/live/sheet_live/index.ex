@@ -7,7 +7,7 @@ defmodule HabitsheetWeb.SheetLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket
-      |> assign(:sheets, list_sheets())
+      |> assign(:sheets, list_sheets(socket.assigns.current_user.id))
     }
   end
 
@@ -39,10 +39,10 @@ defmodule HabitsheetWeb.SheetLive.Index do
     sheet = Sheets.get_sheet!(id)
     {:ok, _} = Sheets.delete_sheet(sheet)
 
-    {:noreply, assign(socket, :sheets, list_sheets())}
+    {:noreply, assign(socket, :sheets, list_sheets(socket.assigns.current_user.id))}
   end
 
-  defp list_sheets() do
-    Sheets.list_sheets()
+  defp list_sheets(current_user_id) do
+    Sheets.list_sheets(current_user_id)
   end
 end

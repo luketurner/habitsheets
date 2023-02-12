@@ -6,6 +6,7 @@
       title={@page_title}
       action={@live_action}
       sheet={@sheet}
+      user_id={@current_user.id}
       return_to={Routes.sheet_index_path(@socket, :index)}
     />
   </.modal>
