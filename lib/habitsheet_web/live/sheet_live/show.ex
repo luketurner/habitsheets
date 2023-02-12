@@ -40,7 +40,7 @@ defmodule HabitsheetWeb.SheetLive.Show do
   end
 
   @impl true
-  def handle_event("delete", %{"habit_id" => habit_id}, socket) do
+  def handle_event("delete_habit", %{"id" => habit_id}, socket) do
     habit = Sheets.get_habit!(habit_id)
     {:ok, _} = Sheets.delete_habit(habit)
 

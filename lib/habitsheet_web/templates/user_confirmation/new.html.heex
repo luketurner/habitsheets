@@ -1,10 +1,13 @@
 <h1 class="text-xl font-bold pb-4">Resend confirmation instructions</h1>
 
 <.form let={f} for={:user} action={Routes.user_confirmation_path(@conn, :create)}>
-  <%= label f, :email, class: "w-48 inline-block text-right p-4" %>
-  <%= email_input f, :email, required: true %>
 
-  <div class="w-48 p-4 text-right">
-    <%= submit "Resend confirmation instructions", class: "text-blue-500 underline" %>
+  <div class="form-control w-full max-w-xs">
+    <%= label f, :email, class: "label label-text" %>
+    <%= email_input f, :email, required: true, class: "input input-bordered w-full max-w-xs" %>
+  </div>
+
+  <div class="py-4">
+    <%= submit "Resend confirmation instructions", class: "btn btn-primary" %>
   </div>
 </.form>

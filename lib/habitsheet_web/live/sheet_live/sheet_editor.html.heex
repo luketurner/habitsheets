@@ -9,12 +9,14 @@
     phx-change="validate"
     phx-submit="save">
 
-    <%= label f, :title, class: "w-32 inline-block text-right p-2" %>
-    <%= text_input f, :title %>
-    <%= error_tag f, :title %>
+    <div class="form-control w-full max-w-xs">
+      <%= label f, :title, class: "label label-text" %>
+      <%= text_input f, :title, required: true, class: "input input-bordered w-full max-w-xs" %>
+      <%= error_tag f, :title %>
+    </div>
 
-    <div>
-      <%= submit "Save", phx_disable_with: "Saving..." %>
+    <div class="modal-action">
+      <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
     </div>
   </.form>
 </div>

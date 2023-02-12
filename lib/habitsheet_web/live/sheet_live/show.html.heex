@@ -13,41 +13,51 @@
 <% end %>
 
 <div class="p-2 flex flex-row flex-nowrap items-end">
-  <div class="w-48 pr-4 flex flex-col flex-nowrap items-end flex-grow-0 flex-shrink-0">
-    <h1 class="font-bold"><%= @sheet.title %></h1>
-    <button class="text-blue-600 underline" phx-click="prev_week"><%= "<<" %></button>
+  <div class="w-64 pr-4 flex flex-col flex-nowrap items-end flex-grow-0 flex-shrink-0">
+    <button class="btn btn-ghost" phx-click="prev_week"><%= "<<" %></button>
   </div>
   <%= for day <- @date_range do %>
-    <div class="mx-4 w-12 text-center flex-grow-0 flex-shrink-0">
-      <span><%= short_date(day) %></span>
-      <%= day_of_week(day) %>
+    <div class="mx-4 w-16 text-center flex-grow-0 flex-shrink-0">
+      <div class="btn btn-ghost flex-col flex-nowrap justify-center">
+        <div class="mb-1"><%= short_date(day) %></div>
+        <div><%= day_of_week(day) %></div>
+      </div>
     </div>
   <% end %>
   <div class="mx-4 w-4 flex-grow-0">
-    <button class="text-blue-600 underline" phx-click="next_week">>></button>
+    <button class="btn btn-ghost" phx-click="next_week">>></button>
   </div>
 </div>
 <%= for habit <- @habits do %>
-  <div class="p-2 flex flex-row flex-nowrap border-slate-400 hover:border rounded cursor-move items-center">
-    <div class="w-48 text-right pr-4 flex-grow-0 flex-shrink-0">
-      <a href={} class="text-blue-600 underline"><%= habit.name %></a>
+  <div class="p-2 flex flex-row flex-nowrap items-center">
+    <div class="w-64 pr-4 flex-grow-0 flex-shrink-0 flex flex-row items-center">
+      <%= link "X", to: "#", phx_click: "delete_habit", phx_value_id: habit.id, data: [confirm: "Are you sure?"], class: "btn btn-error btn-sm btn-outline mr-3" %>
+      <%= live_patch "Edit", to: Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id), class: "btn btn-sm btn-outline" %>
+      <span class="flex-grow text-right">
+        <%= habit.name %>
+      </span>
     </div>
     <%= for day <- @date_range do %>
-      <div class="mx-4 w-12 text-center flex-grow-0 flex-shrink-0">
-        <input
-          class="p-3 rounded text-blue-400"
-          type="checkbox"
-          phx-click="toggle_day"
-          phx-value-date={day}
-          phx-value-habit={habit.id}
-          checked={get_habit_entry_for_date(@habit_entries, habit.id, day) == 1}
-        >
+      <div class="mx-4 w-16 h-6 text-center flex-grow-0 flex-shrink-0">
+        <label class="swap">
+          <input
+            type="checkbox"
+            phx-click="toggle_day"
+            phx-value-date={day}
+            phx-value-habit={habit.id}
+            checked={get_habit_entry_for_date(@habit_entries, habit.id, day) == 1}
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="fill-green-700 swap-on w-8 h-8">
+            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="stroke-slate-500 swap-off w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </label>
       </div>
     <% end %>
   </div>
 <% end %>
 <div class="p-2 flex flex-row flex-nowrap items-end">
-  <div class="w-48 pr-4 text-right">
-    <%= live_patch "New habit...", to: Routes.sheet_show_path(@socket, :new_habit, @id), class: "text-blue-600 underline" %>
-  </div>
+  <%= live_patch "New habit", to: Routes.sheet_show_path(@socket, :new_habit, @id), class: "btn btn-primary btn-sm btn-outline" %>
 </div>

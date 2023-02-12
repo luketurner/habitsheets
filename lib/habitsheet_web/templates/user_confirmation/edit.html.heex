@@ -1,12 +1,7 @@
 <h1 class="text-xl font-bold pb-4">Confirm account</h1>
 
 <.form let={_f} for={:user} action={Routes.user_confirmation_path(@conn, :update, @token)}>
-  <div class="w-48 p-4 text-right">
-    <%= submit "Confirm my account", class: "text-blue-500 underline" %>
+  <div>
+    <%= submit "Confirm my account", class: "btn btn-primary" %>
   </div>
 </.form>
-
-<p>
-  <%= link "Register", to: Routes.user_registration_path(@conn, :new) %> |
-  <%= link "Log in", to: Routes.user_session_path(@conn, :new) %>
-</p>

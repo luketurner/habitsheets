@@ -14,15 +14,20 @@
 
 <%= for sheet <- @sheets do %>
   <div class="p-2 flex flex-row flex-nowrap items-center">
-    <div class="w-40 text-right pr-4">
-      <%= live_redirect sheet.title, to: Routes.sheet_show_path(@socket, :show, sheet.id) %>
+    <div class="w-40 pr-4">
+      <%= sheet.title %>
     </div>
-    <div class="mx-4 w-12 text-center">
-      <%= live_patch "Edit...", to: Routes.sheet_index_path(@socket, :edit, sheet.id) %>
+    <div class="mx-2">
+      <%= live_redirect "Open", to: Routes.sheet_show_path(@socket, :show, sheet.id), class: "btn btn-primary btn-sm btn-outline" %>
     </div>
-    <div class="mx-4 w-12 text-center">
-      <%= link "Delete", to: "#", phx_click: "delete", phx_value_id: sheet.id, data: [confirm: "Are you sure?"] %>
+    <div class="mx-2">
+      <%= live_patch "Edit", to: Routes.sheet_index_path(@socket, :edit, sheet.id), class: "btn btn-sm btn-outline" %>
+    </div>
+    <div class="mx-2">
+      <%= link "X", to: "#", phx_click: "delete", phx_value_id: sheet.id, data: [confirm: "Are you sure?"], class: "btn btn-error btn-sm btn-outline" %>
     </div>
   </div>
 <% end %>
-<%= live_patch "New sheet...", to: Routes.sheet_index_path(@socket, :new) %>
+<div class="ml-40 p-4">
+  <%= live_patch "New sheet", to: Routes.sheet_index_path(@socket, :new), class: "btn btn-primary btn-sm btn-outline" %>
+</div>

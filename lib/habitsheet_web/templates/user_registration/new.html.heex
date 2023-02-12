@@ -7,20 +7,18 @@
     </div>
   <% end %>
 
-  <div>
-    <%= label f, :email, class: "w-48 inline-block text-right p-4" %>
-    <%= email_input f, :email, required: true %>
+  <div class="form-control w-full max-w-xs">
+    <%= label f, :email, class: "label label-text" %>
+    <%= email_input f, :email, required: true, class: "input input-bordered w-full max-w-xs" %>
     <%= error_tag f, :email %>
-
   </div>
-
-  <div>
-    <%= label f, :password, class: "w-48 inline-block text-right p-4" %>
-    <%= password_input f, :password, required: true %>
+  <div class="form-control w-full max-w-xs">
+    <%= label f, :password, class: "label label-text" %>
+    <%= password_input f, :password, required: true, class: "input input-bordered w-full max-w-xs" %>
     <%= error_tag f, :password %>
   </div>
 
-  <div class="p-4">
-    <%= submit "Register", class: "text-blue-500 underline w-40 mr-8 text-right" %>
+  <div class="py-4">
+    <%= submit "Register", class: "btn btn-primary" %>
   </div>
 </.form>
