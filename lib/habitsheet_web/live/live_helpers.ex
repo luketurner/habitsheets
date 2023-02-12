@@ -27,10 +27,10 @@ defmodule HabitsheetWeb.LiveHelpers do
     assigns = assign_new(assigns, :return_to, fn -> nil end)
 
     ~H"""
-    <div id="modal" class="phx-modal" phx-remove={hide_modal()}>
+    <div id="modal" class="modal modal-open" phx-remove={hide_modal()}>
       <div
         id="modal-content"
-        class="phx-modal-content modal-box"
+        class="modal-box"
         phx-click-away={JS.dispatch("click", to: "#close")}
         phx-window-keydown={JS.dispatch("click", to: "#close")}
         phx-key="escape"
