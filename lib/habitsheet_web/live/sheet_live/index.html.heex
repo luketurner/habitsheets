@@ -2,7 +2,7 @@
   <.modal return_to={Routes.sheet_index_path(@socket, :index)}>
     <.live_component
       module={HabitsheetWeb.SheetLive.SheetEditor}
-      id={@sheet.id || :new}
+      id={if @sheet, do: @sheet.id, else: :new}
       title={@page_title}
       action={@live_action}
       sheet={@sheet}

@@ -25,4 +25,8 @@ defmodule HabitsheetWeb.OwnedSheetLiveAuth do
     end
   end
 
+  # fallback for "index" route which has no id param
+  def on_mount(:default, _params, _session, socket) do
+    {:cont, socket}
+  end
 end
