@@ -6,6 +6,6 @@ defmodule Habitsheet.Repo.Migrations.AddUserToSheets do
       add :user_id, references(:users, on_delete: :delete_all), null: false
     end
 
-    create index(:sheets_user_id, [:user_id])
+    create index(:sheets, [:user_id])
   end
 end

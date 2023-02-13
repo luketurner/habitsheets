@@ -6,6 +6,6 @@ defmodule Habitsheet.Repo.Migrations.AddShareIdToSheets do
       add :share_id, :binary
     end
 
-    create index(:sheets_share_id, [:share_id])
+    create index(:sheets, [:share_id])
   end
 end
