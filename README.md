@@ -2,6 +2,8 @@
 
 HabitSheet is a Web application for habit tracking. A demo instance is available at https://habitsheets.fly.dev.
 
+Source code is published with the MIT License.
+
 ## Tech notes
 
 An experiment with the so-called PETAL (Phoenix, Elixir, TailwindCSS, AlpineJS, LiveView) stack.
