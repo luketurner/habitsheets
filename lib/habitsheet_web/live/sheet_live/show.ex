@@ -4,12 +4,13 @@ defmodule HabitsheetWeb.SheetLive.Show do
   alias Habitsheet.Sheets
   alias Habitsheet.Sheets.Habit
 
+  on_mount HabitsheetWeb.OwnedSheetLiveAuth
+
   @impl true
   def mount(%{ "id" => id }, _session, socket) do
     date_range = Sheets.get_week_range(Date.utc_today())
     {:ok, socket
       |> assign(:id, id)
-      |> assign(:sheet, Sheets.get_sheet!(id))
       |> assign(:habits, list_habits(id))
       |> assign(:date_range, date_range)
       |> assign(:habit_entries, all_habit_entries(id, date_range))

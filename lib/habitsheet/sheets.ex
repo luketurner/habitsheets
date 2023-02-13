@@ -41,7 +41,7 @@ defmodule Habitsheet.Sheets do
       ** (Ecto.NoResultsError)
 
   """
-  def get_sheet!(id), do: Repo.get!(Sheet, id)
+  def get_sheet!(user_id, id), do: Repo.get_by!(Sheet, [id: id, user_id: user_id])
 
   def get_sheet_by_share_id!(id), do: Repo.get_by!(Sheet, share_id: id)
 

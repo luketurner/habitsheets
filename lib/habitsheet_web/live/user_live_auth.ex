@@ -4,11 +4,17 @@ defmodule HabitsheetWeb.UserLiveAuth do
 
   alias Habitsheet.Users
 
-  def on_mount(:default, _params, session, socket) do
-    if current_user = Users.get_user_by_session_token(session["user_token"]) do
-      {:cont, assign(socket, :current_user, current_user)}
+  def on_mount(:default, _params, %{"user_token" => user_token}, socket) do
+    socket = assign_new(socket, :current_user, fn ->
+      Users.get_user_by_session_token(user_token)
+    end)
+    if socket.assigns.current_user.id do
+      {:cont, socket}
     else
-      {:halt}
+      {:halt,
+       socket
+       |> put_flash(:error, "Please login to view this page.")
+       |> redirect(to: HabitsheetWeb.Router.Helpers.user_session_path(socket, :new))}
     end
   end
 
