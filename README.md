@@ -23,6 +23,7 @@ Install dependencies:
 1. Erlang
 2. Elixir
 3. Docker (or Postgresql)
+4. Node version 12+ w/NPM
 
 Then run:
 
@@ -30,13 +31,15 @@ Then run:
 # Run a postgres server (Or you can install one w/o using Docker)
 docker run -d -p 5432:5432 --name habitsheetpg -e POSTGRES_PASSWORD=postgres postgres:15 
 
-mix deps.get
-mix ecto.setup
+# install all dependencies / run migrations / etc.
+mix setup
+
+# launch devserver
 mix phx.server
 ```
 
 To deploy:
 
-```
-fly deploy --remote-only
+```bash
+mix fly.deploy
 ```
