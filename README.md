@@ -15,6 +15,7 @@ More explicitly, the following 3rd party libraries/technologies are used:
 - [TailwindCSS](https://tailwindcss.com/)
 - [Heroicons](https://heroicons.com/)
 - [daisyUI](https://daisyui.com/)
+- [Fly.io](https://fly.io/)
 
 ## Development
 
@@ -25,11 +26,12 @@ Install dependencies:
 3. Docker (or Postgresql)
 4. Node version 12+ w/NPM
 
-Then run:
+For local development, run:
 
 ```bash
-# Run a postgres server (Or you can install one w/o using Docker)
-docker run -d -p 5432:5432 --name habitsheetpg -e POSTGRES_PASSWORD=postgres postgres:15 
+# Run a Postgres server with Docker
+mix pg.dev.setup
+mix pg.dev.start
 
 # install all dependencies / run migrations / etc.
 mix setup

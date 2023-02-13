@@ -69,7 +69,9 @@ defmodule Habitsheet.MixProject do
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["cmd --cd assets npm ci"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],
-      "fly.deploy": ["cmd fly deploy --remote-only"]
+      "fly.deploy": ["cmd fly deploy --remote-only"],
+      "pg.dev.setup": ["cmd docker run -d -p 5432:5432 --name habitsheets -e POSTGRES_PASSWORD=postgres postgres:15"],
+      "pg.dev.start": ["cmd docker start habitsheets"]
     ]
   end
 end
