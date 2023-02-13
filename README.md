@@ -47,3 +47,24 @@ To deploy:
 ```bash
 mix fly.deploy
 ```
+
+## Observability / etc.
+
+When running locally, Phoenix LiveDashboard is available at http://localhost:4000/dashboard. When running in production, use the Fly managed Grafana dashboard.
+
+To connect to the app and inspect state in production:
+
+```bash
+# Open an IEx connection
+fly ssh console -C "/app/bin/habitsheet remote"
+```
+
+For example, once connected with `iex`, we can use Ecto to inspect state in the production DB:
+
+```bash
+# Count of sheets
+Habitsheet.Repo.aggregate(Habitsheet.Sheets.Sheet, :count)
+
+# List all users
+Habitsheet.Repo.all(Ecto.Query.from u in Habitsheet.Users.User)
+```
