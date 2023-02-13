@@ -1,6 +1,6 @@
 # HabitSheet
 
-HabitSheet is a Web application for habit tracking.
+HabitSheet is a Web application for habit tracking. A demo instance is available at https://habitsheets.fly.dev.
 
 ## Tech notes
 
@@ -33,4 +33,10 @@ docker run -d -p 5432:5432 --name habitsheetpg -e POSTGRES_PASSWORD=postgres pos
 mix deps.get
 mix ecto.setup
 mix phx.server
+```
+
+To deploy:
+
+```
+fly deploy --remote-only
 ```
