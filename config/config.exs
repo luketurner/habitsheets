@@ -7,6 +7,10 @@
 # General application configuration
 import Config
 
+# application custom config values
+config :habitsheet,
+  require_email_verification: true
+
 config :habitsheet,
   ecto_repos: [Habitsheet.Repo]
 

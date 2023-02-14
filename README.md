@@ -65,7 +65,10 @@ mix setup
 mix phx.server
 ```
 
-When running locally, Phoenix LiveDashboard is available at http://localhost:4000/dashboard.
+When running locally, there are some routes available for easier testing:
+
+- http://localhost:4000/dev/mailbox -- development email mailbox
+- http://localhost:4000/dashboard -- Phoenix LiveDashboard
 
 ### Deployment steps and self-hosting
 
@@ -88,6 +91,25 @@ Deploy new versions of the site with:
 ```bash
 mix fly.deploy
 ```
+
+HabitSheets is configured to send mails over SMTP with TLS/SSL and user-password auth. For this to work you'll need to set environment variables:
+
+```bash
+fly secrets set \
+  MAILER_SMTP_RELAY="smtp.example.com"
+  MAILER_SMTP_PORT="587"
+  MAILER_SMTP_USERNAME="foobar"
+  MAILER_SMTP_PASSWORD="password"
+```
+
+If you want to use HabitSheets without setting up a mailer, you can disable the requirement for email verification by setting this value in `config/config.exs`:
+
+```elixir
+config :habitsheet,
+  require_email_verification: false # <--
+```
+
+### Other notes
 
 To connect to the app and inspect state in production:
 

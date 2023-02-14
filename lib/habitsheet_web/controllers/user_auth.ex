@@ -129,7 +129,15 @@ defmodule HabitsheetWeb.UserAuth do
   """
   def require_authenticated_user(conn, _opts) do
     if conn.assigns[:current_user] do
-      conn
+      if !require_email_verification?() || conn.assigns.current_user.confirmed_at do
+        conn
+      else
+        conn
+        |> put_flash(:error, "Please click the link in the verification email to activate your account.")
+        |> maybe_store_return_to()
+        |> redirect(to: Routes.user_confirmation_path(conn, :new))
+        |> halt()
+      end
     else
       conn
       |> put_flash(:error, "You must log in to access this page.")
@@ -146,4 +154,6 @@ defmodule HabitsheetWeb.UserAuth do
   defp maybe_store_return_to(conn), do: conn
 
   defp signed_in_path(_conn), do: "/"
+
+  defp require_email_verification?(), do: Application.get_env(:habitsheet, :require_email_verification)
 end

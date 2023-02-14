@@ -65,19 +65,19 @@ if config_env() == :prod do
 
   # ## Configuring the mailer
   #
-  # In production you need to configure the mailer to use a different adapter.
-  # Also, you may need to configure the Swoosh API client of your choice if you
-  # are not using SMTP. Here is an example of the configuration:
-  #
-  #     config :habitsheet, Habitsheet.Mailer,
-  #       adapter: Swoosh.Adapters.Mailgun,
-  #       api_key: System.get_env("MAILGUN_API_KEY"),
-  #       domain: System.get_env("MAILGUN_DOMAIN")
-  #
-  # For this example you need include a HTTP client required by Swoosh API client.
-  # Swoosh supports Hackney and Finch out of the box:
-  #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
-  #
-  # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+  config :habitsheet, Habitsheet.Mailer,
+    adapter: Swoosh.Adapters.SMTP,
+    relay: System.get_env("MAILER_SMTP_RELAY"),
+    username: System.get_env("MAILER_SMTP_USERNAME"),
+    password: System.get_env("MAILER_SMTP_PASSWORD"),
+    ssl: true,
+    tls: :always,
+    auth: :always,
+    port: String.to_integer(System.get_env("MAILER_SMTP_PORT", "587")),
+  # dkim: [
+  #   s: "default", d: "domain.com",
+  #   private_key: {:pem_plain, File.read!("priv/keys/domain.private")}
+  # ],
+    retries: 2
+  # no_mx_lookups: false
 end

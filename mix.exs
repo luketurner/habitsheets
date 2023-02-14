@@ -52,6 +52,7 @@ defmodule Habitsheet.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
       {:ecto_psql_extras, "~> 0.6"},
+      {:gen_smtp, "~> 1.1"}
     ]
   end
 
