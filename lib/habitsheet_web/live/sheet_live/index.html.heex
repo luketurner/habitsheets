@@ -1,12 +1,11 @@
-<%= if @live_action in [:new, :edit] do %>
+<%= if @live_action == :new do %>
   <.modal return_to={Routes.sheet_index_path(@socket, :index)}>
     <.live_component
       module={HabitsheetWeb.SheetLive.SheetEditor}
-      id={if @sheet, do: @sheet.id, else: :new}
+      id={:new}
       title={@page_title}
       action={@live_action}
-      sheet={@sheet}
-      user_id={@current_user.id}
+      current_user={@current_user}
       return_to={Routes.sheet_index_path(@socket, :index)}
     />
   </.modal>
@@ -19,9 +18,6 @@
     </div>
     <div class="mx-2">
       <%= live_redirect "Open", to: Routes.sheet_show_path(@socket, :show, sheet.id), class: "btn btn-primary btn-sm btn-outline" %>
-    </div>
-    <div class="mx-2">
-      <%= live_patch "Edit", to: Routes.sheet_index_path(@socket, :edit, sheet.id), class: "btn btn-sm btn-outline" %>
     </div>
     <div class="mx-2">
       <%= link "X", to: "#", phx_click: "delete", phx_value_id: sheet.id, data: [confirm: "Are you sure?"], class: "btn btn-error btn-sm btn-outline" %>

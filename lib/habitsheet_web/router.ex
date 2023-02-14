@@ -27,9 +27,9 @@ defmodule HabitsheetWeb.Router do
         pipe_through :require_authenticated_user
         live "/", SheetLive.Index, :index
         live "/new", SheetLive.Index, :new
-        live "/:id/edit", SheetLive.Index, :edit
 
         live "/:id", SheetLive.Show, :show
+        live "/:id/edit", SheetLive.Show, :edit
         live "/:id/share", SheetLive.Show, :share
         live "/:id/habits/new", SheetLive.Show, :new_habit
         live "/:id/habits/:habit_id/edit", SheetLive.Show, :edit_habit

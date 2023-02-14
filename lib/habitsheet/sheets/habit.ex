@@ -4,10 +4,12 @@ defmodule Habitsheet.Sheets.Habit do
 
   alias Habitsheet.Sheets.Sheet
   alias Habitsheet.Sheets.HabitEntry
+  alias Habitsheet.Users.User
 
   schema "habits" do
     field :name, :string
 
+    belongs_to :user, User
     belongs_to :sheet, Sheet, type: :binary_id
     has_many :entry, HabitEntry
 
@@ -17,7 +19,7 @@ defmodule Habitsheet.Sheets.Habit do
   @doc false
   def changeset(habit, attrs) do
     habit
-    |> cast(attrs, [:name, :sheet_id])
-    |> validate_required([:name, :sheet_id])
+    |> cast(attrs, [:name, :sheet_id, :user_id])
+    |> validate_required([:name, :sheet_id, :user_id])
   end
 end

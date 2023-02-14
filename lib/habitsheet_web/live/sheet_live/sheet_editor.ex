@@ -2,15 +2,24 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
   use HabitsheetWeb, :live_component
 
   alias Habitsheet.Sheets
+  alias Habitsheet.Sheets.Sheet
 
   @impl true
   def update(%{sheet: sheet} = assigns, socket) do
-    changeset = Sheets.change_sheet(sheet)
-
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:changeset, changeset)}
+     |> assign(:changeset, Sheets.change_sheet(sheet))}
+  end
+
+  @impl true
+  def update(%{action: :new} = assigns, socket) do
+    new_sheet = %Sheet{}
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(:sheet, new_sheet)
+     |> assign(:changeset, Sheets.change_sheet(new_sheet))}
   end
 
   @impl true
@@ -28,7 +37,7 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
   end
 
   defp save_sheet(socket, :edit, sheet_params) do
-    case Sheets.update_sheet(socket.assigns.sheet, sheet_params) do
+    case Sheets.update_sheet!(socket.assigns.current_user.id, socket.assigns.sheet, sheet_params) do
       {:ok, _sheet} ->
         {:noreply,
          socket
@@ -42,7 +51,8 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
 
   defp save_sheet(socket, :new, sheet_params) do
     case Sheets.create_sheet(
-      Map.put(sheet_params, "user_id", socket.assigns.user_id)
+      socket.assigns.current_user.id,
+      sheet_params
     ) do
       {:ok, _sheet} ->
         {:noreply,

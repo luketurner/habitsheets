@@ -24,9 +24,4 @@ defmodule HabitsheetWeb.OwnedSheetLiveAuth do
        |> redirect(to: HabitsheetWeb.Router.Helpers.sheet_index_path(socket, :index))}
     end
   end
-
-  # fallback for "index" route which has no id param
-  def on_mount(:default, _params, _session, socket) do
-    {:cont, socket}
-  end
 end

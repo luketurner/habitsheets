@@ -7,6 +7,7 @@
       action={@live_action}
       habit={@habit}
       sheet_id={@id}
+      current_user={@current_user}
       return_to={Routes.sheet_show_path(@socket, :show, @id)}
     />
   </.modal>
@@ -19,6 +20,21 @@
       id={:share}
       title={@page_title}
       sheet={@sheet}
+      current_user={@current_user}
+      return_to={Routes.sheet_show_path(@socket, :show, @id)}
+    />
+  </.modal>
+<% end %>
+
+<%= if @live_action == :edit do %>
+  <.modal return_to={Routes.sheet_show_path(@socket, :show, @id)}>
+    <.live_component
+      module={HabitsheetWeb.SheetLive.SheetEditor}
+      id={:edit}
+      title={@page_title}
+      action={@live_action}
+      sheet={@sheet}
+      current_user={@current_user}
       return_to={Routes.sheet_show_path(@socket, :show, @id)}
     />
   </.modal>
@@ -26,7 +42,8 @@
 
 <div class="p-2 flex flex-row flex-nowrap items-end">
   <div class="w-64 pr-4 flex flex-row flex-nowrap justify-between items-center flex-grow-0 flex-shrink-0">
-    <%= live_patch "Share Sheet", to: Routes.sheet_show_path(@socket, :share, @id), class: "btn btn-sm btn-outline" %>
+    <%= live_patch "Edit", to: Routes.sheet_show_path(@socket, :edit, @id), class: "btn btn-sm btn-outline" %>
+    <%= live_patch "Share", to: Routes.sheet_show_path(@socket, :share, @id), class: "btn btn-sm btn-outline" %>
     <button class="btn btn-ghost" phx-click="prev_week"><%= "<<" %></button>
   </div>
   <%= for day <- @date_range do %>

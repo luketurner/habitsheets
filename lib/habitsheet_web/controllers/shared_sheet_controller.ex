@@ -15,8 +15,9 @@ defmodule HabitsheetWeb.SharedSheetController do
     )
   end
 
-  defp list_habits(sheet_id) do
-    Sheets.list_habits(sheet_id)
+  defp list_habits(_sheet_id) do
+    [] # TODO
+    # Sheets.list_habits(sheet_id)
   end
 
   defp all_habit_entries(sheet_id, days) do
@@ -26,8 +27,9 @@ defmodule HabitsheetWeb.SharedSheetController do
     } end)
   end
 
-  defp entries_for_habit(habit_id, days) do
-    Sheets.get_habit_entry_value_map(habit_id, days)
+  defp entries_for_habit(_habit_id, _days) do
+    [] # TODO
+    # Sheets.get_habit_entry_value_map!(habit_id, days)
   end
 
 end
