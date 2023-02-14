@@ -14,6 +14,7 @@ defmodule HabitsheetWeb.SheetLive.Show do
       |> assign(:habits, list_habits(socket, id))
       |> assign(:date_range, date_range)
       |> assign(:habit_entries, all_habit_entries(socket, id, date_range))
+      |> assign(:subtitle, socket.assigns.sheet.title || "Unnamed Sheet")
     }
   end
 
