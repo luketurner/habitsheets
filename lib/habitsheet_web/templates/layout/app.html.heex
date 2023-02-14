@@ -1,3 +1,19 @@
-<p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-<p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+<div class="toast toast-top toast-center">
+  <%= if info_flash = get_flash(@conn, :info) do %>
+    <div class="alert alert-info shadow-lg" role="alert">
+      <div>
+        <span><%= info_flash %></span>
+      </div>
+    </div>
+  <% end %>
+
+  <%= if error_flash = get_flash(@conn, :error) do %>
+    <div class="alert alert-error shadow-lg" role="alert">
+      <div>
+        <span><%= error_flash %></span>
+      </div>
+    </div>
+  <% end %>
+</div>
+
 <%= @inner_content %>
