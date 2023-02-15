@@ -92,7 +92,7 @@ Deploy new versions of the site with:
 mix fly.deploy
 ```
 
-HabitSheets is configured to send mails over SMTP with TLS/SSL and user-password auth. For this to work you'll need to set environment variables:
+HabitSheets is configured to send mails over SMTP with StartTLS and user-password auth. For this to work you'll need to set environment variables:
 
 ```bash
 fly secrets set \

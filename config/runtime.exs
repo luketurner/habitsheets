@@ -70,8 +70,8 @@ if config_env() == :prod do
     relay: System.get_env("MAILER_SMTP_RELAY"),
     username: System.get_env("MAILER_SMTP_USERNAME"),
     password: System.get_env("MAILER_SMTP_PASSWORD"),
-    ssl: true,
-    tls: :always,
+    # ssl: true,
+    # tls: :always,
     auth: :always,
     port: String.to_integer(System.get_env("MAILER_SMTP_PORT", "587")),
   # dkim: [
