@@ -8,7 +8,7 @@ defmodule Habitsheet.Users.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"HabitSheets", Application.get_env(:habitsheets, :outgoing_email_address)})
+      |> from({"HabitSheets", Application.get_env(:habitsheet, :outgoing_email_address)})
       |> subject(subject)
       |> text_body(body)
 
