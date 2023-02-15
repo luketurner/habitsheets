@@ -9,7 +9,8 @@ import Config
 
 # application custom config values
 config :habitsheet,
-  require_email_verification: true
+  require_email_verification: true,
+  outgoing_email_address: "habitsheets@example.com"
 
 config :habitsheet,
   ecto_repos: [Habitsheet.Repo]

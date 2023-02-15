@@ -80,4 +80,9 @@ if config_env() == :prod do
   # ],
     retries: 2
   # no_mx_lookups: false
+
+  # application custom config values
+  config :habitsheet,
+    outgoing_email_address: System.get_env("MAILER_OUTGOING_EMAIL")
+
 end
