@@ -99,6 +99,8 @@ defmodule HabitsheetWeb do
       import HabitsheetWeb.ErrorHelpers
       import HabitsheetWeb.Gettext
       alias HabitsheetWeb.Router.Helpers, as: Routes
+
+      alias HabitsheetWeb.Components, as: UI
     end
   end
 
