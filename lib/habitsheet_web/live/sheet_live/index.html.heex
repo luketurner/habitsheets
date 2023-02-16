@@ -17,13 +17,15 @@
       <%= sheet.title %>
     </div>
     <div class="mx-2">
-      <%= live_redirect "Open", to: Routes.sheet_show_path(@socket, :show, sheet.id), class: "btn btn-primary btn-sm btn-outline" %>
+      <.link class="btn btn-primary btn-sm btn-outline" navigate={Routes.sheet_show_path(@socket, :show, sheet.id)}>Open</.link>
     </div>
     <div class="mx-2">
-      <%= link "X", to: "#", phx_click: "delete", phx_value_id: sheet.id, data: [confirm: "Are you sure?"], class: "btn btn-error btn-sm btn-outline" %>
+      <.link class="btn btn-error btn-sm btn-outline" href="#" phx-click="delete" phx-value-id={sheet.id} data-confirm="Are you sure?">
+        X
+      </.link>
     </div>
   </div>
 <% end %>
 <div class="ml-40 p-4">
-  <%= live_patch "New sheet", to: Routes.sheet_index_path(@socket, :new), class: "btn btn-primary btn-sm btn-outline" %>
+  <.link class="btn btn-primary btn-sm btn-outline" patch={Routes.sheet_index_path(@socket, :new)}>New sheet</.link>
 </div>

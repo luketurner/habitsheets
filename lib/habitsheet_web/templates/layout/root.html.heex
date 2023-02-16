@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="csrf-token" content={csrf_token_value()}>
-    <%= live_title_tag assigns[:page_title] || "Home", suffix: " · HabitSheet" %>
+    <.live_title suffix=" · HabitSheet">
+      <%= assigns[:page_title] || "Home" %>
+    </.live_title>
     <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
     <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
   </head>
@@ -13,19 +15,19 @@
     <div class="container mx-auto max-w-5xl min-h-screen flex flex-col flex-nowrap">
       <nav class="navbar bg-base-100">
         <h1>
-          <%= link "HabitSheets", to: Routes.home_path(@conn, :index), class: "btn btn-ghost normal-case text-xl" %>
+          <.link class="btn btn-ghost normal-case text-xl" href={Routes.home_path(@conn, :index)}>HabitSheets</.link>
         </h1>
         <div class="flex-grow p-2">
-          <%= if Map.has_key?(@conn.assigns, :subtitle), do: @subtitle %>
+          <!-- subtitle -->
         </div>
         <%= if @current_user do %>
           <div class="p-2"><%= @current_user.email %></div>
-          <%= link "All Sheets", to: Routes.sheet_index_path(@conn, :index), class: "btn btn-ghost normal-case" %>
-          <div><%= link "Settings", to: Routes.user_settings_path(@conn, :edit), class: "btn btn-ghost normal-case" %></div>
-          <div><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete, class: "btn btn-ghost normal-case" %></div>
+          <.link class="btn btn-ghost normal-case" href={Routes.sheet_index_path(@conn, :index)}>All Sheets</.link>
+          <.link class="btn btn-ghost normal-case" href={Routes.user_settings_path(@conn, :edit)}>Settings</.link>
+          <.link class="btn btn-ghost normal-case" href={Routes.user_session_path(@conn, :delete)} method="delete">Log out</.link>
         <% else %>
-          <div><%= link "Register", to: Routes.user_registration_path(@conn, :new), class: "btn btn-ghost normal-case" %></div>
-          <div><%= link "Log in", to: Routes.user_session_path(@conn, :new), class: "btn btn-ghost normal-case" %></div>
+          <.link class="btn btn-ghost normal-case" href={Routes.user_registration_path(@conn, :new)}>Register</.link>
+          <.link class="btn btn-ghost normal-case" href={Routes.user_session_path(@conn, :new)}>Log in</.link>
         <% end %>
       </nav>
       <main class="py-4 px-8 flex-grow self-start w-full">
@@ -33,7 +35,7 @@
       </main>
       <footer class="footer footer-center p-4">
         <div>
-          <p>Copyright 2023 Luke Turner -&nbsp;<a class="text-blue-500 underline" href="https://github.com/luketurner/habitsheets">Github</a></p>
+          <p>Copyright 2023 Luke Turner -&nbsp;<.link class="text-blue-500 underline" href="https://github.com/luketurner/habitsheets">Github</.link></p>
         </div>
       </footer>
     </div>

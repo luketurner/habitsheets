@@ -39,10 +39,11 @@
     />
   </.modal>
 <% end %>
+
 <div class="p-2 flex flex-row flex-nowrap items-end">
-  <%= live_patch "New habit", to: Routes.sheet_show_path(@socket, :new_habit, @id), class: "btn btn-primary btn-sm btn-outline mr-4" %>
-  <%= live_patch "Rename sheet", to: Routes.sheet_show_path(@socket, :edit, @id), class: "btn btn-sm btn-outline mr-4" %>
-  <%= live_patch "Share sheet", to: Routes.sheet_show_path(@socket, :share, @id), class: "btn btn-sm btn-outline" %>
+  <.link class="btn btn-primary btn-sm btn-outline mr-4" patch={Routes.sheet_show_path(@socket, :new_habit, @id)}>New habit</.link>
+  <.link class="btn btn-sm btn-outline mr-4" patch={Routes.sheet_show_path(@socket, :edit, @id)}>Rename sheet</.link>
+  <.link class="btn btn-sm btn-outline" patch={Routes.sheet_show_path(@socket, :share, @id)}>Share sheet</.link>
 </div>
 <div>
   <div class="p-2 flex flex-row flex-nowrap items-end">
@@ -64,8 +65,15 @@
   <%= for habit <- @habits do %>
     <div class="p-2 flex flex-row flex-nowrap items-center">
       <div class="w-64 pr-4 flex-grow-0 flex-shrink-0 flex flex-row items-center">
-        <%= link "X", to: "#", phx_click: "delete_habit", phx_value_id: habit.id, data: [confirm: "Are you sure?"], class: "btn btn-error btn-sm btn-outline mr-3" %>
-        <%= live_patch "Edit", to: Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id), class: "btn btn-sm btn-outline" %>
+        <.link
+          class="btn btn-error btn-sm btn-outline mr-3"
+          href="#"
+          phx-click="delete_habit"
+          phx-value-id={habit.id}
+          data-confirm="Are you sure?">
+          X
+        </.link>
+        <.link class="btn btn-sm btn-outline" patch={Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id)}>Edit</.link>
         <span class="flex-grow text-right">
           <%= habit.name %>
         </span>

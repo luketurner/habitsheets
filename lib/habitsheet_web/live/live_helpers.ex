@@ -1,6 +1,5 @@
 defmodule HabitsheetWeb.LiveHelpers do
-  import Phoenix.LiveView
-  import Phoenix.LiveView.Helpers
+  import Phoenix.Component
 
   alias Phoenix.LiveView.JS
 
@@ -36,14 +35,9 @@ defmodule HabitsheetWeb.LiveHelpers do
         phx-key="escape"
       >
         <%= if @return_to do %>
-          <%= live_patch "✕",
-            to: @return_to,
-            id: "close",
-            class: "absolute right-2 top-2 btn btn-sm btn-circle",
-            phx_click: hide_modal()
-          %>
+          <.link patch={@return_to} id="close" class="absolute right-2 top-2 btn btn-sm btn-circle" phx-click={hide_modal()}>✕</.link>
         <% else %>
-          <a id="close" href="#" class="absolute right-2 top-2 btn btn-sm btn-circle" phx-click={hide_modal()}>✕</a>
+          <.link href="#" id="close" class="absolute right-2 top-2 btn btn-sm btn-circle" phx-click={hide_modal()}>✕</.link>
         <% end %>
 
         <%= render_slot(@inner_block) %>

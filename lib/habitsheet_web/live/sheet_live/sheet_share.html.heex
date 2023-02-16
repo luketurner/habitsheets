@@ -11,25 +11,15 @@
   <% end %>
 
   <div class="py-4">
-    <%= link if(@sheet.share_id, do: "Regenerate URL", else: "Get Public URL"),
-      to: "#",
-      phx_target: @myself,
-      phx_click: "share",
-      class: "btn btn-primary mr-4"
-      #data: if(@sheet.share_id, do: [confirm: "Your previous share link will stop working. Are you sure?"])
-    %>
+      <.link class="btn btn-primary mr-4" href="#" phx-click="share" phx-target={@myself}>
+        <%= if @sheet.share_id, do: "Regenerate URL", else: "Get Public URL" %>
+      </.link>
     <%= if @sheet.share_id do %>
-      <%= link "Unshare",
-        to: "#",
-        phx_target: @myself,
-        phx_click: "unshare",
-        class: "btn btn"
-        #data: [confirm: "All share links for this sheet will stop working. Are you sure?"]
-      %>
+      <.link class="btn" href="#" phx-click="unshare" phx-target={@myself}>Unshare</.link>
     <% end %>
   </div>
 
   <div class="modal-action">
-    <%= live_patch "OK", to: @return_to, class: "btn" %>
+    <.link class="btn" patch={@return_to}>OK</.link>
   </div>
 </div>
