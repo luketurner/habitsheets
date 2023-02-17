@@ -52,10 +52,10 @@
     </div>
     <%= for day <- @date_range do %>
       <div class="mx-2 w-16 text-center flex-grow-0 flex-shrink-0">
-        <div class="btn btn-ghost flex-col flex-nowrap justify-center">
+        <.link navigate={Routes.daily_review_show_path(@socket, :show, @id, Date.to_iso8601(day))} class="btn btn-ghost flex-col flex-nowrap justify-center">
           <div class="mb-1"><%= short_date(day) %></div>
           <div><%= day_of_week(day) %></div>
-        </div>
+        </.link>
       </div>
     <% end %>
     <div class="mx-2 w-16 flex-grow-0">

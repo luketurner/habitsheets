@@ -78,6 +78,9 @@ defmodule Habitsheet.Sheets do
   """
   def update_sheet!(user_id, %Sheet{} = sheet, attrs) do
     if get_sheet!(user_id, sheet.id) do
+      # don't allow overwriting owner
+      Map.delete(attrs, :user_id)
+
       sheet
       |> Sheet.changeset(attrs)
       |> Repo.update()
@@ -206,6 +209,9 @@ defmodule Habitsheet.Sheets do
   """
   def update_habit!(user_id, %Habit{} = habit, attrs) do
     if get_habit!(user_id, habit.id) do
+      # don't allow overwriting owner
+      Map.delete(attrs, :user_id)
+
       habit
       |> Habit.changeset(attrs)
       |> Repo.update!()
@@ -287,6 +293,18 @@ defmodule Habitsheet.Sheets do
     Date.range(
       Date.beginning_of_week(date),
       Date.end_of_week(date)
+    )
+  end
+
+  def get_habit_entries_for_date(user_id, sheet_id, date) do
+    Repo.all(
+      from habit in Habit,
+      join: entry in HabitEntry,
+      on: entry.habit_id == habit.id,
+      select: %{habit | entry: entry},
+      where: habit.sheet_id == ^sheet_id
+         and habit.user_id == ^user_id
+         and entry.date == ^date
     )
   end
 end

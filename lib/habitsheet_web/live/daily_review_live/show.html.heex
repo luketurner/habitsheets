@@ -1,0 +1,7 @@
+<p>
+Hi there with review <%= @review.id %>
+</p>
+
+<%= for habit <- @habit_entries do %>
+  <%= habit.id %> - <%= habit.name %> - <%= habit.entry.date %> - <%= habit.entry.value %>
+<% end %>
