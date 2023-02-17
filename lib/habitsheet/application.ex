@@ -15,9 +15,9 @@ defmodule Habitsheet.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Habitsheet.PubSub},
       # Start the Endpoint (http/https)
-      HabitsheetWeb.Endpoint
-      # Start a worker by calling: Habitsheet.Worker.start_link(arg)
-      # {Habitsheet.Worker, arg}
+      HabitsheetWeb.Endpoint,
+      # Start background tasks
+      Habitsheet.Reviews.Scheduler
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

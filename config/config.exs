@@ -61,6 +61,16 @@ config :tailwind, version: "3.2.4", default: [
   cd: Path.expand("../assets", __DIR__)
 ]
 
+config :habitsheet, Habitsheet.Reviews.Scheduler,
+  overlap: false,
+  run_strategy: Quantum.RunStrategy.Local,
+  jobs: [
+    fill_reviews: [
+      schedule: "@hourly",
+      task: {Habitsheet.Reviews.Scheduler, :fill_reviews_task, []}
+    ]
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

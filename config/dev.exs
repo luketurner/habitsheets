@@ -74,3 +74,11 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# run scheduled jobs more rapidly
+config :habitsheet, Habitsheet.Reviews.Scheduler,
+  jobs: [
+    fill_reviews: [
+      schedule: "@minutely",
+    ]
+  ]

@@ -126,4 +126,14 @@ defmodule Habitsheet.Reviews do
   def change_daily_review(%DailyReview{} = daily_review, attrs \\ %{}) do
     DailyReview.changeset(daily_review, attrs)
   end
+
+  def fill_reviews() do
+    with {:ok, _} = fill_daily_reviews() do
+      {:ok}
+    end
+  end
+
+  def fill_daily_reviews() do
+    {:ok, []}
+  end
 end
