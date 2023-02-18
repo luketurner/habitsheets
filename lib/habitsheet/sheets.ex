@@ -166,7 +166,7 @@ defmodule Habitsheet.Sheets do
       Repo.all(
         from habit in Habit,
         select: habit,
-        where: habit.sheet_id == ^sheet_id
+        where: habit.sheet_id == ^sheet_id and is_nil(habit.archived_at)
       )
     else
       raise "Could not find sheet"
@@ -256,6 +256,13 @@ defmodule Habitsheet.Sheets do
 
   def delete_habit_by_id!(user_id, habit_id) do
     Repo.delete_all(from h in Habit, where: h.id == ^habit_id and h.user_id == ^user_id)
+  end
+
+  def archive_habit_by_id!(user_id, habit_id) do
+    Repo.update_all(
+      from(h in Habit, where: h.id == ^habit_id and h.user_id == ^user_id),
+      set: [archived_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)]
+    )
   end
 
   @doc """

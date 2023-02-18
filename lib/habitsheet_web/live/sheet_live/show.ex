@@ -60,8 +60,8 @@ defmodule HabitsheetWeb.SheetLive.Show do
   end
 
   @impl true
-  def handle_event("delete_habit", %{"id" => habit_id}, socket) do
-    Sheets.delete_habit_by_id!(socket.assigns.current_user.id, habit_id)
+  def handle_event("archive_habit", %{"id" => habit_id}, socket) do
+    Sheets.archive_habit_by_id!(socket.assigns.current_user.id, habit_id)
 
     {:noreply, assign(socket, :habits, list_habits(socket, socket.assigns.id))}
   end

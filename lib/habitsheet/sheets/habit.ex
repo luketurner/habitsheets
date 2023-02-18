@@ -13,6 +13,8 @@ defmodule Habitsheet.Sheets.Habit do
     belongs_to :sheet, Sheet, type: :binary_id
     has_many :entry, HabitEntry
 
+    field :archived_at, :naive_datetime
+
     timestamps()
   end
 
