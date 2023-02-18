@@ -11,6 +11,8 @@ defmodule Habitsheet.Reviews do
 
   alias Habitsheet.Sheets
   alias Habitsheet.Sheets.Sheet
+  alias Habitsheet.Sheets.Habit
+  alias Habitsheet.Sheets.HabitEntry
 
   alias Habitsheet.Users
   alias Habitsheet.Users.User
@@ -225,6 +227,19 @@ defmodule Habitsheet.Reviews do
   def temp_send_email_stub(review, email) do
     IO.puts("sending email for daily review #{review.id} to email #{email}")
     {:ok}
+  end
+
+  def get_habits_for_daily_review(review) do
+    Repo.all(
+      from habit in Habit,
+      left_join: entry in HabitEntry, on: entry.habit_id == habit.id,
+      select: %{habit | entry: entry},
+      where: habit.sheet_id == ^review.sheet_id
+         and habit.user_id == ^review.user_id
+         and (is_nil(entry.id) or entry.date == ^review.date)
+         # habit needs to either: not be archived, or have an entry
+         and (is_nil(habit.archived_at) or not is_nil(entry.id))
+    )
   end
 
   # @doc """

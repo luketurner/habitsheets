@@ -2,6 +2,11 @@
 Hi there with review <%= @review.id %>
 </p>
 
-<%= for habit <- @habit_entries do %>
-  <%= habit.id %> - <%= habit.name %> - <%= habit.entry.date %> - <%= habit.entry.value %>
+<%= for habit <- @habits do %>
+  <div>
+  <%= habit.id %> - <%= habit.name %> - <%= habit.archived_at %>
+  <%= if habit.entry do %>
+    <%= habit.entry.date %> - <%= habit.entry.value %>
+  <% end %>
+  </div>
 <% end %>
