@@ -59,47 +59,28 @@
   <.link class="btn btn-sm btn-outline mr-4" patch={Routes.sheet_show_path(@socket, :share, @id)}>Share sheet</.link>
 </div>
 <div>
-  <div class="p-2 flex flex-row flex-nowrap items-end">
-    <div class="w-64 pr-4 flex flex-row flex-nowrap justify-end items-center flex-grow-0 flex-shrink-0">
-      <button class="btn btn-ghost" phx-click="prev_week"><%= "<<" %></button>
-    </div>
-    <%= for day <- @date_range do %>
-      <div class="mx-2 w-16 text-center flex-grow-0 flex-shrink-0">
-        <.link navigate={Routes.daily_review_show_path(@socket, :show, @id, Date.to_iso8601(day))} class="btn btn-ghost flex-col flex-nowrap justify-center">
-          <div class="mb-1"><%= short_date(day) %></div>
-          <div><%= day_of_week(day) %></div>
-        </.link>
-      </div>
-    <% end %>
-    <div class="mx-2 w-16 flex-grow-0">
-      <button class="btn btn-ghost" phx-click="next_week">>></button>
-    </div>
-  </div>
+  <UI.date_heading_line date_range={@date_range}>
+    <:prev><.link phx-click="prev_week" class="btn btn-ghost"><%= "<<" %></.link></:prev>
+    <:date :let={day}>
+      <.link navigate={Routes.daily_review_show_path(@socket, :show, @id, Date.to_iso8601(day))} class="btn btn-ghost flex-col flex-nowrap justify-center">
+        <div class="mb-1"><%= short_date(day) %></div>
+        <div><%= day_of_week(day) %></div>
+      </.link>
+    </:date>
+    <:next><.link phx-click="next_week" class="btn btn-ghost">>></.link></:next>
+  </UI.date_heading_line>
   <%= for habit <- @habits do %>
-    <div class="p-2 flex flex-row flex-nowrap items-center">
-      <div class="w-64 pr-4 flex-grow-0 flex-shrink-0 flex flex-row items-center">
-        <.link
-          class="btn btn-error btn-sm btn-outline mr-3"
-          href="#"
-          phx-click="archive_habit"
-          phx-value-id={habit.id}
-          data-confirm="Are you sure?">
-          X
-        </.link>
-        <.link class="btn btn-sm btn-outline" patch={Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id)}>Edit</.link>
-        <span class="flex-grow text-right">
-          <%= habit.name %>
-        </span>
-      </div>
-      <%= for day <- @date_range do %>
-        <div class="mx-2 w-16 h-6 text-center flex-grow-0 flex-shrink-0">
-          <UI.habit_entry_status
-            click="toggle_day"
-            entry={get_habit_entry_for_date(@habit_entries, habit.id, day)}
-            date={day}
-            habit_id={habit.id} />
-        </div>
-      <% end %>
-    </div>
+    <UI.habit_entry_line
+      habit={habit}
+      date_range={@date_range}
+      entry_map={Map.get(@habit_entries, habit.id, %{})}
+      delete_attrs={%{
+        phx_click: "archive_habit",
+        href: "#",
+        phx_value_id: habit.id,
+        data_confirm: "Are you sure?"
+      }}
+      edit_attrs={%{patch: Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id)}}
+    />
   <% end %>
 </div>

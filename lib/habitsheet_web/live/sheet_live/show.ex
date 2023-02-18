@@ -105,11 +105,11 @@ defmodule HabitsheetWeb.SheetLive.Show do
     Sheets.get_habit_entry_value_map(socket.assigns.current_user.id, habit_id, days)
   end
 
-  defp get_habit_entry_for_date(habit_entries, habit_id, date) do
-    habit_entries
-    |> Map.get(habit_id, Map.new())
-    |> Map.get(date, nil)
-  end
+  # defp get_habit_entry_for_date(habit_entries, habit_id, date) do
+  #   habit_entries
+  #   |> Map.get(habit_id, Map.new())
+  #   |> Map.get(date, nil)
+  # end
 
   defp short_date(date) do
     "#{date.month}/#{date.day}"

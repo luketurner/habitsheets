@@ -21,11 +21,24 @@ defmodule HabitsheetWeb.Components do
   attr :entry, Habitsheet.Sheets.HabitEntry
   attr :readonly, :boolean, default: false
   attr :click, :any, default: nil
-
+  attr :rest, :global, default: %{class: "swap"}
   # these must be specified to create new entries in case entry is nil
   attr :date, Date, default: nil
   attr :habit_id, :any, default: nil
-
-  attr :rest, :global, default: %{class: "swap"}
   def habit_entry_status(assigns)
+
+  attr :habit, Habitsheets.Sheets.Habit, required: true
+  attr :date_range, DateRange, required: true
+  attr :entry_map, :map, default: %{}
+  attr :delete_attrs, :map, default: nil
+  attr :edit_attrs, :map, default: nil
+  attr :rest, :global, default: %{class: ""}
+  def habit_entry_line(assigns)
+
+  attr :date_range, DateRange, required: true
+  attr :rest, :global, default: %{class: ""}
+  slot :next
+  slot :prev
+  slot :date
+  def date_heading_line(assigns)
 end

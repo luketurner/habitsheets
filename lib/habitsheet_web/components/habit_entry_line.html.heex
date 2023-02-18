@@ -1,0 +1,29 @@
+<div {@rest}>
+  <div class="p-2 flex flex-row flex-nowrap items-center">
+    <div class="w-64 pr-4 flex-grow-0 flex-shrink-0 flex flex-row items-center">
+      <%= if @delete_attrs do %>
+        <.link
+          class="btn btn-error btn-sm btn-outline mr-3"
+          href="#"
+          {@delete_attrs}>
+          X
+        </.link>
+      <% end %>
+      <%= if @edit_attrs do %>
+        <.link class="btn btn-sm btn-outline" {@edit_attrs}>Edit</.link>
+      <% end %>
+      <span class="flex-grow text-right">
+        <UI.habit_label habit={@habit} />
+      </span>
+    </div>
+    <%= for date <- @date_range do %>
+      <div class="mx-2 w-16 h-6 text-center flex-grow-0 flex-shrink-0">
+        <UI.habit_entry_status
+          click="toggle_day"
+          entry={Map.get(@entry_map, date, nil)}
+          date={date}
+          habit_id={@habit.id} />
+      </div>
+    <% end %>
+  </div>
+</div>
