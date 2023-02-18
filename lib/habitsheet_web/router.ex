@@ -31,7 +31,6 @@ defmodule HabitsheetWeb.Router do
         live "/:id", SheetLive.Show, :show
         live "/:id/edit", SheetLive.Show, :edit
         live "/:id/share", SheetLive.Show, :share
-        live "/:id/review_settings", SheetLive.Show, :review_settings
         live "/:id/habits/new", SheetLive.Show, :new_habit
         live "/:id/habits/:habit_id/edit", SheetLive.Show, :edit_habit
 
