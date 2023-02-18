@@ -114,7 +114,7 @@ defmodule HabitsheetWeb.SheetLive.Show do
   defp get_habit_entry_for_date(habit_entries, habit_id, date) do
     habit_entries
     |> Map.get(habit_id, Map.new())
-    |> Map.get(date, 0)
+    |> Map.get(date, nil)
   end
 
   defp short_date(date) do

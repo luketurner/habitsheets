@@ -307,7 +307,7 @@ defmodule Habitsheet.Sheets do
   end
 
   def get_habit_entry_value_map(user_id, habit_id, date_range) do
-    Map.new(get_habit_entries!(user_id, habit_id, date_range), fn entry -> { entry.date, entry.value } end)
+    Map.new(get_habit_entries!(user_id, habit_id, date_range), fn entry -> { entry.date, entry } end)
   end
 
   def get_week_range(date) do

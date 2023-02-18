@@ -1,12 +1,10 @@
-<p>
-Hi there with review <%= @review.id %>
-</p>
+<UI.page_title>
+  <%= @review.date %> :: Daily Review
+</UI.page_title>
 
 <%= for habit <- @habits do %>
   <div>
-  <%= habit.id %> - <%= habit.name %> - <%= habit.archived_at %>
-  <%= if habit.entry do %>
-    <%= habit.entry.date %> - <%= habit.entry.value %>
-  <% end %>
+    <UI.habit_label habit={habit} />
+    <UI.habit_entry_status entry={habit.entry} readonly={true} />
   </div>
 <% end %>
