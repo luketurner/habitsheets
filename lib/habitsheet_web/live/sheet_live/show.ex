@@ -47,6 +47,11 @@ defmodule HabitsheetWeb.SheetLive.Show do
     |> assign(:habit, nil)
   end
 
+  defp apply_action(socket, :review_settings, _params) do
+    socket
+    |> assign(:page_title, "Review Settings")
+    |> assign(:habit, nil)
+  end
 
   defp apply_action(socket, :edit, _params) do
     socket

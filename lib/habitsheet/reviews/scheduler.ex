@@ -4,6 +4,11 @@ defmodule Habitsheet.Reviews.Scheduler do
   alias Habitsheet.Reviews
 
   def fill_reviews_task() do
-    Reviews.fill_reviews()
+    num_days = Application.get_env(:habitsheet, :review_fill_days)
+    today = Date.utc_today()
+    date_range = Date.range(Date.add(today, -num_days), today)
+
+    Reviews.fill_daily_reviews(date_range)
+    Reviews.send_emails_for_daily_reviews_with_pending_attempts()
   end
 end

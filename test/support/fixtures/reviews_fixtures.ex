@@ -19,4 +19,21 @@ defmodule Habitsheet.ReviewsFixtures do
 
     daily_review
   end
+
+  @doc """
+  Generate a daily_review_email.
+  """
+  def daily_review_email_fixture(attrs \\ %{}) do
+    {:ok, daily_review_email} =
+      attrs
+      |> Enum.into(%{
+        address: "some address",
+        retry_num: 42,
+        status: :success,
+        trigger: :fill_review
+      })
+      |> Habitsheet.Reviews.create_daily_review_email()
+
+    daily_review_email
+  end
 end

@@ -10,7 +10,10 @@ import Config
 # application custom config values
 config :habitsheet,
   require_email_verification: true,
-  outgoing_email_address: "habitsheets@example.com"
+  outgoing_email_address: "habitsheets@example.com",
+  review_retention_days: 365,
+  review_fill_days: 3,
+  review_email_max_failure_count: 2
 
 config :habitsheet,
   ecto_repos: [Habitsheet.Repo]

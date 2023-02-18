@@ -27,6 +27,8 @@ defmodule Habitsheet.Sheets do
     )
   end
 
+  # def list_all_sheets(), do: Repo.all(Sheet)
+
   @doc """
   Gets a single sheet.
 
@@ -76,7 +78,7 @@ defmodule Habitsheet.Sheets do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_sheet!(user_id, %Sheet{} = sheet, attrs) do
+  def update_sheet(user_id, %Sheet{} = sheet, attrs) do
     if get_sheet!(user_id, sheet.id) do
       # don't allow overwriting owner
       Map.delete(attrs, :user_id)
@@ -90,16 +92,28 @@ defmodule Habitsheet.Sheets do
   end
 
   def share_sheet!(user_id, %Sheet{} = sheet) do
-    update_sheet!(user_id, sheet, %{
+    update_sheet(user_id, sheet, %{
       share_id: Ecto.UUID.generate()
     })
   end
 
   def unshare_sheet!(user_id, %Sheet{} = sheet) do
-    update_sheet!(user_id, sheet, %{
+    update_sheet(user_id, sheet, %{
       share_id: nil
     })
   end
+
+  # def enable_daily_review_emails!(user_id, %Sheet{} = sheet) do
+  #   update_sheet!(user_id, sheet, %{
+  #     daily_review_email_enabled: true
+  #   })
+  # end
+
+  # def disable_daily_review_emails!(user_id, %Sheet{} = sheet) do
+  #   update_sheet!(user_id, sheet, %{
+  #     daily_review_email_enabled: false
+  #   })
+  # end
 
   @doc """
   Deletes a sheet.

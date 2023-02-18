@@ -350,4 +350,6 @@ defmodule Habitsheet.Users do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  def list_users(), do: Repo.all(from u in User, select: u, where: not is_nil(u.confirmed_at))
 end

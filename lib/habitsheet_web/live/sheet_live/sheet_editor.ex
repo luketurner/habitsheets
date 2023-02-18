@@ -37,10 +37,11 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
   end
 
   defp save_sheet(socket, :edit, sheet_params) do
-    case Sheets.update_sheet!(socket.assigns.current_user.id, socket.assigns.sheet, sheet_params) do
-      {:ok, _sheet} ->
+    case Sheets.update_sheet(socket.assigns.current_user.id, socket.assigns.sheet, sheet_params) do
+      {:ok, sheet} ->
         {:noreply,
          socket
+         |> assign(:sheet, sheet)
          |> put_flash(:info, "Sheet updated")
          |> push_redirect(to: socket.assigns.return_to)}
 

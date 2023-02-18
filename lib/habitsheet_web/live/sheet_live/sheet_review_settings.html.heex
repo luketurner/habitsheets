@@ -1,0 +1,29 @@
+<div>
+  <h2 class="text-lg font-bold pb-4"><%= @title %></h2>
+
+  <.form
+    :let={f}
+    for={@changeset}
+    id="sheet-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save">
+
+    <div class="form-control w-full max-w-xs py-2">
+      <%= label f, :daily_review_email_enabled, class: "label cursor-pointer" do %>
+        <span class="label-text">Send reviews to your email daily</span>
+        <%= checkbox f, :daily_review_email_enabled, class: "checkbox" %>
+      <% end %>
+    </div>
+
+    <div class="form-control w-full max-w-xs">
+      <%= label f, :daily_review_email_time, class: "label label-text" %>
+      <%= time_input f, :daily_review_email_time, required: true, class: "input input-bordered w-full max-w-xs", step: 60 * 60 %>
+      <%= error_tag f, :name %>
+    </div>
+
+    <div class="modal-action">
+      <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
+    </div>
+  </.form>
+</div>
