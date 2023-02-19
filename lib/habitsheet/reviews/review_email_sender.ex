@@ -2,6 +2,8 @@ defmodule Habitsheet.Reviews.ReviewEmailSender do
   import Swoosh.Email
 
   alias Habitsheet.Repo
+  alias HabitsheetWeb.Router.Helpers, as: Routes
+  alias HabitsheetWeb.Endpoint
 
   alias Habitsheet.Mailer
   alias Habitsheet.Reviews
@@ -20,14 +22,51 @@ defmodule Habitsheet.Reviews.ReviewEmailSender do
     end
   end
 
+  defp url_for_review(review), do: Routes.daily_review_show_url(Endpoint, :show, review.sheet_id, Date.to_iso8601(review.date))
+
   defp subject(review), do: "[#{review.sheet.title}] Daily Review: #{review.date}"
 
-  defp body(review), do: "Placeholder review for #{review.date}"
+  defp body(review, habits), do: """
+    HabitSheets Daily Review for #{review.date}
+    =======================================
+
+    Sheet: #{review.sheet.title}
+    Review URL: #{url_for_review(review)}
+
+
+    Daily Habits
+    ------------
+
+    Reinforced habits:
+
+    #{Enum.reduce(habits, "", fn habit, acc ->
+      if habit.entry && habit.entry.value == 1 do
+        """
+        - #{habit.name}
+        """
+      else
+        acc
+      end
+    end)}
+
+    Didn't reinforce habits:
+
+    #{Enum.reduce(habits, "", fn habit, acc ->
+      if !habit.entry || habit.entry.value == 0 do
+        """
+        - #{habit.name}
+        """
+      else
+        acc
+      end
+    end)}
+  """
 
   def send_email_for_daily_review(review, email, trigger) do
     review = Repo.preload review, :sheet
+    habits = Reviews.get_habits_for_daily_review(review)
 
-    case deliver(email, subject(review), body(review)) do
+    case deliver(email, subject(review), body(review, habits)) do
       {:ok, _email} -> {:ok, handle_success(review, email, trigger)}
       {:error, error} -> {:error, handle_failure(review, email, trigger, error)}
     end
