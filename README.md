@@ -100,7 +100,7 @@ fly secrets set \
   MAILER_SMTP_PORT="587" \
   MAILER_SMTP_USERNAME="foobar" \
   MAILER_SMTP_PASSWORD="password" \
-  MAILER_OUTGOING_EMAIL="habitsheets-noreply@example.com"
+  OUTGOING_EMAIL_ADDRESS="habitsheets-noreply@example.com"
 ```
 
 If you want to use HabitSheets without setting up a mailer, you can disable the requirement for email verification by setting this value in `config/config.exs`:

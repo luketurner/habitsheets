@@ -83,6 +83,6 @@ if config_env() == :prod do
 
   # application custom config values
   config :habitsheet,
-    outgoing_email_address: System.get_env("MAILER_OUTGOING_EMAIL")
+    outgoing_email_address: System.get_env("OUTGOING_EMAIL_ADDRESS")
 
 end
