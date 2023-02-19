@@ -13,7 +13,8 @@ config :habitsheet,
   outgoing_email_address: "habitsheets@example.com",
   review_retention_days: 365,
   review_fill_days: 3,
-  review_email_max_failure_count: 2
+  review_email_max_failure_count: 2,
+  admin_email_address: "admin@example.com"
 
 config :habitsheet,
   ecto_repos: [Habitsheet.Repo]
@@ -71,6 +72,16 @@ config :habitsheet, Habitsheet.Reviews.Scheduler,
     fill_reviews: [
       schedule: "@hourly",
       task: {Habitsheet.Reviews.Scheduler, :fill_reviews_task, []}
+    ]
+  ]
+
+config :habitsheet, Habitsheet.Admin.AdminEmailSender,
+  overlap: false,
+  run_strategy: Quantum.RunStrategy.Local,
+  jobs: [
+    digest: [
+      schedule: "@daily",
+      task: {Habitsheet.Admin.AdminEmailSender, :digest_task, []}
     ]
   ]
 

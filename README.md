@@ -110,6 +110,18 @@ config :habitsheet,
   require_email_verification: false # <--
 ```
 
+### Admin email digests
+
+HabitSheets can send a daily email with a high-level summary of the database content (currently, just table counts). No user information is included.
+
+To receive emails, configure an `ADMIN_EMAIL_ADDRESS` environment variable:
+
+```bash
+fly secrets set ADMIN_EMAIL_ADDRESS="me@example.com"
+```
+
+If `ADMIN_EMAIL_ADDRESS` is not set, the admin email feature is disabled.
+
 ### Other notes
 
 To connect to the app and inspect state in production:

@@ -17,7 +17,8 @@ defmodule Habitsheet.Application do
       # Start the Endpoint (http/https)
       HabitsheetWeb.Endpoint,
       # Start background tasks
-      Habitsheet.Reviews.Scheduler
+      Habitsheet.Reviews.Scheduler,
+      Habitsheet.Admin.AdminEmailSender
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
