@@ -9,6 +9,7 @@ defmodule Habitsheet.Reviews.DailyReviewEmail do
     field :attempt, :integer
     field :status, Ecto.Enum, values: [:success, :failure]
     field :trigger, Ecto.Enum, values: [:fill_review, :user]
+    field :error_text, :string
 
     belongs_to :daily_review, DailyReview
 

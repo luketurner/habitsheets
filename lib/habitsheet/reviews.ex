@@ -8,6 +8,7 @@ defmodule Habitsheet.Reviews do
 
   alias Habitsheet.Reviews.DailyReviewEmail
   alias Habitsheet.Reviews.DailyReview
+  alias Habitsheet.Reviews.ReviewEmailSender
 
   alias Habitsheet.Sheets
   alias Habitsheet.Sheets.Sheet
@@ -152,6 +153,7 @@ defmodule Habitsheet.Reviews do
             date: date,
             email_status: :pending,
             email_failure_count: 0,
+            email_attempt_count: 0,
             status: :not_started,
             inserted_at: now,
             updated_at: now
@@ -179,7 +181,7 @@ defmodule Habitsheet.Reviews do
         Repo.update(DailyReview.changeset(review, %{email_status: :skipped}))
       else
         if daily_review_email_time < Time.add(now, -30, :minute) do
-          send_email_for_daily_review(review, email)
+          ReviewEmailSender.send_email_for_daily_review(review, email, :fill_review)
         end
       end
     end)
@@ -196,37 +198,6 @@ defmodule Habitsheet.Reviews do
         review.email_status in [:pending, :failed] and
         review.email_failure_count < ^max_email_failure_count
     )
-  end
-
-  def send_email_for_daily_review(review, email) do
-    case temp_send_email_stub(review, email) do
-      {:ok} ->
-        create_daily_review_email(%{
-          daily_review_id: review.id,
-          email: email,
-          attempt: review.email_failure_count + 1,
-          status: :success,
-          trigger: :fill_review
-        })
-        Repo.update(DailyReview.changeset(review, %{email_status: :sent}))
-      _ ->
-        create_daily_review_email(%{
-          daily_review_id: review.id,
-          email: email,
-          attempt: review.email_failure_count + 1,
-          status: :failure,
-          trigger: :fill_review
-        })
-        Repo.update(DailyReview.changeset(review, %{
-          email_status: :failed,
-          email_failure_count: review.email_failure_count + 1
-        }))
-    end
-  end
-
-  def temp_send_email_stub(review, email) do
-    IO.puts("sending email for daily review #{review.id} to email #{email}")
-    {:ok}
   end
 
   def get_habits_for_daily_review(review) do
