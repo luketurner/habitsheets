@@ -138,7 +138,7 @@ For example, once connected with `iex`, we can use Ecto to inspect state in the 
 Habitsheet.Repo.aggregate(Habitsheet.Sheets.Sheet, :count)
 
 # List all users
-Habitsheet.Repo.all(Ecto.Query.from u in Habitsheet.Users.User)
+Habitsheet.Repo.all(Habitsheet.Users.User)
 
 # Delete all habits
 Habitsheet.Repo.delete_all(Habitsheet.Sheets.Habit)
