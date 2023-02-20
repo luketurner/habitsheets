@@ -32,8 +32,19 @@ defmodule HabitsheetWeb.SheetLive.HabitEditor do
     {:noreply, assign(socket, :changeset, changeset)}
   end
 
+  @impl true
   def handle_event("save", %{"habit" => habit_params}, socket) do
     save_habit(socket, socket.assigns.action, habit_params)
+  end
+
+  @impl true
+  def handle_event("archive", _params, socket) do
+    Sheets.archive_habit_by_id!(socket.assigns.current_user.id, socket.assigns.habit.id)
+
+    {:noreply,
+     socket
+     |> put_flash(:info, "Habit archived")
+     |> push_redirect(to: socket.assigns.return_to)}
   end
 
   defp save_habit(socket, :edit_habit, habit_params) do

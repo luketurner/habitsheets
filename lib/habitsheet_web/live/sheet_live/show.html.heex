@@ -54,33 +54,40 @@
 <% end %>
 
 <div class="p-2 flex flex-row flex-nowrap items-end">
-  <.link class="btn btn-primary btn-sm btn-outline mr-4" patch={Routes.sheet_show_path(@socket, :new_habit, @id)}>New habit</.link>
   <.link class="btn btn-sm btn-outline mr-4" patch={Routes.sheet_show_path(@socket, :edit, @id)}>Sheet Settings</.link>
   <.link class="btn btn-sm btn-outline mr-4" patch={Routes.sheet_show_path(@socket, :share, @id)}>Share sheet</.link>
 </div>
-<div>
-  <UI.date_heading_line date_range={@date_range}>
-    <:prev><.link phx-click="prev_week" class="btn btn-ghost"><%= "<<" %></.link></:prev>
-    <:date :let={day}>
-      <.link navigate={Routes.daily_review_show_path(@socket, :show, @id, Date.to_iso8601(day))} class="btn btn-ghost flex-col flex-nowrap justify-center">
-        <div class="mb-1"><%= short_date(day) %></div>
-        <div><%= day_of_week(day) %></div>
-      </.link>
-    </:date>
-    <:next><.link phx-click="next_week" class="btn btn-ghost">>></.link></:next>
-  </UI.date_heading_line>
-  <%= for habit <- @habits do %>
-    <UI.habit_entry_line
-      habit={habit}
-      date_range={@date_range}
-      entry_map={Map.get(@habit_entries, habit.id, %{})}
-      delete_attrs={%{
-        phx_click: "archive_habit",
-        href: "#",
-        phx_value_id: habit.id,
-        data_confirm: "Are you sure?"
-      }}
-      edit_attrs={%{patch: Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id)}}
-    />
-  <% end %>
-</div>
+
+<%= if @viewport_width do %>
+  <div>
+    <UI.date_heading_line date_range={@date_range}>
+      <:prev><.link phx-click="prev_week" class="btn btn-ghost"><%= "<<" %></.link></:prev>
+      <:date :let={day}>
+        <.link navigate={Routes.daily_review_show_path(@socket, :show, @id, Date.to_iso8601(day))} class="btn btn-ghost flex-col flex-nowrap justify-center">
+          <div class="mb-1"><%= short_date(day) %></div>
+          <div><%= day_of_week(day) %></div>
+        </.link>
+      </:date>
+      <:next><.link phx-click="next_week" class="btn btn-ghost">>></.link></:next>
+    </UI.date_heading_line>
+    <%= for habit <- @habits do %>
+      <UI.habit_entry_line
+        habit={habit}
+        date_range={@date_range}
+        entry_map={Map.get(@habit_entries, habit.id, %{})}
+        edit_attrs={%{patch: Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id)}}
+      />
+    <% end %>
+  </div>
+  <div class="p-2 mt-4 flex flex-row flex-nowrap items-end">
+    <.link class="btn btn-primary" patch={Routes.sheet_show_path(@socket, :new_habit, @id)}>New habit</.link>
+  </div>
+<% else %>
+  <div class="hero min-h-64">
+    <div class="hero-content text-center">
+      <div class="max-w-md">
+        <p class="py-6">Loading habit data...</p>
+      </div>
+    </div>
+  </div>
+<% end %>

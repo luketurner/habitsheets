@@ -16,6 +16,9 @@
     </div>
 
     <div class="modal-action">
+      <%= if @action == :edit_habit do %>
+        <.link class="btn btn-error mr-3" href="#" phx-click="archive" phx-target={@myself} data-confirm="Are you sure you want to archive this habit?">Archive</.link>
+      <% end %>
       <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
     </div>
   </.form>

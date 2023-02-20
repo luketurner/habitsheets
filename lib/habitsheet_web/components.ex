@@ -12,6 +12,12 @@ defmodule HabitsheetWeb.Components do
   attr :rest, :global, default: %{class: "w-6 h-6"}
   def icon_bars_three_outline(assigns)
 
+  attr :rest, :global, default: %{class: "w-6 h-6"}
+  def icon_pencil_square_outline(assigns)
+
+  attr :rest, :global, default: %{class: "w-5 h-5"}
+  def icon_pencil_square_mini(assigns)
+
   attr :rest, :global, default: %{class: "text-xl font-bold pb-4"}
   slot :inner_block
   def page_title(assigns)
