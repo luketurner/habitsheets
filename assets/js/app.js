@@ -22,6 +22,14 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+let tz;
+try {
+  tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+} catch (e) {
+  console.error("Could not read browser timezone", e);
+  tz = "Etc/UTC"
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   params: {
@@ -29,7 +37,8 @@ let liveSocket = new LiveSocket("/live", Socket, {
     viewport: {
       width: window.innerWidth,
       height: window.innerHeight
-    }
+    },
+    browser_timezone: tz
   }
 })
 
