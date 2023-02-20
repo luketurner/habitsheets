@@ -1,75 +1,28 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="night">
-  <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="csrf-token" content={csrf_token_value()}>
-    <.live_title suffix=" · HabitSheet">
-      <%= assigns[:page_title] || "Home" %>
-    </.live_title>
-    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
-    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
-  </head>
-  <body>
-    <div class="container mx-auto max-w-5xl min-h-screen flex flex-col flex-nowrap">
-      <div class="drawer drawer-end">
-        <input id="mobile-menu-drawer" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content flex flex-col">
-          <nav class=" w-full navbar bg-base-100">
-            <h1>
-              <.link class="btn btn-ghost normal-case text-xl" href={Routes.home_path(@conn, :index)}>HabitSheets</.link>
-            </h1>
-            <div class="flex-grow p-2">
-              <!-- subtitle -->
-            </div>
-            <div class="flex-none lg:hidden">
-              <label for="mobile-menu-drawer" class="btn btn-ghost">
-                <UI.icon_bars_three_outline class="w-5 h-5" />
-              </label>
-            </div>
-            <div class="flex-none hidden lg:block">
-              <ul class="menu menu-horizontal">
-                <%= if @current_user do %>
-                  <li><div><%= @current_user.email %></div></li>
-                  <li><.link class="btn btn-ghost normal-case" href={Routes.sheet_index_path(@conn, :index)}>All Sheets</.link></li>
-                  <li><.link class="btn btn-ghost normal-case" href={Routes.user_settings_path(@conn, :edit)}>Settings</.link></li>
-                  <li><.link class="btn btn-ghost normal-case" href={Routes.user_session_path(@conn, :delete)} method="delete">Log out</.link></li>
-                <% else %>
-                  <li><.link class="btn btn-ghost normal-case" href={Routes.user_registration_path(@conn, :new)}>Register</.link></li>
-                  <li><.link class="btn btn-ghost normal-case" href={Routes.user_session_path(@conn, :new)}>Log in</.link></li>
-                <% end %>
-              </ul>
-            </div>
-          </nav>
+<UI.layout conn_or_socket={@conn}>
 
-          <main class="py-4 px-8 flex-grow self-start w-full">
-            <%= @inner_content %>
-          </main>
+<:nav_title>
+  <.link class="btn btn-ghost normal-case text-xl" href={Routes.home_path(@conn, :index)}>HabitSheets</.link>
+</:nav_title>
 
-          <footer class="footer footer-center p-4">
-            <div>
-              <p>Copyright 2023 Luke Turner -&nbsp;<.link class="text-blue-500 underline" href="https://github.com/luketurner/habitsheets">Github</.link></p>
-            </div>
-          </footer>
+<:nav_subtitle></:nav_subtitle>
 
-        </div>
+<:nav_menu>
+  <%= if @current_user do %>
+    <li><.link href={Routes.sheet_index_path(@conn, :index)}>All Sheets</.link></li>
+    <li><.link href={Routes.user_settings_path(@conn, :edit)}>Settings</.link></li>
+    <li><.link href={Routes.user_session_path(@conn, :delete)} method="delete">Log out</.link></li>
+  <% else %>
+    <li><.link href={Routes.user_registration_path(@conn, :new)}>Register</.link></li>
+    <li><.link href={Routes.user_session_path(@conn, :new)}>Log in</.link></li>
+  <% end %>
+</:nav_menu>
 
-        <div class="drawer-side">
-          <label for="mobile-menu-drawer" class="drawer-overlay"></label>
-          <ul class="menu p-4 w-80 bg-base-100">
-            <%= if @current_user do %>
-              <li><div><%= @current_user.email %></div></li>
-              <li><.link class="btn btn-ghost normal-case" href={Routes.sheet_index_path(@conn, :index)}>All Sheets</.link></li>
-              <li><.link class="btn btn-ghost normal-case" href={Routes.user_settings_path(@conn, :edit)}>Settings</.link></li>
-              <li><.link class="btn btn-ghost normal-case" href={Routes.user_session_path(@conn, :delete)} method="delete">Log out</.link></li>
-            <% else %>
-              <li><.link class="btn btn-ghost normal-case" href={Routes.user_registration_path(@conn, :new)}>Register</.link></li>
-              <li><.link class="btn btn-ghost normal-case" href={Routes.user_session_path(@conn, :new)}>Log in</.link></li>
-            <% end %>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
+<%= @inner_content %>
+
+<:footer>
+  <div>
+    <p>Copyright 2023 Luke Turner -&nbsp;<.link class="text-blue-500 underline" href="https://github.com/luketurner/habitsheets">Github</.link></p>
+  </div>
+</:footer>
+
+</UI.layout>

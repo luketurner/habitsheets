@@ -44,4 +44,12 @@ defmodule HabitsheetWeb.Components do
   slot :prev
   slot :date
   def date_heading_line(assigns)
+
+  attr :conn_or_socket, :any, required: true
+  slot :inner_block, required: true
+  slot :nav_menu, required: true
+  slot :nav_title, required: true
+  slot :nav_subtitle
+  slot :footer, required: true
+  def layout(assigns)
 end

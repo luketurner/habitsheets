@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="csrf-token" content={csrf_token_value()}>
+    <.live_title suffix=" · HabitSheet">
+      <%= assigns[:page_title] || "Home" %>
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn_or_socket, "/assets/app.css")}/>
+    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn_or_socket, "/assets/app.js")}></script>
+  </head>
+  <body>
+    <div class="container mx-auto max-w-5xl min-h-screen flex flex-col flex-nowrap">
+      <div class="drawer drawer-end">
+        <input id="mobile-menu-drawer" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex flex-col">
+          <nav class=" w-full navbar bg-neutral text-neutral-content shadow-lg">
+            <ul class="menu menu-horizontal text-xl">
+              <li><%= render_slot(@nav_title) %></li>
+            </ul>
+            <div class="flex-grow p-2">
+              <%= render_slot(@nav_subtitle) %>
+            </div>
+            <div class="flex-none md:hidden">
+              <ul class="menu menu-horizontal text-xl">
+                <li>
+                  <label for="mobile-menu-drawer" class="btn btn-ghost">
+                    <UI.icon_bars_three_outline class="w-5 h-5" />
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div class="flex-none hidden md:block">
+              <ul class="menu menu-horizontal font-semibold">
+                <%= render_slot(@nav_menu) %>
+              </ul>
+            </div>
+          </nav>
+
+          <main class="py-4 px-8 flex-grow self-start w-full">
+            <%= render_slot(@inner_block) %>
+          </main>
+
+          <footer class="footer footer-center p-4">
+            <%= render_slot(@footer) %>
+          </footer>
+
+        </div>
+
+        <div class="drawer-side">
+          <label for="mobile-menu-drawer" class="drawer-overlay"></label>
+          <ul class="menu p-4 w-80 bg-base-100">
+            <%= render_slot(@nav_menu) %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
