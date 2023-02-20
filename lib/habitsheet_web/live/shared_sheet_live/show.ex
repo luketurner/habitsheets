@@ -6,8 +6,9 @@ defmodule HabitsheetWeb.SharedSheetLive.Show do
   @impl true
   def mount(%{ "id" => share_id }, _session, socket) do
     viewport_width = socket.private.connect_params["viewport"]["width"]
-    browser_timezone = socket.private.connect_params["browser_timezone"]
-    timezone = browser_timezone || get_in(socket.assigns, [:current_user, :timezone]) || "Etc/UTC"
+    timezone = get_in(socket.private, [:connect_params, "browser_timezone"])
+            || get_in(socket.assigns, [:current_user, :timezone])
+            || "Etc/UTC"
     full_week_view? = breakpoint?(viewport_width, :md)
     today = DateTime.to_date(DateTime.now!(timezone))
     date_range = if full_week_view? do

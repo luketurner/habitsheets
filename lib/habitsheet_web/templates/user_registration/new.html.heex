@@ -17,6 +17,11 @@
     <%= password_input f, :password, required: true, class: "input input-bordered w-full max-w-xs" %>
     <%= error_tag f, :password %>
   </div>
+  <div class="form-control w-full max-w-xs">
+    <%= label f, :timezone, class: "label label-text" %>
+    <%= select f, :timezone, @timezones, required: true, class: "input input-bordered w-full max-w-xs" %>
+    <%= error_tag f, :timezone %>
+  </div>
 
   <div class="py-4">
     <%= submit "Register", class: "btn btn-primary" %>

@@ -31,14 +31,17 @@ defmodule Habitsheet.Users.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :timezone])
     |> validate_email()
     |> validate_password(opts)
+    |> validate_required(:timezone)
+    |> TzExtra.Changeset.validate_time_zone_identifier(:timezone)
   end
 
   def update_changeset(user, attrs) do
     user
     |> cast(attrs, [:timezone])
+    |> TzExtra.Changeset.validate_time_zone_identifier(:timezone)
   end
 
   defp validate_email(changeset) do
