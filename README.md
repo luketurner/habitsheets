@@ -18,6 +18,10 @@ More explicitly, the following 3rd party libraries/technologies are used:
 - [Heroicons](https://heroicons.com/)
 - [daisyUI](https://daisyui.com/)
 - [Fly.io](https://fly.io/)
+- [Quantum](https://github.com/quantum-elixir/quantum-core)
+- [Swoosh](https://github.com/swoosh/swoosh)
+- [gen_smtp](https://github.com/gen-smtp/gen_smtp) 
+- [Tz](https://github.com/mathieuprog/tz) and [TzExtra](https://github.com/mathieuprog/tz_extra)
 
 ## Development
 
