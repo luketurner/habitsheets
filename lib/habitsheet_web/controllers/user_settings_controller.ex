@@ -4,10 +4,26 @@ defmodule HabitsheetWeb.UserSettingsController do
   alias Habitsheet.Users
   alias HabitsheetWeb.UserAuth
 
-  plug :assign_email_and_password_changesets
+  plug :assign_changesets
 
   def edit(conn, _params) do
-    render(conn, "edit.html")
+    conn
+    |> assign(:timezones, TzExtra.time_zone_identifiers())
+    |> render("edit.html")
+  end
+
+  def update(conn, %{"action" => "update_settings", "user" => user_params} = params) do
+    user = conn.assigns.current_user
+
+    # TODO
+    case Users.update_user(user, user_params) do
+      {:ok, _user} ->
+        conn
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
+
+      {:error, changeset} ->
+        render(conn, "edit.html", settings_changeset: changeset)
+    end
   end
 
   def update(conn, %{"action" => "update_email"} = params) do
@@ -64,10 +80,11 @@ defmodule HabitsheetWeb.UserSettingsController do
     end
   end
 
-  defp assign_email_and_password_changesets(conn, _opts) do
+  defp assign_changesets(conn, _opts) do
     user = conn.assigns.current_user
 
     conn
+    |> assign(:settings_changeset, Users.change_user(user))
     |> assign(:email_changeset, Users.change_user_email(user))
     |> assign(:password_changeset, Users.change_user_password(user))
   end

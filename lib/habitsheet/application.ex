@@ -19,6 +19,7 @@ defmodule Habitsheet.Application do
       # Start background tasks
       Habitsheet.Reviews.Scheduler,
       Habitsheet.Admin.AdminEmailSender
+      # {Tz.WatchPeriodically, [interval_in_days: 7]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

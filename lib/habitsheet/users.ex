@@ -187,6 +187,10 @@ defmodule Habitsheet.Users do
     User.password_changeset(user, attrs, hash_password: false)
   end
 
+  def change_user(user, attrs \\ %{}) do
+    User.update_changeset(user, attrs)
+  end
+
   @doc """
   Updates the user password.
 
@@ -213,6 +217,12 @@ defmodule Habitsheet.Users do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  def update_user(user, attrs \\ %{}) do
+    user
+    |> User.update_changeset(attrs)
+    |> Repo.update()
   end
 
   ## Session

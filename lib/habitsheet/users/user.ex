@@ -7,6 +7,7 @@ defmodule Habitsheet.Users.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+    field :timezone, :string, default: "Etc/UTC"
 
     timestamps()
   end
@@ -33,6 +34,11 @@ defmodule Habitsheet.Users.User do
     |> cast(attrs, [:email, :password])
     |> validate_email()
     |> validate_password(opts)
+  end
+
+  def update_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:timezone])
   end
 
   defp validate_email(changeset) do

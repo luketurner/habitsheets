@@ -175,12 +175,14 @@ defmodule Habitsheet.Reviews do
   end
 
   def send_emails_for_daily_reviews_with_pending_attempts() do
-    now = Time.utc_now()
     Enum.map(get_daily_reviews_with_pending_attempts(), fn {review, email, daily_review_email_enabled, daily_review_email_time } ->
       if !daily_review_email_enabled or is_nil(email) do
         Repo.update(DailyReview.changeset(review, %{email_status: :skipped}))
       else
-        if daily_review_email_time < Time.add(now, -30, :minute) do
+        # TODO
+        review = Repo.preload(review, :user)
+        now = DateTime.to_time(DateTime.now!(review.user.timezone))
+        if Time.compare(daily_review_email_time, Time.add(now, -30, :minute)) == :lt do
           ReviewEmailSender.send_email_for_daily_review(review, email, :fill_review)
         end
       end

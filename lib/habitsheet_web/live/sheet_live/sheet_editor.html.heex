@@ -25,7 +25,7 @@
     </div>
 
     <div class="form-control w-full max-w-xs">
-      <%= label f, :daily_review_email_time, "Daily review email time (UTC)", class: "label label-text" %>
+      <%= label f, :daily_review_email_time, "Daily review email time (#{@current_user.timezone})", class: "label label-text" %>
       <%= time_input f, :daily_review_email_time, required: true, class: "input input-bordered w-full max-w-xs", step: 60 * 60 %>
       <%= error_tag f, :name %>
     </div>
