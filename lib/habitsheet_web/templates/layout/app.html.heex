@@ -1,5 +1,5 @@
 <%= if get_flash(@conn, :info) || get_flash(@conn, :error) do %>
-  <div class="toast toast-top toast-right">
+  <div class="toast toast-top toast-right" onclick="this.setAttribute('style', 'display: none;')">
     <%= if info_flash = get_flash(@conn, :info) do %>
       <div class="alert alert-info shadow-lg" role="alert">
         <div>
