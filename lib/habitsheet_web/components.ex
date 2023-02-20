@@ -36,20 +36,15 @@ defmodule HabitsheetWeb.Components do
   attr :habit_id, :any, default: nil
   def habit_entry_status(assigns)
 
-  attr :habit, Habitsheets.Sheets.Habit, required: true
-  attr :date_range, DateRange, required: true
-  attr :entry_map, :map, default: %{}
-  attr :delete_attrs, :map, default: nil
-  attr :edit_attrs, :map, default: nil
-  attr :rest, :global, default: %{class: ""}
-  def habit_entry_line(assigns)
-
-  attr :date_range, DateRange, required: true
-  attr :rest, :global, default: %{class: ""}
-  slot :next
-  slot :prev
-  slot :date
-  def date_heading_line(assigns)
+  attr :cols, :list
+  attr :rows, :list
+  slot :col_label
+  slot :row_label
+  slot :cell
+  slot :next_btn
+  slot :prev_btn
+  attr :rest, :global
+  def flex_table(assigns)
 
   attr :conn_or_socket, :any, required: true
   slot :inner_block, required: true

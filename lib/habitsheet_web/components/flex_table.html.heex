@@ -1,0 +1,31 @@
+<div {@rest}>
+  <div class="p-2 flex flex-row flex-nowrap items-end">
+    <div class="w-48 flex flex-row flex-nowrap justify-end items-center flex-grow-0 flex-shrink-0">
+      <%= render_slot(@prev_btn) %>
+    </div>
+    <%= for col <- @cols do %>
+      <div class="mx-2 w-16 text-center flex-grow-0 flex-shrink-0">
+        <%= render_slot(@col_label, col) %>
+      </div>
+    <% end %>
+    <div class="mx-2 w-16 flex-grow-0">
+      <%= render_slot(@next_btn) %>
+    </div>
+  </div>
+  <%= for row <- @rows do %>
+    <div>
+      <div class="p-2 flex flex-row flex-nowrap items-center">
+        <div class="w-48 flex-grow-0 flex-shrink-0 flex flex-row items-center">
+          <span class="flex-grow">
+            <%= render_slot(@row_label, row) %>
+          </span>
+        </div>
+        <%= for col <- @cols do %>
+          <div class="mx-2 w-16 h-6 text-center flex-grow-0 flex-shrink-0">
+            <%= render_slot(@cell, {row, col}) %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

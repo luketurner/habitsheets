@@ -59,26 +59,36 @@
 </div>
 
 <%= if @viewport_width do %>
-  <div>
-    <UI.date_heading_line date_range={@date_range}>
-      <:prev><.link phx-click="prev_week" class="btn btn-ghost"><%= "<<" %></.link></:prev>
-      <:date :let={day}>
-        <.link navigate={Routes.daily_review_show_path(@socket, :show, @id, Date.to_iso8601(day))} class="btn btn-ghost flex-col flex-nowrap justify-center">
-          <div class="mb-1"><%= short_date(day) %></div>
-          <div><%= day_of_week(day) %></div>
-        </.link>
-      </:date>
-      <:next><.link phx-click="next_week" class="btn btn-ghost">>></.link></:next>
-    </UI.date_heading_line>
-    <%= for habit <- @habits do %>
-      <UI.habit_entry_line
-        habit={habit}
-        date_range={@date_range}
-        entry_map={Map.get(@habit_entries, habit.id, %{})}
-        edit_attrs={%{patch: Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id)}}
-      />
-    <% end %>
-  </div>
+
+  <UI.flex_table rows={@habits} cols={@date_range}>
+
+    <:col_label :let={date}>
+      <.link class="btn btn-ghost flex-col flex-nowrap justify-center" navigate={Routes.daily_review_show_path(@socket, :show, @id, Date.to_iso8601(date))}>
+        <div class="mb-1"><%= short_date(date) %></div>
+        <div><%= day_of_week(date) %></div>
+      </.link>
+    </:col_label>
+
+    <:row_label :let={habit}>
+      <.link class="btn btn-ghost w-full justify-start normal-case" patch={Routes.sheet_show_path(@socket, :edit_habit, @id, habit.id)}>
+        <UI.icon_pencil_square_mini class="w-5 h-5 mr-2" />
+        <UI.habit_label habit={habit} />
+      </.link>
+    </:row_label>
+
+    <:prev_btn><.link class="btn btn-ghost" phx-click="prev_week"><%= "<<" %></.link></:prev_btn>
+    <:next_btn><.link class="btn btn-ghost" phx-click="next_week">>></.link></:next_btn>
+
+    <:cell :let={{habit, date}}>
+      <UI.habit_entry_status
+        click="toggle_day"
+        entry={@habit_entries |> Map.get(habit.id, %{}) |> Map.get(date, nil)}
+        date={date}
+        habit_id={habit.id} />
+    </:cell>
+
+  </UI.flex_table>
+
   <div class="p-2 mt-4 flex flex-row flex-nowrap items-end">
     <.link class="btn btn-primary" patch={Routes.sheet_show_path(@socket, :new_habit, @id)}>New habit</.link>
   </div>
