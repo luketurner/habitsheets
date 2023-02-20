@@ -306,8 +306,42 @@ defmodule Habitsheet.Sheets do
     end
   end
 
+  def get_shared_habit_entries!(share_id, habit_id, date_range) do
+    if not is_nil(share_id) do
+      Repo.all(
+        from entry in HabitEntry,
+        select: entry,
+        join: habit in Habit,
+        join: sheet in Sheet,
+        where: entry.habit_id == ^habit_id
+            and entry.date >= ^date_range.first
+            and entry.date <= ^date_range.last
+            and sheet.share_id == ^share_id
+      )
+    else
+      raise "Could not find habit"
+    end
+  end
+
   def get_habit_entry_value_map(user_id, habit_id, date_range) do
     Map.new(get_habit_entries!(user_id, habit_id, date_range), fn entry -> { entry.date, entry } end)
+  end
+
+  def get_shared_habit_entry_value_map(share_id, habit_id, date_range) do
+    Map.new(get_shared_habit_entries!(share_id, habit_id, date_range), fn entry -> { entry.date, entry } end)
+  end
+
+  def list_habits_for_shared_sheet(share_id) do
+    if not is_nil(share_id) do
+      Repo.all(
+        from habit in Habit,
+        select: habit,
+        join: sheet in Sheet,
+        where: sheet.share_id == ^share_id and is_nil(habit.archived_at)
+      )
+    else
+      raise "Could not find shared sheet"
+    end
   end
 
   def get_week_range(date) do

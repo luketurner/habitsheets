@@ -9,7 +9,7 @@ defmodule HabitsheetWeb.SheetLive.SheetShare do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:share_url, if(sheet.share_id, do: Routes.shared_sheet_url(socket, :show, sheet.share_id)))}
+     |> assign(:share_url, if(sheet.share_id, do: Routes.shared_sheet_show_url(socket, :show, sheet.share_id)))}
   end
 
   @impl true

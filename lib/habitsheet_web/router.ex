@@ -39,7 +39,7 @@ defmodule HabitsheetWeb.Router do
     end
 
     scope "/share" do
-      get "/:id", SharedSheetController, :show
+      live "/:id", SharedSheetLive.Show, :show
     end
 
   end

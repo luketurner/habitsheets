@@ -11,6 +11,7 @@ defmodule HabitsheetWeb.UserRegistrationController do
   end
 
   def create(conn, %{"user" => user_params}) do
+    # TODO -- should register user with browser timezone, if present
     case Users.register_user(user_params) do
       {:ok, user} ->
         {:ok, _} =

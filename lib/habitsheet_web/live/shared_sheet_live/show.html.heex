@@ -1,0 +1,45 @@
+<div class="alert alert-info shadow-lg">
+  <div>
+    <UI.icon_academic_cap_mini />
+    <span>You're viewing a shared sheet in read-only mode.</span>
+  </div>
+</div>
+
+<%= if @viewport_width do %>
+
+  <UI.flex_table rows={@habits} cols={@date_range}>
+
+    <:col_label :let={date}>
+      <.link class="btn btn-ghost flex-col flex-nowrap justify-center">
+        <div class="mb-1"><%= short_date(date) %></div>
+        <div><%= day_of_week(date) %></div>
+      </.link>
+    </:col_label>
+
+    <:row_label :let={habit}>
+      <.link class="btn btn-ghost w-full justify-start normal-case">
+        <UI.habit_label habit={habit} />
+      </.link>
+    </:row_label>
+
+    <:prev_btn><.link class="btn btn-ghost" phx-click="prev_week"><%= "<<" %></.link></:prev_btn>
+    <:next_btn><.link class="btn btn-ghost" phx-click="next_week">>></.link></:next_btn>
+
+    <:cell :let={{habit, date}}>
+      <UI.habit_entry_status
+        entry={@habit_entries |> Map.get(habit.id, %{}) |> Map.get(date, nil)}
+        date={date}
+        readonly={true}
+        habit_id={habit.id} />
+    </:cell>
+
+  </UI.flex_table>
+<% else %>
+  <div class="hero min-h-64">
+    <div class="hero-content text-center">
+      <div class="max-w-md">
+        <p class="py-6">Loading habit data...</p>
+      </div>
+    </div>
+  </div>
+<% end %>
