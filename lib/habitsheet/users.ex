@@ -7,6 +7,7 @@ defmodule Habitsheet.Users do
   alias Habitsheet.Repo
 
   alias Habitsheet.Users.{User, UserToken, UserNotifier}
+  alias Habitsheet.Sheets
 
   ## Database getters
 
@@ -189,6 +190,15 @@ defmodule Habitsheet.Users do
 
   def change_user(user, attrs \\ %{}) do
     User.update_changeset(user, attrs)
+  end
+
+  def delete_user(user) do
+    Repo.delete(user)
+  end
+
+  def clear_user_data(user) do
+    Sheets.delete_sheets_for_user(user.id)
+    {:ok, user}
   end
 
   @doc """

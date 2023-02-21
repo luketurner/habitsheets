@@ -362,4 +362,11 @@ defmodule Habitsheet.Sheets do
          and entry.date == ^date
     )
   end
+
+  def delete_sheets_for_user(user_id) do
+    Repo.delete_all(
+      from sheet in Sheet,
+      where: sheet.user_id == ^user_id
+    )
+  end
 end

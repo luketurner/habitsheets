@@ -109,6 +109,8 @@ defmodule HabitsheetWeb.Router do
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
+    post "/users/delete", UserSettingsController, :delete
+    post "/users/clear_data", UserSettingsController, :clear_data
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
   end
 

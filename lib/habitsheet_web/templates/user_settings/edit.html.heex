@@ -86,3 +86,24 @@
     <%= submit "Change password", class: "btn btn-primary" %>
   </div>
 </.form>
+
+<h1 class="text-xl font-bold py-4">Danger Zone</h1>
+
+<div class="mb-4">
+  <.link
+    class="btn btn-error"
+    href={Routes.user_settings_path(@conn, :delete)}
+    method="post"
+    data-confirm={"This will PERMANENTLY DELETE the #{@current_user.email} account and all associated data. Continue?"}>
+    Delete Account
+  </.link>
+</div>
+<div>
+  <.link
+    class="btn btn-error"
+    href={Routes.user_settings_path(@conn, :clear_data)}
+    method="post"
+    data-confirm={"This will PERMANENTLY DELETE all data (sheets, reviews, etc.) in the #{@current_user.email} account. The account itself will not be deleted. Continue?"}>
+    Delete All Data (But Keep The Account)
+  </.link>
+</div>

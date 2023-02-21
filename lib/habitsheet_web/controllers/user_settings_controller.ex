@@ -12,6 +12,32 @@ defmodule HabitsheetWeb.UserSettingsController do
     |> render("edit.html")
   end
 
+  def delete(conn, _params) do
+    case Users.delete_user(conn.assigns.current_user) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Deleted account #{conn.assigns.current_user.email}")
+        |> redirect(to: Routes.home_path(conn, :index))
+      {:error, _} ->
+        conn
+        |> put_flash(:error, "Error deleting account")
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
+    end
+  end
+
+  def clear_data(conn, _params) do
+    case Users.clear_user_data(conn.assigns.current_user) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Cleared account data")
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
+      {:error, _} ->
+        conn
+        |> put_flash(:error, "Error clearing account data")
+        |> redirect(to: Routes.user_settings_path(conn, :edit))
+    end
+  end
+
   def update(conn, %{"action" => "update_settings", "user" => user_params} = params) do
     user = conn.assigns.current_user
 
