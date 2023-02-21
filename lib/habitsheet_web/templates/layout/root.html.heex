@@ -20,8 +20,12 @@
 <%= @inner_content %>
 
 <:footer>
-  <div>
-    <p>Copyright 2023 Luke Turner -&nbsp;<.link class="text-blue-500 underline" href="https://github.com/luketurner/habitsheets">Github</.link></p>
+  <div class="flex flex-row w-full">
+    <div class="flex flex-col flex-nowrap justify-start text-left flex-grow">
+      <p class="mr-4">HabitSheets</p>
+      <p class="mr-4">Copyright 2023 Luke Turner</p>
+    </div>
+    <.link class="btn" href="https://github.com/luketurner/habitsheets">Github</.link>
   </div>
 </:footer>
 
