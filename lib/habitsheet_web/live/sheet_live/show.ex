@@ -10,8 +10,8 @@ defmodule HabitsheetWeb.SheetLive.Show do
   def mount(%{ "id" => id }, _session, socket) do
     viewport_width = socket.private.connect_params["viewport"]["width"]
     full_week_view? = breakpoint?(viewport_width, :md)
-    timezone = get_in(socket.private, [:connect_params, "browser_timezone"])
-            || get_in(socket.assigns, [:current_user, :timezone])
+    timezone = socket.private.connect_params["browser_timezone"]
+            || socket.assigns.current_user.timezone
             || "Etc/UTC"
     today = DateTime.to_date(DateTime.now!(timezone))
     date_range = if full_week_view? do

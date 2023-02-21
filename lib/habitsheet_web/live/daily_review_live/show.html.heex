@@ -1,6 +1,8 @@
-<UI.page_title>
-  <%= @review.date %> :: Daily Review
-</UI.page_title>
+<UI.breadcrumbs>
+  <li><.link navigate={Routes.sheet_index_path(@socket, :index)}>All Sheets</.link></li>
+  <li><.link navigate={Routes.sheet_show_path(@socket, :show, @sheet_id)}><%= @sheet.title %></.link></li>
+  <li><.link navigate={Routes.daily_review_show_path(@socket, :show, @sheet_id, Date.to_iso8601(@review.date))}><%= @review.date %></.link></li>
+</UI.breadcrumbs>
 
 <%= for habit <- @habits do %>
   <div class="flex flex-row">

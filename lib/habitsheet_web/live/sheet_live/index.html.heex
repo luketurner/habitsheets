@@ -11,6 +11,10 @@
   </.modal>
 <% end %>
 
+<UI.breadcrumbs>
+  <li><.link navigate={Routes.sheet_index_path(@socket, :index)}>All Sheets</.link></li>
+</UI.breadcrumbs>
+
 <%= for sheet <- @sheets do %>
   <div class="p-2 flex flex-row flex-nowrap items-center">
     <div class="w-40 pr-4">

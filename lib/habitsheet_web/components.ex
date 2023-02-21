@@ -56,4 +56,8 @@ defmodule HabitsheetWeb.Components do
   slot :nav_subtitle
   slot :footer, required: true
   def layout(assigns)
+
+  slot :inner_block
+  attr :rest, :global, default: %{class: "breadcrumbs text-sm font-semibold mx-3 mt-2 mb-4"}
+  def breadcrumbs(assign)
 end
