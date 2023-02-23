@@ -55,7 +55,8 @@ defmodule Habitsheet.MixProject do
       {:gen_smtp, "~> 1.1"},
       {:quantum, "~> 3.0"},
       {:tz, "~> 0.24.0"},
-      {:tz_extra, "~> 0.24.0"}
+      {:tz_extra, "~> 0.24.0"},
+      {:bodyguard, "~> 2.4"}
     ]
   end
 
