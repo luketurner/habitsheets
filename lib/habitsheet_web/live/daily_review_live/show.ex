@@ -5,10 +5,10 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
   alias Habitsheet.Reviews
   alias Habitsheet.Repo
 
-  on_mount HabitsheetWeb.OwnedSheetLiveAuth
+  on_mount {HabitsheetWeb.LiveInit, :load_sheet}
 
   @impl true
-  def mount(%{ "id" => _sheet_id, "date" => date_param }, _session, socket) do
+  def mount(%{ "sheet_id" => _sheet_id, "date" => date_param }, _session, socket) do
     date = Date.from_iso8601!(date_param)
     user_id = socket.assigns.current_user.id
     sheet_id = socket.assigns.sheet.id
@@ -17,7 +17,6 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
       review = Repo.preload review, :email
       {:ok,
       socket
-      |> assign(:sheet_id, sheet_id)
       |> assign(:date, date)
       |> assign(:review, review)
       |> assign(:habits, habits)}

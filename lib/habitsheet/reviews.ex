@@ -145,7 +145,9 @@ defmodule Habitsheet.Reviews do
     now = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
 
     reviews = Enum.flat_map(all_users, fn user ->
-      Enum.flat_map(Sheets.list_sheets(user.id), fn sheet ->
+      # TODO -- should handle errors better
+      {:ok, sheets} = Sheets.list_sheets_for_user(user)
+      Enum.flat_map(sheets, fn sheet ->
         Enum.map(date_range, fn date ->
           %{
             user_id: sheet.user_id,

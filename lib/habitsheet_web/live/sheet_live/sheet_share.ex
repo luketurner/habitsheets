@@ -14,7 +14,7 @@ defmodule HabitsheetWeb.SheetLive.SheetShare do
 
   @impl true
   def handle_event("share", _params, socket) do
-    case Sheets.share_sheet!(socket.assigns.current_user.id, socket.assigns.sheet) do
+    case Sheets.share_sheet_as(socket.assigns.current_user, socket.assigns.sheet) do
       {:ok, _sheet} ->
         {:noreply, push_redirect(socket, Routes.sheet_show_path(socket, :share, socket.assigns.sheet.id))}
       {:error, _error} ->
@@ -27,7 +27,7 @@ defmodule HabitsheetWeb.SheetLive.SheetShare do
 
   @impl true
   def handle_event("unshare", _params, socket) do
-    case Sheets.unshare_sheet!(socket.assigns.current_user.id, socket.assigns.sheet) do
+    case Sheets.unshare_sheet_as(socket.assigns.current_user, socket.assigns.sheet) do
       {:ok, _sheet} ->
         {:noreply, push_redirect(socket, Routes.sheet_show_path(socket, :share, socket.assigns.sheet.id))}
       {:error, _error} ->

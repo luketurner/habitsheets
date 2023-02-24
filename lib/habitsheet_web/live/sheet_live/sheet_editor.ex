@@ -9,7 +9,7 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:changeset, Sheets.change_sheet(sheet))}
+     |> assign(:changeset, Sheets.sheet_update_changeset(sheet))}
   end
 
   @impl true
@@ -19,15 +19,17 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
      socket
      |> assign(assigns)
      |> assign(:sheet, new_sheet)
-     |> assign(:changeset, Sheets.change_sheet(new_sheet))}
+     |> assign(:changeset, Sheets.sheet_create_changeset(new_sheet))}
   end
 
   @impl true
-  def handle_event("validate", %{"sheet" => sheet}, socket) do
-    changeset =
-      socket.assigns.sheet
-      |> Sheets.change_sheet(sheet)
-      |> Map.put(:action, :validate)
+  def handle_event("validate", %{"sheet" => sheet_params}, socket) do
+    changeset = if socket.assigns.action == :new do
+      Sheets.sheet_create_changeset(socket.assigns.sheet, sheet_params)
+    else
+      Sheets.sheet_update_changeset(socket.assigns.sheet, sheet_params)
+    end
+    changeset = Map.put(changeset, :action, :validate)
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
@@ -37,32 +39,52 @@ defmodule HabitsheetWeb.SheetLive.SheetEditor do
   end
 
   defp save_sheet(socket, :edit, sheet_params) do
-    case Sheets.update_sheet(socket.assigns.current_user.id, socket.assigns.sheet, sheet_params) do
-      {:ok, sheet} ->
-        {:noreply,
+    sheet = socket.assigns.sheet
+    with(
+      :ok <- Bodyguard.permit(Sheets, :update_sheet, socket.assigns.current_user, sheet),
+      changeset <- Sheets.sheet_update_changeset(socket.assigns.sheet, sheet_params),
+      {:ok, sheet} <- Sheets.update_sheet(changeset)
+    ) do
+      {:noreply,
          socket
          |> assign(:sheet, sheet)
          |> put_flash(:info, "Sheet updated")
          |> push_redirect(to: socket.assigns.return_to)}
-
+    else
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
+        {:noreply,
+         socket
+         |> assign(:submit_error, "Error updating sheet")
+         |> assign(:changeset, changeset)}
+      {:error, _} ->
+        {:noreply,
+         socket
+         |> assign(:submit_error, "Error updating sheet")}
     end
   end
 
   defp save_sheet(socket, :new, sheet_params) do
-    case Sheets.create_sheet(
-      socket.assigns.current_user.id,
-      sheet_params
+    sheet_params = Map.put(sheet_params, "user_id", socket.assigns.current_user.id)
+    with(
+      changeset <- Sheets.sheet_create_changeset(socket.assigns.sheet, sheet_params),
+      :ok <- Bodyguard.permit(Sheets, :create_sheet, socket.assigns.current_user, changeset),
+      {:ok, sheet} <- Sheets.create_sheet(changeset)
     ) do
-      {:ok, _sheet} ->
-        {:noreply,
+      {:noreply,
          socket
+         |> assign(:sheet, sheet)
          |> put_flash(:info, "Sheet created")
          |> push_redirect(to: socket.assigns.return_to)}
-
+    else
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
+        {:noreply,
+         socket
+         |> assign(:submit_error, "Error creating sheet")
+         |> assign(:changeset, changeset)}
+      {:error, v} ->
+        {:noreply,
+         socket
+         |> assign(:submit_error, "Error creating sheet: #{v}")}
     end
   end
 end

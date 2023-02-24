@@ -9,7 +9,7 @@ defmodule HabitsheetWeb.SheetLive.HabitEditor do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:changeset, Sheets.change_habit(habit))}
+     |> assign(:changeset, Sheets.habit_update_changeset(habit))}
   end
 
   @impl true
@@ -19,15 +19,18 @@ defmodule HabitsheetWeb.SheetLive.HabitEditor do
      socket
      |> assign(assigns)
      |> assign(:habit, new_habit)
-     |> assign(:changeset, Sheets.change_habit(new_habit))}
+     |> assign(:changeset, Sheets.habit_create_changeset(new_habit))}
   end
 
   @impl true
   def handle_event("validate", %{"habit" => habit_params}, socket) do
-    changeset =
-      socket.assigns.habit
-      |> Sheets.change_habit(habit_params)
-      |> Map.put(:action, :validate)
+    changeset = if socket.assigns.action == :new_habit do
+      Sheets.habit_create_changeset(socket.assigns.habit, habit_params)
+    else
+      Sheets.habit_update_changeset(socket.assigns.habit, habit_params)
+    end
+
+    changeset = Map.put(changeset, :action, :validate)
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
@@ -39,7 +42,7 @@ defmodule HabitsheetWeb.SheetLive.HabitEditor do
 
   @impl true
   def handle_event("archive", _params, socket) do
-    Sheets.archive_habit_by_id!(socket.assigns.current_user.id, socket.assigns.habit.id)
+    Sheets.archive_habit_as(socket.assigns.current_user, socket.assigns.habit)
 
     {:noreply,
      socket
@@ -49,7 +52,7 @@ defmodule HabitsheetWeb.SheetLive.HabitEditor do
 
   defp save_habit(socket, :edit_habit, habit_params) do
     # TODO -- update_habit! throws exceptions. I should implement a non-exception-throwing version.
-    case Sheets.update_habit!(socket.assigns.current_user.id, socket.assigns.habit, habit_params) do
+    case Sheets.update_habit_as(socket.assigns.current_user, Sheets.habit_update_changeset(socket.assigns.habit, habit_params)) do
       _ -> #{:ok, _habit}
         {:noreply,
          socket
@@ -62,7 +65,13 @@ defmodule HabitsheetWeb.SheetLive.HabitEditor do
   end
 
   defp save_habit(socket, :new_habit, habit_params) do
-    case Sheets.create_habit(socket.assigns.current_user.id, Map.put(habit_params, "sheet_id", socket.assigns.sheet_id)) do
+    changeset = Sheets.habit_create_changeset(
+      socket.assigns.habit,
+      habit_params
+      |> Map.put("sheet_id", socket.assigns.sheet.id)
+      |> Map.put("user_id", socket.assigns.current_user.id)
+    )
+    case Sheets.create_habit_as(socket.assigns.current_user, changeset) do
       {:ok, _habit} ->
         {:noreply,
          socket

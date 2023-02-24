@@ -1,9 +1,12 @@
 defmodule Habitsheet.Sheets.Sheet do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
 
   alias Habitsheet.Sheets.Habit
   alias Habitsheet.Users.User
+
+  @behaviour Bodyguard.Schema
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
@@ -19,10 +22,18 @@ defmodule Habitsheet.Sheets.Sheet do
     timestamps()
   end
 
-  @doc false
-  def changeset(sheet, attrs) do
+  def scope(query, %User{id: user_id}, _) do
+    from sheet in query, where: sheet.user_id == ^user_id
+  end
+
+  def create_changeset(sheet, attrs) do
     sheet
     |> cast(attrs, [:title, :user_id, :share_id, :daily_review_email_enabled, :daily_review_email_time])
     |> validate_required([:title, :user_id])
+  end
+
+  def update_changeset(sheet, attrs) do
+    sheet
+    |> cast(attrs, [:title, :share_id, :daily_review_email_enabled, :daily_review_email_time])
   end
 end

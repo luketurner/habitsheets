@@ -3,30 +3,32 @@ defmodule HabitsheetWeb.SharedSheetLive.Show do
 
   alias Habitsheet.Sheets
 
+  on_mount {HabitsheetWeb.LiveInit, :load_shared_sheet}
+
   @impl true
-  def mount(%{ "id" => share_id }, _session, socket) do
+  def mount(_params, _session, socket) do
+    current_user = socket.assigns.current_user
     viewport_width = socket.private.connect_params["viewport"]["width"]
     timezone = socket.private.connect_params["browser_timezone"]
-            || socket.assigns.current_user.timezone
+            || (current_user && current_user.timezone)
             || "Etc/UTC"
     full_week_view? = breakpoint?(viewport_width, :md)
     today = DateTime.to_date(DateTime.now!(timezone))
     date_range = if full_week_view? do
-      Sheets.get_week_range(today)
+      Date.range(
+        Date.beginning_of_week(today),
+        Date.end_of_week(today)
+      )
     else
       Date.range(today, today)
     end
-    sheet = Sheets.get_sheet_by_share_id!(share_id)
-    habits = list_habits(sheet)
     {:ok, socket
-      |> assign(:sheet, sheet)
-      |> assign(:habits, habits)
       |> assign(:date_range, date_range)
-      |> assign(:habit_entries, all_habit_entries(sheet, habits, date_range))
-      |> assign(:subtitle, sheet.title || "Unnamed Sheet")
+      |> assign_habits()
+      |> assign_habit_entries()
+      |> assign(:subtitle, socket.assigns.sheet.title || "Unnamed Sheet")
       |> assign(:viewport_width, viewport_width)
-      |> assign(:timezone, timezone)
-    }
+      |> assign(:timezone, timezone)}
   end
 
   @impl true
@@ -49,7 +51,7 @@ defmodule HabitsheetWeb.SharedSheetLive.Show do
     )
     {:noreply, socket
       |> assign(:date_range, new_range)
-      |> assign(:habit_entries, all_habit_entries(socket.assigns.sheet, socket.assigns.habits, new_range))
+      |> assign_habit_entries()
     }
   end
 
@@ -62,23 +64,22 @@ defmodule HabitsheetWeb.SharedSheetLive.Show do
     )
     {:noreply, socket
       |> assign(:date_range, new_range)
-      |> assign(:habit_entries, all_habit_entries(socket.assigns.sheet, socket.assigns.habits, new_range))
+      |> assign_habit_entries()
     }
   end
 
-  defp list_habits(sheet) do
-    Sheets.list_habits_for_shared_sheet(sheet.share_id)
+  defp assign_habits(%{ assigns: %{current_user: current_user, sheet: sheet} } = socket) do
+    case Sheets.list_habits_for_sheet_as(current_user, sheet) do
+      {:ok, habits} -> assign(socket, :habits, habits)
+      {:error, _} -> assign(socket, :habits, []) # TODO
+    end
   end
 
-  defp all_habit_entries(sheet, habits, days) do
-    Map.new(habits, fn habit -> {
-      habit.id,
-      entries_for_habit(sheet, habit.id, days)
-    } end)
-  end
-
-  defp entries_for_habit(sheet, habit_id, days) do
-    Sheets.get_shared_habit_entry_value_map(sheet.share_id, habit_id, days)
+  defp assign_habit_entries(%{ assigns: %{current_user: current_user, sheet: sheet, date_range: date_range, habits: habits} } = socket) do
+    case Sheets.list_habit_entries_for_sheet_as(current_user, sheet, date_range) do
+      {:ok, entries} -> assign(socket, :habit_entries, Sheets.habit_entry_map(habits, date_range, entries))
+      {:error, _} -> assign(socket, :habit_entries, %{}) # TODO
+    end
   end
 
   defp short_date(date) do

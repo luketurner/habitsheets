@@ -4,369 +4,294 @@ defmodule Habitsheet.Sheets do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Changeset
   alias Habitsheet.Repo
 
   alias Habitsheet.Sheets.Sheet
   alias Habitsheet.Sheets.Habit
   alias Habitsheet.Sheets.HabitEntry
+  alias Habitsheet.Users.User
 
-  @doc """
-  Returns the list of sheets.
+  alias __MODULE__
 
-  ## Examples
+  @behaviour Bodyguard.Policy
 
-      iex> list_sheets()
-      [%Sheet{}, ...]
+  # TODO -- should this check user confirmation? I'm thinking no
 
-  """
-  def list_sheets(user_id) do
-    Repo.all(
-      from s in Sheet,
-      select: s,
-      where: s.user_id == ^user_id
-    )
+  # Users can only list their own sheets
+  def authorize(:list_sheets_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
+
+  # Users can only delete all sheets for their own user
+  def authorize(:delete_sheets_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
+
+  # Users can get their own sheets and related sub-resources
+  # TODO make this more DRY? Or does it matter?
+  def authorize(:get_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+  def authorize(:list_habits_for_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+  def authorize(:list_habit_entries_for_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+
+  # Anyone can get a sheet (or related habits/entries) with a share ID
+  def authorize(:get_sheet, _user, %Sheet{share_id: share_id}), do: !is_nil(share_id)
+  def authorize(:list_habits_for_sheet, _user, %Sheet{share_id: share_id}), do: !is_nil(share_id)
+  def authorize(:list_habit_entries_for_sheet, _user, %Sheet{share_id: share_id}), do: !is_nil(share_id)
+
+  # Only the owner can update/delete a sheet
+  def authorize(:update_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+  def authorize(:delete_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+
+  # Some special types of updates, because they change sheet visibility
+  # is there any point to handling these separately from :update_sheet?
+  def authorize(:share_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+  def authorize(:unshare_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+
+  # Any logged-in user can create a sheet, but only for themselves
+  def authorize(:create_sheet, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}), do: :ok
+
+  # Habits can only be edited by their owner
+  def authorize(:update_habit, %User{id: user_id}, %Habit{user_id: user_id}), do: :ok
+  def authorize(:delete_habit, %User{id: user_id}, %Habit{user_id: user_id}), do: :ok
+  def authorize(:archive_habit, %User{id: user_id}, %Habit{user_id: user_id}), do: :ok
+  def authorize(:update_entry_for_habit, %User{id: user_id}, %Habit{user_id: user_id}), do: :ok
+
+  # Any logged-in user can create a habit, but only for themselves
+  def authorize(:create_habit, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}), do: :ok
+
+
+  # Fallback policy
+  def authorize(_, _, _), do: :error
+
+
+  def list_sheets_for_user(%User{} = user) do
+    {:ok,
+     Sheet
+     |> Bodyguard.scope(user)
+     |> Repo.all}
   end
 
-  # def list_all_sheets(), do: Repo.all(Sheet)
-
-  @doc """
-  Gets a single sheet.
-
-  Raises `Ecto.NoResultsError` if the Sheet does not exist.
-
-  ## Examples
-
-      iex> get_sheet!(123)
-      %Sheet{}
-
-      iex> get_sheet!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_sheet!(user_id, id), do: Repo.get_by!(Sheet, [id: id, user_id: user_id])
-
-  def get_sheet_by_share_id!(id), do: Repo.get_by!(Sheet, share_id: id)
-
-
-  @doc """
-  Creates a sheet.
-
-  ## Examples
-
-      iex> create_sheet(%{field: value})
-      {:ok, %Sheet{}}
-
-      iex> create_sheet(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_sheet(user_id, attrs \\ %{}) do
-    %Sheet{}
-    |> Sheet.changeset(Map.put(attrs, "user_id", user_id))
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a sheet.
-
-  ## Examples
-
-      iex> update_sheet(sheet, %{field: new_value})
-      {:ok, %Sheet{}}
-
-      iex> update_sheet(sheet, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_sheet(user_id, %Sheet{} = sheet, attrs) do
-    if get_sheet!(user_id, sheet.id) do
-      # don't allow overwriting owner
-      Map.delete(attrs, :user_id)
-
-      sheet
-      |> Sheet.changeset(attrs)
-      |> Repo.update()
-    else
-      raise "Could not find sheet"
+  def list_sheets_for_user_as(%User{} = current_user, %User{} = user) do
+    with :ok <- Bodyguard.permit(Sheets, :list_sheets_for_user, current_user, user) do
+      list_sheets_for_user(user)
     end
   end
 
-  def share_sheet!(user_id, %Sheet{} = sheet) do
-    update_sheet(user_id, sheet, %{
-      share_id: Ecto.UUID.generate()
-    })
+  def delete_sheet(%Sheet{} = sheet) do
+    Repo.delete(sheet)
   end
 
-  def unshare_sheet!(user_id, %Sheet{} = sheet) do
-    update_sheet(user_id, sheet, %{
-      share_id: nil
-    })
-  end
-
-  # def enable_daily_review_emails!(user_id, %Sheet{} = sheet) do
-  #   update_sheet!(user_id, sheet, %{
-  #     daily_review_email_enabled: true
-  #   })
-  # end
-
-  # def disable_daily_review_emails!(user_id, %Sheet{} = sheet) do
-  #   update_sheet!(user_id, sheet, %{
-  #     daily_review_email_enabled: false
-  #   })
-  # end
-
-  @doc """
-  Deletes a sheet.
-
-  ## Examples
-
-      iex> delete_sheet(sheet)
-      {:ok, %Sheet{}}
-
-      iex> delete_sheet(sheet)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_sheet!(user_id, %Sheet{} = sheet) do
-    if get_sheet!(user_id, sheet) do
-      Repo.delete!(sheet)
-    else
-      raise "Could not find sheet"
+  def delete_sheet_as(%User{} = current_user, %Sheet{} = sheet) do
+    with :ok <- Bodyguard.permit(Sheets, :delete_sheet, current_user, sheet) do
+      delete_sheet(sheet)
     end
   end
 
-  def delete_sheet_by_id!(user_id, sheet_id) do
-    Repo.delete_all(from s in Sheet, where: s.id == ^sheet_id and s.user_id == ^user_id)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking sheet changes.
-
-  ## Examples
-
-      iex> change_sheet(sheet)
-      %Ecto.Changeset{data: %Sheet{}}
-
-  """
-  def change_sheet(%Sheet{} = sheet, attrs \\ %{}) do
-    Sheet.changeset(sheet, attrs)
-  end
-
-  @doc """
-  Returns the list of habits.
-
-  ## Examples
-
-      iex> list_habits()
-      [%Habit{}, ...]
-
-  """
-  def list_habits_for_sheet!(user_id, sheet_id) do
-    if get_sheet!(user_id, sheet_id) do
-      Repo.all(
-        from habit in Habit,
-        select: habit,
-        where: habit.sheet_id == ^sheet_id and is_nil(habit.archived_at)
-      )
+  def get_sheet(sheet_id) do
+    if sheet = Repo.get(Sheet, sheet_id) do
+      {:ok, sheet}
     else
-      raise "Could not find sheet"
+      {:error, "sheet not found"}
     end
   end
 
-
-
-  @doc """
-  Gets a single habit.
-
-  Raises `Ecto.NoResultsError` if the Habit does not exist.
-
-  ## Examples
-
-      iex> get_habit!(123)
-      %Habit{}
-
-      iex> get_habit!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_habit!(user_id, id), do: Repo.get_by!(Habit, [id: id, user_id: user_id])
-
-  @doc """
-  Creates a habit.
-
-  ## Examples
-
-      iex> create_habit(%{field: value})
-      {:ok, %Habit{}}
-
-      iex> create_habit(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_habit(user_id, attrs \\ %{}) do
-    %Habit{}
-    |> Habit.changeset(Map.put(attrs, "user_id", user_id))
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a habit.
-
-  ## Examples
-
-      iex> update_habit(habit, %{field: new_value})
-      {:ok, %Habit{}}
-
-      iex> update_habit(habit, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_habit!(user_id, %Habit{} = habit, attrs) do
-    if get_habit!(user_id, habit.id) do
-      # don't allow overwriting owner
-      Map.delete(attrs, :user_id)
-
-      habit
-      |> Habit.changeset(attrs)
-      |> Repo.update!()
+  def get_sheet_as(current_user, sheet_id)
+  do
+    with(
+      {:ok, sheet} <- get_sheet(sheet_id),
+      :ok <- Bodyguard.permit(Sheets, :get_sheet, current_user, sheet)
+    ) do
+      {:ok, sheet}
     else
-      raise "Could not find sheet"
+      # return same error for missing sheet vs. unauthorized sheet
+      {:error, :unauthorized} -> {:error, "sheet not found"}
+      error -> error
     end
   end
 
-  @doc """
-  Deletes a habit.
-
-  ## Examples
-
-      iex> delete_habit(habit)
-      {:ok, %Habit{}}
-
-      iex> delete_habit(habit)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_habit!(user_id, %Habit{} = habit) do
-    if get_habit!(user_id, habit.id) do
-      Repo.delete!(habit)
+  def get_sheet_by_share_id(share_id) do
+    if is_nil(share_id) do
+      {:error, "shared sheet not found"}
     else
-      raise "Could not find habit"
+      if sheet = Repo.get_by(Sheet, share_id: share_id) do
+        {:ok, sheet}
+      else
+        {:error, "shared sheet not found"}
+      end
     end
   end
 
-  def delete_habit_by_id!(user_id, habit_id) do
-    Repo.delete_all(from h in Habit, where: h.id == ^habit_id and h.user_id == ^user_id)
-  end
-
-  def archive_habit_by_id!(user_id, habit_id) do
-    Repo.update_all(
-      from(h in Habit, where: h.id == ^habit_id and h.user_id == ^user_id),
-      set: [archived_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)]
-    )
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking habit changes.
-
-  ## Examples
-
-      iex> change_habit(habit)
-      %Ecto.Changeset{data: %Habit{}}
-
-  """
-  def change_habit(%Habit{} = habit, attrs \\ %{}) do
-    Habit.changeset(habit, attrs)
-  end
-
-  def update_habit_entry_for_date!(user_id, habit_id, date, value) do
-    if get_habit!(user_id, habit_id) do
-      %HabitEntry{}
-      |> HabitEntry.changeset(%{
-        habit_id: habit_id,
-        date: date,
-        value: value
-      })
-      |> Repo.insert!(on_conflict: :replace_all, conflict_target: [:habit_id, :date])
+  def get_sheet_by_share_id_as(current_user, share_id) do
+    with {:ok, sheet} <- get_sheet_by_share_id(share_id),
+         :ok <- Bodyguard.permit(Sheets, :get_sheet, current_user, sheet) do
+      {:ok, sheet}
     else
-      raise "Could not find habit"
+      {:error, :unauthorized} -> {:error, "shared sheet not found"}
+      error -> error
     end
   end
 
-  def get_habit_entries!(user_id, habit_id, date_range) do
-    if get_habit!(user_id, habit_id) do
-      Repo.all(
-        from entry in HabitEntry,
-        select: entry,
-        where: entry.habit_id == ^habit_id
-            and entry.date >= ^date_range.first
-            and entry.date <= ^date_range.last
-      )
-    else
-      raise "Could not find habit"
+  def create_sheet(%Changeset{data: %Sheet{}} = sheet) do
+    Repo.insert(sheet)
+  end
+
+  def create_sheet_as(%User{} = current_user, %Changeset{data: %Sheet{}} = sheet) do
+    with :ok <- Bodyguard.permit(Sheets, :create_sheet, current_user, sheet) do
+      create_sheet(sheet)
     end
   end
 
-  def get_shared_habit_entries!(share_id, habit_id, date_range) do
-    if not is_nil(share_id) do
-      Repo.all(
-        from entry in HabitEntry,
-        select: entry,
-        join: habit in Habit,
-        join: sheet in Sheet,
-        where: entry.habit_id == ^habit_id
-            and entry.date >= ^date_range.first
-            and entry.date <= ^date_range.last
-            and sheet.share_id == ^share_id
-      )
-    else
-      raise "Could not find habit"
+  def update_sheet(%Changeset{data: %Sheet{}} = sheet) do
+    Repo.update(sheet)
+  end
+
+  def update_sheet_as(%User{} = current_user, %Changeset{data: %Sheet{}} = sheet) do
+    with :ok <- Bodyguard.permit(Sheets, :update_sheet, current_user, sheet) do
+      update_sheet(sheet)
     end
   end
 
-  def get_habit_entry_value_map(user_id, habit_id, date_range) do
-    Map.new(get_habit_entries!(user_id, habit_id, date_range), fn entry -> { entry.date, entry } end)
+  def sheet_update_changeset(%Sheet{} = sheet, attrs \\ %{}) do
+    Sheet.update_changeset(sheet, attrs)
   end
 
-  def get_shared_habit_entry_value_map(share_id, habit_id, date_range) do
-    Map.new(get_shared_habit_entries!(share_id, habit_id, date_range), fn entry -> { entry.date, entry } end)
+  def sheet_create_changeset(%Sheet{} = sheet, attrs \\ %{}) do
+    Sheet.create_changeset(sheet, attrs)
   end
 
-  def list_habits_for_shared_sheet(share_id) do
-    if not is_nil(share_id) do
-      Repo.all(
-        from habit in Habit,
-        select: habit,
-        join: sheet in Sheet,
-        where: sheet.share_id == ^share_id and is_nil(habit.archived_at)
-      )
-    else
-      raise "Could not find shared sheet"
-    end
-  end
-
-  def get_week_range(date) do
-    Date.range(
-      Date.beginning_of_week(date),
-      Date.end_of_week(date)
-    )
-  end
-
-  def get_habit_entries_for_date(user_id, sheet_id, date) do
-    Repo.all(
+  def list_habits_for_sheet(%Sheet{} = sheet) do
+    {:ok, Repo.all(
       from habit in Habit,
-      join: entry in HabitEntry,
-      on: entry.habit_id == habit.id,
-      select: %{habit | entry: entry},
-      where: habit.sheet_id == ^sheet_id
-         and habit.user_id == ^user_id
-         and entry.date == ^date
-    )
+      select: habit,
+      where:
+        habit.sheet_id == ^sheet.id
+        and is_nil(habit.archived_at)
+    )}
   end
 
-  def delete_sheets_for_user(user_id) do
-    Repo.delete_all(
+  def list_habits_for_sheet_as(current_user, %Sheet{} = sheet) do
+    with :ok <- Bodyguard.permit(Sheets, :list_habits_for_sheet, current_user, sheet) do
+      list_habits_for_sheet(sheet)
+    end
+  end
+
+  def list_habit_entries_for_sheet(%Sheet{} = sheet, date_range) do
+    {:ok, Repo.all(
+      from entry in HabitEntry,
+      join: habit in Habit,
+      select: %{entry | habit: habit},
+      where:
+        habit.sheet_id == ^sheet.id
+        and is_nil(habit.archived_at)
+        and entry.date >= ^date_range.first
+        and entry.date <= ^date_range.last
+    )}
+  end
+
+  def list_habit_entries_for_sheet_as(current_user, %Sheet{} = sheet, date_range) do
+    with :ok <- Bodyguard.permit(Sheets, :list_habit_entries_for_sheet, current_user, sheet) do
+      list_habit_entries_for_sheet(sheet, date_range)
+    end
+  end
+
+  def habit_entry_map(habits, date_range, habit_entries) do
+    entry_map = Map.new(Enum.map(habit_entries, fn entry ->
+      {{entry.habit_id, entry.date}, entry}
+    end))
+    Map.new(Enum.map(habits, fn habit ->
+      {habit.id, Map.new(Enum.map(date_range, fn date ->
+        {date, Map.get(entry_map, {habit.id, date})}
+      end))}
+    end))
+  end
+
+  def delete_sheets_for_user(%User{id: user_id}) do
+    {:ok, Repo.delete_all(
       from sheet in Sheet,
       where: sheet.user_id == ^user_id
-    )
+    )}
+  end
+
+  def delete_sheets_for_user_as(%User{} = current_user, %User{} = user) do
+    with :ok <- Bodyguard.permit(Sheets, :delete_sheets_for_user, current_user, user) do
+      delete_sheets_for_user(user)
+    end
+  end
+
+  def share_sheet(%Sheet{} = sheet) do
+    update_sheet(sheet_update_changeset(sheet, %{
+      share_id: Ecto.UUID.generate()
+    }))
+  end
+
+  def share_sheet_as(%User{} = current_user, %Sheet{} = sheet) do
+    with :ok <- Bodyguard.permit(Sheets, :share_sheet, current_user, sheet) do
+      share_sheet(sheet)
+    end
+  end
+
+  def unshare_sheet(%Sheet{} = sheet) do
+    update_sheet(sheet_update_changeset(sheet, %{
+      share_id: nil
+    }))
+  end
+
+  def unshare_sheet_as(%User{} = current_user, %Sheet{} = sheet) do
+    with :ok <- Bodyguard.permit(Sheets, :unshare_sheet, current_user, sheet) do
+      unshare_sheet(sheet)
+    end
+  end
+
+  def habit_update_changeset(%Habit{} = habit, attrs \\ %{}) do
+    Habit.update_changeset(habit, attrs)
+  end
+
+  def habit_create_changeset(%Habit{} = habit, attrs \\ %{}) do
+    Habit.create_changeset(habit, attrs)
+  end
+
+  def create_habit(%Changeset{data: %Habit{}} = habit) do
+    Repo.insert(habit)
+  end
+
+  def create_habit_as(%User{} = current_user, %Changeset{data: %Habit{}} = habit) do
+    with :ok <- Bodyguard.permit(Sheets, :create_habit, current_user, habit) do
+      create_habit(habit)
+    end
+  end
+
+  def update_habit(%Changeset{data: %Habit{}} = habit) do
+    Repo.update(habit)
+  end
+
+  def update_habit_as(%User{} = current_user, %Changeset{data: %Habit{}} = habit) do
+    with :ok <- Bodyguard.permit(Sheets, :update_habit, current_user, habit) do
+      update_habit(habit)
+    end
+  end
+
+  def archive_habit(%Habit{} = habit) do
+    update_habit(habit_update_changeset(habit, %{
+      archived_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+    }))
+  end
+
+  def archive_habit_as(%User{} = current_user, %Habit{} = habit) do
+    with :ok <- Bodyguard.permit(Sheets, :archive_habit, current_user, habit) do
+      archive_habit(habit)
+    end
+  end
+
+  def update_habit_entry_for_date(%Habit{} = habit, date, value) do
+    %HabitEntry{}
+    |> HabitEntry.create_changeset(%{
+      habit_id: habit.id,
+      date: date,
+      value: value
+    })
+    |> Repo.insert(on_conflict: :replace_all, conflict_target: [:habit_id, :date])
+  end
+
+  def update_habit_entry_for_date_as(%User{} = current_user, %Habit{} = habit, date, value) do
+    with :ok <- Bodyguard.permit(Sheets, :update_entry_for_habit, current_user, habit) do
+      update_habit_entry_for_date(habit, date, value)
+    end
   end
 end

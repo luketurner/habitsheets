@@ -30,6 +30,14 @@
       <%= error_tag f, :name %>
     </div>
 
+    <%= if Map.get assigns, :submit_error do %>
+    <div class="alert alert-error my-4">
+      <div>
+        <span><%= @submit_error %></span>
+      </div>
+    </div>
+    <% end %>
+
     <div class="modal-action">
       <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
     </div>

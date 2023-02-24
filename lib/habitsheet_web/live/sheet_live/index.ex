@@ -7,8 +7,7 @@ defmodule HabitsheetWeb.SheetLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket
-      |> assign(:sheets, list_sheets(socket.assigns.current_user.id))
-    }
+      |> assign_sheets()}
   end
 
   @impl true
@@ -18,7 +17,7 @@ defmodule HabitsheetWeb.SheetLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New sheet...")
+    |> assign(:page_title, "New sheet")
     |> assign(:sheet, %Sheet{})
   end
 
@@ -30,12 +29,24 @@ defmodule HabitsheetWeb.SheetLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    Sheets.delete_sheet_by_id!(socket.assigns.current_user.id, id)
-
-    {:noreply, assign(socket, :sheets, list_sheets(socket.assigns.current_user.id))}
+    sheet = Enum.find(socket.assigns.sheets, fn sheet -> sheet.id == id end)
+    {:noreply, case Sheets.delete_sheet_as(socket.assigns.current_user, sheet) do
+      {:ok, _sheet} -> assign_sheets(socket)
+      {:error, _error} ->
+        socket
+        |> put_flash(:error, "Cannot delete sheet")
+        |> push_redirect(to: Routes.sheet_index_path(socket, :index))
+    end}
   end
 
-  defp list_sheets(current_user_id) do
-    Sheets.list_sheets(current_user_id)
+  defp assign_sheets(socket) do
+    current_user = socket.assigns.current_user
+    case Sheets.list_sheets_for_user_as(current_user, current_user) do
+      {:ok, sheets} -> assign(socket, :sheets, sheets)
+      {:error, _error} ->
+        socket
+        |> put_flash(:error, "Error viewing sheets")
+        |> push_redirect(to: Routes.home_path(socket, :index))
+    end
   end
 end
