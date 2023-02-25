@@ -5,8 +5,6 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
   alias Habitsheet.Reviews
   alias Habitsheet.Repo
 
-  on_mount {HabitsheetWeb.LiveInit, :load_sheet}
-
   @impl true
   def mount(%{ "sheet_id" => _sheet_id, "date" => date_param }, _session, socket) do
     date = Date.from_iso8601!(date_param)

@@ -3,17 +3,10 @@ defmodule HabitsheetWeb.SharedSheetLive.Show do
 
   alias Habitsheet.Sheets
 
-  on_mount {HabitsheetWeb.LiveInit, :load_shared_sheet}
-
   @impl true
   def mount(_params, _session, socket) do
-    current_user = socket.assigns.current_user
-    viewport_width = socket.private.connect_params["viewport"]["width"]
-    timezone = socket.private.connect_params["browser_timezone"]
-            || (current_user && current_user.timezone)
-            || "Etc/UTC"
-    full_week_view? = breakpoint?(viewport_width, :md)
-    today = DateTime.to_date(DateTime.now!(timezone))
+    full_week_view? = breakpoint?(socket, :md)
+    today = DateTime.to_date(DateTime.now!(socket.assigns.timezone))
     date_range = if full_week_view? do
       Date.range(
         Date.beginning_of_week(today),
@@ -26,9 +19,7 @@ defmodule HabitsheetWeb.SharedSheetLive.Show do
       |> assign(:date_range, date_range)
       |> assign_habits()
       |> assign_habit_entries()
-      |> assign(:subtitle, socket.assigns.sheet.title || "Unnamed Sheet")
-      |> assign(:viewport_width, viewport_width)
-      |> assign(:timezone, timezone)}
+      |> assign(:subtitle, socket.assigns.sheet.title || "Unnamed Sheet")}
   end
 
   @impl true
@@ -80,36 +71,6 @@ defmodule HabitsheetWeb.SharedSheetLive.Show do
       {:ok, entries} -> assign(socket, :habit_entries, Sheets.habit_entry_map(habits, date_range, entries))
       {:error, _} -> assign(socket, :habit_entries, %{}) # TODO
     end
-  end
-
-  defp short_date(date) do
-    "#{date.month}/#{date.day}"
-  end
-
-  defp day_of_week(date) do
-    case Date.day_of_week(date) do
-      1 -> "M"
-      2 -> "T"
-      3 -> "W"
-      4 -> "T"
-      5 -> "F"
-      6 -> "S"
-      7 -> "S"
-    end
-  end
-
-  # TODO -- abstract this stuff into a helper
-
-  defp breakpoint?(viewport_width, breakpoint) do
-    points = %{
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      twoxl: 1536
-    }
-    width = points[breakpoint]
-    !is_nil(viewport_width) && width <= viewport_width
   end
 
 end

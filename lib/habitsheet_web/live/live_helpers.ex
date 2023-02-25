@@ -3,6 +3,9 @@ defmodule HabitsheetWeb.LiveHelpers do
 
   alias Phoenix.LiveView.JS
 
+  alias Habitsheet.Users
+  alias Habitsheet.Sheets
+
   @doc """
   Renders a live component inside a modal.
 
@@ -51,4 +54,75 @@ defmodule HabitsheetWeb.LiveHelpers do
     |> JS.hide(to: "#modal", transition: "fade-out")
     |> JS.hide(to: "#modal-content", transition: "fade-out-scale")
   end
+
+  def assign_user_for_session(socket, %{"user_token" => user_token} = _session) do
+    assign(socket, :current_user, Users.get_user_by_session_token(user_token))
+  end
+
+  def assign_timezone(socket) do
+    timezone = socket.private.connect_params["browser_timezone"]
+            || socket.assigns.current_user.timezone
+            || "Etc/UTC"
+    assign(socket, :timezone, timezone)
+  end
+
+  def assign_viewport(socket) do
+    width = socket.private.connect_params["viewport"]["width"]
+    height = socket.private.connect_params["viewport"]["height"]
+    assign(socket, :viewport, %{width: width, height: height})
+  end
+
+  def get_resources_for_params(%{assigns: %{current_user: current_user}} = _socket, params) do
+    with(
+      {:ok, sheet} <- if sheet_id = Map.get(params, "sheet_id") do
+        Sheets.get_sheet_as(current_user, sheet_id)
+      else
+        if share_id = Map.get(params, "share_id") do
+          Sheets.get_sheet_by_share_id_as(current_user, share_id)
+        else
+          {:ok, nil}
+        end
+      end
+    ) do
+      {:ok, %{sheet: sheet}}
+    end
+  end
+
+  def short_date(date) do
+    "#{date.month}/#{date.day}"
+  end
+
+  def day_of_week(date) do
+    case Date.day_of_week(date) do
+      1 -> "M"
+      2 -> "T"
+      3 -> "W"
+      4 -> "T"
+      5 -> "F"
+      6 -> "S"
+      7 -> "S"
+    end
+  end
+
+  # TODO -- abstract this stuff into a helper
+
+  def breakpoint?(%{assigns: %{viewport: %{width: viewport_width}}} = _socket, breakpoint) do
+    points = %{
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      twoxl: 1536
+    }
+    width = points[breakpoint]
+    !is_nil(viewport_width) && width <= viewport_width
+  end
+
+    # TODO -- this event needs to be implemented client-side before it'll do anything.
+  # @impl true
+  # def handle_event("viewport_resize", viewport, socket) do
+  #   {:noreply, socket
+  #     |> assign(:viewport_width, viewport["width"])}
+  # end
+
 end

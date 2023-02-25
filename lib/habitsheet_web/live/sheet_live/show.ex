@@ -4,16 +4,10 @@ defmodule HabitsheetWeb.SheetLive.Show do
   alias Habitsheet.Sheets
   alias Habitsheet.Sheets.Habit
 
-  on_mount {HabitsheetWeb.LiveInit, :load_sheet}
-
   @impl true
   def mount(_params, _session, socket) do
-    viewport_width = socket.private.connect_params["viewport"]["width"]
-    full_week_view? = breakpoint?(viewport_width, :md)
-    timezone = socket.private.connect_params["browser_timezone"]
-            || socket.assigns.current_user.timezone
-            || "Etc/UTC"
-    today = DateTime.to_date(DateTime.now!(timezone))
+    full_week_view? = breakpoint?(socket, :md)
+    today = DateTime.to_date(DateTime.now!(socket.assigns.timezone))
     date_range = if full_week_view? do
       Date.range(
         Date.beginning_of_week(today),
@@ -27,7 +21,6 @@ defmodule HabitsheetWeb.SheetLive.Show do
       |> assign_habits()
       |> assign_habit_entries()
       |> assign(:subtitle, socket.assigns.sheet.title || "Unnamed Sheet")
-      |> assign(:viewport_width, viewport_width)
     }
   end
 
@@ -111,13 +104,6 @@ defmodule HabitsheetWeb.SheetLive.Show do
       |> assign_habit_entries()}
   end
 
-  # TODO -- this event needs to be implemented client-side before it'll do anything.
-  # @impl true
-  # def handle_event("viewport_resize", viewport, socket) do
-  #   {:noreply, socket
-  #     |> assign(:viewport_width, viewport["width"])}
-  # end
-
   defp assign_habits(%{ assigns: %{current_user: current_user, sheet: sheet} } = socket) do
     case Sheets.list_habits_for_sheet_as(current_user, sheet) do
       {:ok, habits} -> assign(socket, :habits, habits)
@@ -130,42 +116,6 @@ defmodule HabitsheetWeb.SheetLive.Show do
       {:ok, entries} -> assign(socket, :habit_entries, Sheets.habit_entry_map(habits, date_range, entries))
       {:error, _} -> assign(socket, :habit_entries, %{}) # TODO
     end
-  end
-
-  # defp get_habit_entry_for_date(habit_entries, habit_id, date) do
-  #   habit_entries
-  #   |> Map.get(habit_id, Map.new())
-  #   |> Map.get(date, nil)
-  # end
-
-  defp short_date(date) do
-    "#{date.month}/#{date.day}"
-  end
-
-  defp day_of_week(date) do
-    case Date.day_of_week(date) do
-      1 -> "M"
-      2 -> "T"
-      3 -> "W"
-      4 -> "T"
-      5 -> "F"
-      6 -> "S"
-      7 -> "S"
-    end
-  end
-
-  # TODO -- abstract this stuff into a helper
-
-  defp breakpoint?(viewport_width, breakpoint) do
-    points = %{
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      twoxl: 1536
-    }
-    width = points[breakpoint]
-    !is_nil(viewport_width) && width <= viewport_width
   end
 
 end
