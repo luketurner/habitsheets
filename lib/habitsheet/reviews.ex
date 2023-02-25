@@ -19,17 +19,19 @@ defmodule Habitsheet.Reviews do
   alias Habitsheet.Users.User
 
   def get_or_create_daily_review_by_date(user_id, sheet_id, date) do
-    Repo.insert(%DailyReview{
-      user_id: user_id,
-      sheet_id: sheet_id,
-      date: date,
-      status: :started,
-      email_status: :pending,
-      email_failure_count: 0,
-    },
-    on_conflict: {:replace, [:updated_at]},
-    conflict_target: [:user_id, :sheet_id, :date],
-    returning: true)
+    Repo.insert(
+      %DailyReview{
+        user_id: user_id,
+        sheet_id: sheet_id,
+        date: date,
+        status: :started,
+        email_status: :pending,
+        email_failure_count: 0
+      },
+      on_conflict: {:replace, [:updated_at]},
+      conflict_target: [:user_id, :sheet_id, :date],
+      returning: true
+    )
   end
 
   @doc """
@@ -42,7 +44,9 @@ defmodule Habitsheet.Reviews do
 
   """
   def list_daily_review(user_id, sheet_id) do
-    Repo.all(from r in DailyReview, select: r, where: r.user_id == ^user_id and r.sheet_id == ^sheet_id)
+    Repo.all(
+      from r in DailyReview, select: r, where: r.user_id == ^user_id and r.sheet_id == ^sheet_id
+    )
   end
 
   @doc """
@@ -59,9 +63,14 @@ defmodule Habitsheet.Reviews do
       ** (Ecto.NoResultsError)
 
   """
-  def get_daily_review_by_date(user_id, sheet_id, date), do: Repo.get_by(DailyReview, [user_id: user_id, sheet_id: sheet_id, date: date])
-  def get_daily_review(user_id, sheet_id, review_id), do: Repo.get_by(DailyReview, [user_id: user_id, sheet_id: sheet_id, id: review_id])
-  def get_daily_review!(user_id, sheet_id, review_id), do: Repo.get_by!(DailyReview, [user_id: user_id, sheet_id: sheet_id, id: review_id])
+  def get_daily_review_by_date(user_id, sheet_id, date),
+    do: Repo.get_by(DailyReview, user_id: user_id, sheet_id: sheet_id, date: date)
+
+  def get_daily_review(user_id, sheet_id, review_id),
+    do: Repo.get_by(DailyReview, user_id: user_id, sheet_id: sheet_id, id: review_id)
+
+  def get_daily_review!(user_id, sheet_id, review_id),
+    do: Repo.get_by!(DailyReview, user_id: user_id, sheet_id: sheet_id, id: review_id)
 
   @doc """
   Creates a daily_review.
@@ -76,7 +85,8 @@ defmodule Habitsheet.Reviews do
 
   """
   def create_daily_review(user_id, sheet_id, attrs \\ %{}) do
-    attrs = attrs
+    attrs =
+      attrs
       |> Map.put(:user_id, user_id)
       |> Map.put(:sheet_id, sheet_id)
 
@@ -144,46 +154,53 @@ defmodule Habitsheet.Reviews do
 
     now = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
 
-    reviews = Enum.flat_map(all_users, fn user ->
-      # TODO -- should handle errors better
-      {:ok, sheets} = Sheets.list_sheets_for_user(user)
-      Enum.flat_map(sheets, fn sheet ->
-        Enum.map(date_range, fn date ->
-          %{
-            user_id: sheet.user_id,
-            sheet_id: sheet.id,
-            date: date,
-            email_status: :pending,
-            email_failure_count: 0,
-            email_attempt_count: 0,
-            status: :not_started,
-            inserted_at: now,
-            updated_at: now
-          }
+    reviews =
+      Enum.flat_map(all_users, fn user ->
+        # TODO -- should handle errors better
+        {:ok, sheets} = Sheets.list_sheets_for_user(user)
+
+        Enum.flat_map(sheets, fn sheet ->
+          Enum.map(date_range, fn date ->
+            %{
+              user_id: sheet.user_id,
+              sheet_id: sheet.id,
+              date: date,
+              email_status: :pending,
+              email_failure_count: 0,
+              email_attempt_count: 0,
+              status: :not_started,
+              inserted_at: now,
+              updated_at: now
+            }
+          end)
         end)
       end)
-    end)
 
     # TODO -- I wonder if there is a better way to do this...
-    {_count, _new_review_ids} = Repo.insert_all(
-      DailyReview,
-      reviews,
-      on_conflict: :nothing, # {:replace, [:updated_at]},
-      conflict_target: [:user_id, :sheet_id, :date],
-      returning: [:id]
-    )
+    {_count, _new_review_ids} =
+      Repo.insert_all(
+        DailyReview,
+        reviews,
+        # {:replace, [:updated_at]},
+        on_conflict: :nothing,
+        conflict_target: [:user_id, :sheet_id, :date],
+        returning: [:id]
+      )
 
     {:ok, []}
   end
 
   def send_emails_for_daily_reviews_with_pending_attempts() do
-    Enum.map(get_daily_reviews_with_pending_attempts(), fn {review, email, daily_review_email_enabled, daily_review_email_time } ->
+    Enum.map(get_daily_reviews_with_pending_attempts(), fn {review, email,
+                                                            daily_review_email_enabled,
+                                                            daily_review_email_time} ->
       if !daily_review_email_enabled or is_nil(email) do
         Repo.update(DailyReview.changeset(review, %{email_status: :skipped}))
       else
         # TODO
         review = Repo.preload(review, :user)
         now = DateTime.to_time(DateTime.now!(review.user.timezone))
+
         if Time.compare(daily_review_email_time, Time.add(now, -30, :minute)) == :lt do
           ReviewEmailSender.send_email_for_daily_review(review, email, :fill_review)
         end
@@ -193,27 +210,33 @@ defmodule Habitsheet.Reviews do
 
   def get_daily_reviews_with_pending_attempts() do
     max_email_failure_count = Application.get_env(:habitsheet, :review_email_max_failure_count)
+
     Repo.all(
       from review in DailyReview,
-      join: user in User, on: review.user_id == user.id,
-      join: sheet in Sheet, on: review.sheet_id == sheet.id,
-      select: {review, user.email, sheet.daily_review_email_enabled, sheet.daily_review_email_time},
-      where:
-        review.email_status in [:pending, :failed] and
-        review.email_failure_count < ^max_email_failure_count
+        join: user in User,
+        on: review.user_id == user.id,
+        join: sheet in Sheet,
+        on: review.sheet_id == sheet.id,
+        select:
+          {review, user.email, sheet.daily_review_email_enabled, sheet.daily_review_email_time},
+        where:
+          review.email_status in [:pending, :failed] and
+            review.email_failure_count < ^max_email_failure_count
     )
   end
 
   def get_habits_for_daily_review(review) do
     Repo.all(
       from habit in Habit,
-      left_join: entry in HabitEntry, on: entry.habit_id == habit.id,
-      select: %{habit | entry: entry},
-      where: habit.sheet_id == ^review.sheet_id
-         and habit.user_id == ^review.user_id
-         and (is_nil(entry.id) or entry.date == ^review.date)
-         # habit needs to either: not be archived, or have an entry
-         and (is_nil(habit.archived_at) or not is_nil(entry.id))
+        left_join: entry in HabitEntry,
+        on: entry.habit_id == habit.id,
+        select: %{habit | entry: entry},
+        # habit needs to either: not be archived, or have an entry
+        where:
+          habit.sheet_id == ^review.sheet_id and
+            habit.user_id == ^review.user_id and
+            (is_nil(entry.id) or entry.date == ^review.date) and
+            (is_nil(habit.archived_at) or not is_nil(entry.id))
     )
   end
 

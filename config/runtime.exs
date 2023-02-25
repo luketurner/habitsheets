@@ -74,16 +74,16 @@ if config_env() == :prod do
     # tls: :always,
     auth: :always,
     port: String.to_integer(System.get_env("MAILER_SMTP_PORT", "587")),
-  # dkim: [
-  #   s: "default", d: "domain.com",
-  #   private_key: {:pem_plain, File.read!("priv/keys/domain.private")}
-  # ],
+    # dkim: [
+    #   s: "default", d: "domain.com",
+    #   private_key: {:pem_plain, File.read!("priv/keys/domain.private")}
+    # ],
     retries: 2
+
   # no_mx_lookups: false
 
   # application custom config values
   config :habitsheet,
     outgoing_email_address: System.get_env("OUTGOING_EMAIL_ADDRESS"),
     admin_email_address: System.get_env("ADMIN_EMAIL_ADDRESS")
-
 end

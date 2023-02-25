@@ -22,12 +22,12 @@ defmodule HabitsheetWeb.Components do
   def icon_academic_cap_mini(assigns)
 
   attr :rest, :global, default: %{class: "text-xl font-bold pb-4"}
-  slot :inner_block
+  slot(:inner_block)
   def page_title(assigns)
 
   attr :habit, Habitsheet.Sheets.Habit
   attr :rest, :global, default: %{class: ""}
-  slot :inner_block
+  slot(:inner_block)
   def habit_label(assigns)
 
   attr :entry, Habitsheet.Sheets.HabitEntry
@@ -41,23 +41,23 @@ defmodule HabitsheetWeb.Components do
 
   attr :cols, :list
   attr :rows, :list
-  slot :col_label
-  slot :row_label
-  slot :cell
-  slot :next_btn
-  slot :prev_btn
+  slot(:col_label)
+  slot(:row_label)
+  slot(:cell)
+  slot(:next_btn)
+  slot(:prev_btn)
   attr :rest, :global
   def flex_table(assigns)
 
   attr :conn_or_socket, :any, required: true
-  slot :inner_block, required: true
-  slot :nav_menu, required: true
-  slot :nav_title, required: true
-  slot :nav_subtitle
-  slot :footer, required: true
+  slot(:inner_block, required: true)
+  slot(:nav_menu, required: true)
+  slot(:nav_title, required: true)
+  slot(:nav_subtitle)
+  slot(:footer, required: true)
   def layout(assigns)
 
-  slot :inner_block
+  slot(:inner_block)
   attr :rest, :global, default: %{class: "breadcrumbs text-sm font-semibold mx-3 mt-2 mb-4"}
   def breadcrumbs(assign)
 end

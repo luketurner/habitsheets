@@ -144,7 +144,9 @@ defmodule Habitsheet.SheetsTest do
       habit_entry = habit_entry_fixture()
       update_attrs = %{date: ~D[2023-02-11], value: 43}
 
-      assert {:ok, %HabitEntry{} = habit_entry} = Sheets.update_habit_entry(habit_entry, update_attrs)
+      assert {:ok, %HabitEntry{} = habit_entry} =
+               Sheets.update_habit_entry(habit_entry, update_attrs)
+
       assert habit_entry.date == ~D[2023-02-11]
       assert habit_entry.value == 43
     end

@@ -60,9 +60,11 @@ defmodule HabitsheetWeb.LiveHelpers do
   end
 
   def assign_timezone(socket) do
-    timezone = socket.private.connect_params["browser_timezone"]
-            || socket.assigns.current_user.timezone
-            || "Etc/UTC"
+    timezone =
+      socket.private.connect_params["browser_timezone"] ||
+        socket.assigns.current_user.timezone ||
+        "Etc/UTC"
+
     assign(socket, :timezone, timezone)
   end
 
@@ -74,15 +76,16 @@ defmodule HabitsheetWeb.LiveHelpers do
 
   def get_resources_for_params(%{assigns: %{current_user: current_user}} = _socket, params) do
     with(
-      {:ok, sheet} <- if sheet_id = Map.get(params, "sheet_id") do
-        Sheets.get_sheet_as(current_user, sheet_id)
-      else
-        if share_id = Map.get(params, "share_id") do
-          Sheets.get_sheet_by_share_id_as(current_user, share_id)
+      {:ok, sheet} <-
+        if sheet_id = Map.get(params, "sheet_id") do
+          Sheets.get_sheet_as(current_user, sheet_id)
         else
-          {:ok, nil}
+          if share_id = Map.get(params, "share_id") do
+            Sheets.get_sheet_by_share_id_as(current_user, share_id)
+          else
+            {:ok, nil}
+          end
         end
-      end
     ) do
       {:ok, %{sheet: sheet}}
     end
@@ -114,15 +117,15 @@ defmodule HabitsheetWeb.LiveHelpers do
       xl: 1280,
       twoxl: 1536
     }
+
     width = points[breakpoint]
     !is_nil(viewport_width) && width <= viewport_width
   end
 
-    # TODO -- this event needs to be implemented client-side before it'll do anything.
+  # TODO -- this event needs to be implemented client-side before it'll do anything.
   # @impl true
   # def handle_event("viewport_resize", viewport, socket) do
   #   {:noreply, socket
   #     |> assign(:viewport_width, viewport["width"])}
   # end
-
 end

@@ -18,6 +18,7 @@ defmodule HabitsheetWeb.UserSettingsController do
         conn
         |> put_flash(:info, "Deleted account #{conn.assigns.current_user.email}")
         |> redirect(to: Routes.home_path(conn, :index))
+
       {:error, _} ->
         conn
         |> put_flash(:error, "Error deleting account")
@@ -31,6 +32,7 @@ defmodule HabitsheetWeb.UserSettingsController do
         conn
         |> put_flash(:info, "Cleared account data")
         |> redirect(to: Routes.user_settings_path(conn, :edit))
+
       {:error, _} ->
         conn
         |> put_flash(:error, "Error clearing account data")

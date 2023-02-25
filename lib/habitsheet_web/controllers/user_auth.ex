@@ -133,7 +133,10 @@ defmodule HabitsheetWeb.UserAuth do
         conn
       else
         conn
-        |> put_flash(:error, "Please click the link in the verification email to activate your account.")
+        |> put_flash(
+          :error,
+          "Please click the link in the verification email to activate your account."
+        )
         |> maybe_store_return_to()
         |> redirect(to: Routes.user_confirmation_path(conn, :new))
         |> halt()
@@ -155,5 +158,6 @@ defmodule HabitsheetWeb.UserAuth do
 
   defp signed_in_path(_conn), do: "/"
 
-  defp require_email_verification?(), do: Application.get_env(:habitsheet, :require_email_verification)
+  defp require_email_verification?(),
+    do: Application.get_env(:habitsheet, :require_email_verification)
 end

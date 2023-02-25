@@ -28,12 +28,16 @@ defmodule Habitsheet.Sheets do
   # TODO make this more DRY? Or does it matter?
   def authorize(:get_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
   def authorize(:list_habits_for_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
-  def authorize(:list_habit_entries_for_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+
+  def authorize(:list_habit_entries_for_sheet, %User{id: user_id}, %Sheet{user_id: user_id}),
+    do: :ok
 
   # Anyone can get a sheet (or related habits/entries) with a share ID
   def authorize(:get_sheet, _user, %Sheet{share_id: share_id}), do: !is_nil(share_id)
   def authorize(:list_habits_for_sheet, _user, %Sheet{share_id: share_id}), do: !is_nil(share_id)
-  def authorize(:list_habit_entries_for_sheet, _user, %Sheet{share_id: share_id}), do: !is_nil(share_id)
+
+  def authorize(:list_habit_entries_for_sheet, _user, %Sheet{share_id: share_id}),
+    do: !is_nil(share_id)
 
   # Only the owner can update/delete a sheet
   def authorize(:update_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
@@ -45,7 +49,8 @@ defmodule Habitsheet.Sheets do
   def authorize(:unshare_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
 
   # Any logged-in user can create a sheet, but only for themselves
-  def authorize(:create_sheet, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}), do: :ok
+  def authorize(:create_sheet, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}),
+    do: :ok
 
   # Habits can only be edited by their owner
   def authorize(:update_habit, %User{id: user_id}, %Habit{user_id: user_id}), do: :ok
@@ -54,18 +59,17 @@ defmodule Habitsheet.Sheets do
   def authorize(:update_entry_for_habit, %User{id: user_id}, %Habit{user_id: user_id}), do: :ok
 
   # Any logged-in user can create a habit, but only for themselves
-  def authorize(:create_habit, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}), do: :ok
-
+  def authorize(:create_habit, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}),
+    do: :ok
 
   # Fallback policy
   def authorize(_, _, _), do: :error
-
 
   def list_sheets_for_user(%User{} = user) do
     {:ok,
      Sheet
      |> Bodyguard.scope(user)
-     |> Repo.all}
+     |> Repo.all()}
   end
 
   def list_sheets_for_user_as(%User{} = current_user, %User{} = user) do
@@ -92,8 +96,7 @@ defmodule Habitsheet.Sheets do
     end
   end
 
-  def get_sheet_as(current_user, sheet_id)
-  do
+  def get_sheet_as(current_user, sheet_id) do
     with(
       {:ok, sheet} <- get_sheet(sheet_id),
       :ok <- Bodyguard.permit(Sheets, :get_sheet, current_user, sheet)
@@ -157,13 +160,14 @@ defmodule Habitsheet.Sheets do
   end
 
   def list_habits_for_sheet(%Sheet{} = sheet) do
-    {:ok, Repo.all(
-      from habit in Habit,
-      select: habit,
-      where:
-        habit.sheet_id == ^sheet.id
-        and is_nil(habit.archived_at)
-    )}
+    {:ok,
+     Repo.all(
+       from habit in Habit,
+         select: habit,
+         where:
+           habit.sheet_id == ^sheet.id and
+             is_nil(habit.archived_at)
+     )}
   end
 
   def list_habits_for_sheet_as(current_user, %Sheet{} = sheet) do
@@ -173,16 +177,17 @@ defmodule Habitsheet.Sheets do
   end
 
   def list_habit_entries_for_sheet(%Sheet{} = sheet, date_range) do
-    {:ok, Repo.all(
-      from entry in HabitEntry,
-      join: habit in Habit,
-      select: %{entry | habit: habit},
-      where:
-        habit.sheet_id == ^sheet.id
-        and is_nil(habit.archived_at)
-        and entry.date >= ^date_range.first
-        and entry.date <= ^date_range.last
-    )}
+    {:ok,
+     Repo.all(
+       from entry in HabitEntry,
+         join: habit in Habit,
+         select: %{entry | habit: habit},
+         where:
+           habit.sheet_id == ^sheet.id and
+             is_nil(habit.archived_at) and
+             entry.date >= ^date_range.first and
+             entry.date <= ^date_range.last
+     )}
   end
 
   def list_habit_entries_for_sheet_as(current_user, %Sheet{} = sheet, date_range) do
@@ -192,21 +197,31 @@ defmodule Habitsheet.Sheets do
   end
 
   def habit_entry_map(habits, date_range, habit_entries) do
-    entry_map = Map.new(Enum.map(habit_entries, fn entry ->
-      {{entry.habit_id, entry.date}, entry}
-    end))
-    Map.new(Enum.map(habits, fn habit ->
-      {habit.id, Map.new(Enum.map(date_range, fn date ->
-        {date, Map.get(entry_map, {habit.id, date})}
-      end))}
-    end))
+    entry_map =
+      Map.new(
+        Enum.map(habit_entries, fn entry ->
+          {{entry.habit_id, entry.date}, entry}
+        end)
+      )
+
+    Map.new(
+      Enum.map(habits, fn habit ->
+        {habit.id,
+         Map.new(
+           Enum.map(date_range, fn date ->
+             {date, Map.get(entry_map, {habit.id, date})}
+           end)
+         )}
+      end)
+    )
   end
 
   def delete_sheets_for_user(%User{id: user_id}) do
-    {:ok, Repo.delete_all(
-      from sheet in Sheet,
-      where: sheet.user_id == ^user_id
-    )}
+    {:ok,
+     Repo.delete_all(
+       from sheet in Sheet,
+         where: sheet.user_id == ^user_id
+     )}
   end
 
   def delete_sheets_for_user_as(%User{} = current_user, %User{} = user) do
@@ -216,9 +231,11 @@ defmodule Habitsheet.Sheets do
   end
 
   def share_sheet(%Sheet{} = sheet) do
-    update_sheet(sheet_update_changeset(sheet, %{
-      share_id: Ecto.UUID.generate()
-    }))
+    update_sheet(
+      sheet_update_changeset(sheet, %{
+        share_id: Ecto.UUID.generate()
+      })
+    )
   end
 
   def share_sheet_as(%User{} = current_user, %Sheet{} = sheet) do
@@ -228,9 +245,11 @@ defmodule Habitsheet.Sheets do
   end
 
   def unshare_sheet(%Sheet{} = sheet) do
-    update_sheet(sheet_update_changeset(sheet, %{
-      share_id: nil
-    }))
+    update_sheet(
+      sheet_update_changeset(sheet, %{
+        share_id: nil
+      })
+    )
   end
 
   def unshare_sheet_as(%User{} = current_user, %Sheet{} = sheet) do
@@ -268,9 +287,11 @@ defmodule Habitsheet.Sheets do
   end
 
   def archive_habit(%Habit{} = habit) do
-    update_habit(habit_update_changeset(habit, %{
-      archived_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
-    }))
+    update_habit(
+      habit_update_changeset(habit, %{
+        archived_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+      })
+    )
   end
 
   def archive_habit_as(%User{} = current_user, %Habit{} = habit) do

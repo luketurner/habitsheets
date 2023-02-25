@@ -6,8 +6,9 @@ defmodule HabitsheetWeb.SheetLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket
-      |> assign_sheets()}
+    {:ok,
+     socket
+     |> assign_sheets()}
   end
 
   @impl true
@@ -30,19 +31,26 @@ defmodule HabitsheetWeb.SheetLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     sheet = Enum.find(socket.assigns.sheets, fn sheet -> sheet.id == id end)
-    {:noreply, case Sheets.delete_sheet_as(socket.assigns.current_user, sheet) do
-      {:ok, _sheet} -> assign_sheets(socket)
-      {:error, _error} ->
-        socket
-        |> put_flash(:error, "Cannot delete sheet")
-        |> push_redirect(to: Routes.sheet_index_path(socket, :index))
-    end}
+
+    {:noreply,
+     case Sheets.delete_sheet_as(socket.assigns.current_user, sheet) do
+       {:ok, _sheet} ->
+         assign_sheets(socket)
+
+       {:error, _error} ->
+         socket
+         |> put_flash(:error, "Cannot delete sheet")
+         |> push_redirect(to: Routes.sheet_index_path(socket, :index))
+     end}
   end
 
   defp assign_sheets(socket) do
     current_user = socket.assigns.current_user
+
     case Sheets.list_sheets_for_user_as(current_user, current_user) do
-      {:ok, sheets} -> assign(socket, :sheets, sheets)
+      {:ok, sheets} ->
+        assign(socket, :sheets, sheets)
+
       {:error, _error} ->
         socket
         |> put_flash(:error, "Error viewing sheets")

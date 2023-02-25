@@ -13,6 +13,7 @@ defmodule Habitsheet.Admin.AdminEmailSender do
 
   defp deliver(subject, body) do
     recipient = admin_email()
+
     if is_nil(recipient) do
       {:ok, nil}
     else
@@ -30,7 +31,6 @@ defmodule Habitsheet.Admin.AdminEmailSender do
   end
 
   def digest_task() do
-
     today = Date.utc_today()
     user_count = Repo.aggregate(Habitsheet.Users.User, :count)
     user_token_count = Repo.aggregate(Habitsheet.Users.UserToken, :count)
@@ -41,17 +41,18 @@ defmodule Habitsheet.Admin.AdminEmailSender do
     daily_review_email_count = Repo.aggregate(Habitsheet.Reviews.DailyReviewEmail, :count)
     home_url = Routes.home_url(Endpoint, :index)
 
-    subject = "Digest #{today} - #{user_count} users, #{sheet_count} sheets, #{daily_review_email_count} review emails"
+    subject =
+      "Digest #{today} - #{user_count} users, #{sheet_count} sheets, #{daily_review_email_count} review emails"
 
     body = """
     HabitSheets Admin Digest for #{today}
     =======================================
-
+    
     Website link: #{home_url}
-
+    
     Table counts
     ------------
-
+    
     User: #{user_count}
     UserToken: #{user_token_count}
     Sheet: #{sheet_count}

@@ -28,7 +28,13 @@ defmodule Habitsheet.Sheets.Sheet do
 
   def create_changeset(sheet, attrs) do
     sheet
-    |> cast(attrs, [:title, :user_id, :share_id, :daily_review_email_enabled, :daily_review_email_time])
+    |> cast(attrs, [
+      :title,
+      :user_id,
+      :share_id,
+      :daily_review_email_enabled,
+      :daily_review_email_time
+    ])
     |> validate_required([:title, :user_id])
   end
 

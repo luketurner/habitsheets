@@ -46,7 +46,9 @@ defmodule HabitsheetWeb.HabitStatisticLiveTest do
     test "updates habit_statistic in listing", %{conn: conn, habit_statistic: habit_statistic} do
       {:ok, index_live, _html} = live(conn, Routes.habit_statistic_index_path(conn, :index))
 
-      assert index_live |> element("#habit_statistic-#{habit_statistic.id} a", "Edit") |> render_click() =~
+      assert index_live
+             |> element("#habit_statistic-#{habit_statistic.id} a", "Edit")
+             |> render_click() =~
                "Edit Habit statistic"
 
       assert_patch(index_live, Routes.habit_statistic_index_path(conn, :edit, habit_statistic))
@@ -67,7 +69,10 @@ defmodule HabitsheetWeb.HabitStatisticLiveTest do
     test "deletes habit_statistic in listing", %{conn: conn, habit_statistic: habit_statistic} do
       {:ok, index_live, _html} = live(conn, Routes.habit_statistic_index_path(conn, :index))
 
-      assert index_live |> element("#habit_statistic-#{habit_statistic.id} a", "Delete") |> render_click()
+      assert index_live
+             |> element("#habit_statistic-#{habit_statistic.id} a", "Delete")
+             |> render_click()
+
       refute has_element?(index_live, "#habit_statistic-#{habit_statistic.id}")
     end
   end
@@ -76,13 +81,15 @@ defmodule HabitsheetWeb.HabitStatisticLiveTest do
     setup [:create_habit_statistic]
 
     test "displays habit_statistic", %{conn: conn, habit_statistic: habit_statistic} do
-      {:ok, _show_live, html} = live(conn, Routes.habit_statistic_show_path(conn, :show, habit_statistic))
+      {:ok, _show_live, html} =
+        live(conn, Routes.habit_statistic_show_path(conn, :show, habit_statistic))
 
       assert html =~ "Show Habit statistic"
     end
 
     test "updates habit_statistic within modal", %{conn: conn, habit_statistic: habit_statistic} do
-      {:ok, show_live, _html} = live(conn, Routes.habit_statistic_show_path(conn, :show, habit_statistic))
+      {:ok, show_live, _html} =
+        live(conn, Routes.habit_statistic_show_path(conn, :show, habit_statistic))
 
       assert show_live |> element("a", "Edit") |> render_click() =~
                "Edit Habit statistic"

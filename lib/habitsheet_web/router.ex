@@ -23,7 +23,8 @@ defmodule HabitsheetWeb.Router do
     get "/", HomeController, :index
 
     scope "/sheets" do
-      live_session :user, on_mount: [HabitsheetWeb.LiveInit, {HabitsheetWeb.LiveInit, :require_authenticated_user}] do
+      live_session :user,
+        on_mount: [HabitsheetWeb.LiveInit, {HabitsheetWeb.LiveInit, :require_authenticated_user}] do
         pipe_through :require_authenticated_user
         live "/", SheetLive.Index, :index
         live "/new", SheetLive.Index, :new
@@ -43,7 +44,6 @@ defmodule HabitsheetWeb.Router do
         live "/:share_id", SharedSheetLive.Show, :show
       end
     end
-
   end
 
   # defp fetch_current_user(conn, _opts) do

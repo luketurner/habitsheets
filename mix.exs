@@ -20,7 +20,8 @@ defmodule Habitsheet.MixProject do
   def application do
     [
       mod: {Habitsheet.Application, []},
-      extra_applications: [:logger, :runtime_tools] ++ if(Mix.env() == :dev, do: [], else: [:os_mon])
+      extra_applications:
+        [:logger, :runtime_tools] ++ if(Mix.env() == :dev, do: [], else: [:os_mon])
     ]
   end
 
@@ -75,7 +76,9 @@ defmodule Habitsheet.MixProject do
       "assets.setup": ["cmd --cd assets npm ci"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],
       "fly.deploy": ["cmd fly deploy --remote-only"],
-      "pg.dev.setup": ["cmd docker run -d -p 5432:5432 --name habitsheets -e POSTGRES_PASSWORD=postgres postgres:15"],
+      "pg.dev.setup": [
+        "cmd docker run -d -p 5432:5432 --name habitsheets -e POSTGRES_PASSWORD=postgres postgres:15"
+      ],
       "pg.dev.start": ["cmd docker start habitsheets"]
     ]
   end
