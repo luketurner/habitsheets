@@ -58,7 +58,7 @@
   <li><.link navigate={Routes.sheet_show_path(@socket, :show, @sheet.id)}><%= @sheet.title %></.link></li>
 </UI.breadcrumbs>
 
-<%= if @viewport_width do %>
+<%= if @browser_params_assigned? do %>
 
   <UI.flex_table rows={@habits} cols={@date_range}>
 

@@ -59,6 +59,16 @@ defmodule HabitsheetWeb.LiveHelpers do
     assign(socket, :current_user, Users.get_user_by_session_token(user_token))
   end
 
+  def assign_browser_params(socket) do
+    # TODO -- is there a built-in way to detect this?
+    loaded? = socket.private.connect_params["loaded"] == true
+
+    socket
+    |> assign(:browser_params_assigned?, loaded?)
+    |> assign_timezone()
+    |> assign_viewport()
+  end
+
   def assign_timezone(socket) do
     timezone =
       socket.private.connect_params["browser_timezone"] ||

@@ -38,7 +38,8 @@ let liveSocket = new LiveSocket("/live", Socket, {
       width: window.innerWidth,
       height: window.innerHeight
     },
-    browser_timezone: tz
+    browser_timezone: tz,
+    loaded: true
   }
 })
 

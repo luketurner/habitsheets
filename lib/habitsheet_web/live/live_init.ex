@@ -9,8 +9,7 @@ defmodule HabitsheetWeb.LiveInit do
     socket =
       socket
       |> assign_user_for_session(session)
-      |> assign_viewport()
-      |> assign_timezone()
+      |> assign_browser_params()
 
     with {:ok, resources} <- get_resources_for_params(socket, params) do
       {:cont,

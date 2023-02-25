@@ -5,7 +5,7 @@
   </div>
 </div>
 
-<%= if @viewport_width do %>
+<%= if @browser_params_assigned? do %>
 
   <UI.flex_table rows={@habits} cols={@date_range}>
 
