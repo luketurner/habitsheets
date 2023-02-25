@@ -1,5 +1,6 @@
 {
   "emmet.includeLanguages": {
     "html-eex": "html"
-  }
+  },
+  "editor.formatOnSave": true
 }
