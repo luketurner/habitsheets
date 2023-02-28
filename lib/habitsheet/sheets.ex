@@ -33,11 +33,15 @@ defmodule Habitsheet.Sheets do
     do: :ok
 
   # Anyone can get a sheet (or related habits/entries) with a share ID
-  def authorize(:get_sheet, _user, %Sheet{share_id: share_id}), do: !is_nil(share_id)
-  def authorize(:list_habits_for_sheet, _user, %Sheet{share_id: share_id}), do: !is_nil(share_id)
+  def authorize(:get_sheet, _user, %Sheet{share_id: share_id}) when not is_nil(share_id), do: :ok
 
-  def authorize(:list_habit_entries_for_sheet, _user, %Sheet{share_id: share_id}),
-    do: !is_nil(share_id)
+  def authorize(:list_habits_for_sheet, _user, %Sheet{share_id: share_id})
+      when not is_nil(share_id),
+      do: :ok
+
+  def authorize(:list_habit_entries_for_sheet, _user, %Sheet{share_id: share_id})
+      when not is_nil(share_id),
+      do: :ok
 
   # Only the owner can update/delete a sheet
   def authorize(:update_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
