@@ -4,6 +4,7 @@ defmodule Habitsheet.Reviews do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Changeset
   alias Habitsheet.Repo
 
   alias Habitsheet.Reviews.DailyReviewEmail
@@ -18,135 +19,41 @@ defmodule Habitsheet.Reviews do
   alias Habitsheet.Users
   alias Habitsheet.Users.User
 
-  def get_or_create_daily_review_by_date(user_id, sheet_id, date) do
+  alias __MODULE__
+
+  @behaviour Bodyguard.Policy
+
+  def authorize(:get_review, %User{id: user_id}, %DailyReview{user_id: user_id}), do: :ok
+
+  def authorize(:upsert_review, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}),
+    do: :ok
+
+  def authorize(:receive_review_emails, %User{id: user_id}, %DailyReview{user_id: user_id}),
+    do: :ok
+
+  def authorize(_, _, _), do: :error
+
+  def upsert_review_for_date(%Changeset{} = changeset) do
     Repo.insert(
-      %DailyReview{
-        user_id: user_id,
-        sheet_id: sheet_id,
-        date: date,
-        status: :started,
-        email_status: :pending,
-        email_failure_count: 0
-      },
+      changeset,
       on_conflict: {:replace, [:updated_at]},
       conflict_target: [:user_id, :sheet_id, :date],
       returning: true
     )
   end
 
-  @doc """
-  Returns the list of daily_review.
-
-  ## Examples
-
-      iex> list_daily_review()
-      [%DailyReview{}, ...]
-
-  """
-  def list_daily_review(user_id, sheet_id) do
-    Repo.all(
-      from r in DailyReview, select: r, where: r.user_id == ^user_id and r.sheet_id == ^sheet_id
-    )
+  def upsert_review_for_date_as(%User{} = current_user, %Changeset{} = changeset) do
+    with(
+      :ok <- Bodyguard.permit(Reviews, :upsert_review, current_user, changeset),
+      {:ok, review} <- upsert_review_for_date(changeset),
+      :ok <- Bodyguard.permit(Reviews, :get_review, current_user, review)
+    ) do
+      {:ok, review}
+    end
   end
 
-  @doc """
-  Gets a single daily_review.
-
-  Raises `Ecto.NoResultsError` if the Daily review does not exist.
-
-  ## Examples
-
-      iex> get_daily_review!(123)
-      %DailyReview{}
-
-      iex> get_daily_review!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_daily_review_by_date(user_id, sheet_id, date),
-    do: Repo.get_by(DailyReview, user_id: user_id, sheet_id: sheet_id, date: date)
-
-  def get_daily_review(user_id, sheet_id, review_id),
-    do: Repo.get_by(DailyReview, user_id: user_id, sheet_id: sheet_id, id: review_id)
-
-  def get_daily_review!(user_id, sheet_id, review_id),
-    do: Repo.get_by!(DailyReview, user_id: user_id, sheet_id: sheet_id, id: review_id)
-
-  @doc """
-  Creates a daily_review.
-
-  ## Examples
-
-      iex> create_daily_review(%{field: value})
-      {:ok, %DailyReview{}}
-
-      iex> create_daily_review(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_daily_review(user_id, sheet_id, attrs \\ %{}) do
-    attrs =
-      attrs
-      |> Map.put(:user_id, user_id)
-      |> Map.put(:sheet_id, sheet_id)
-
-    %DailyReview{}
-    |> DailyReview.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a daily_review.
-
-  ## Examples
-
-      iex> update_daily_review(daily_review, %{field: new_value})
-      {:ok, %DailyReview{}}
-
-      iex> update_daily_review(daily_review, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_daily_review(user_id, sheet_id, %DailyReview{} = daily_review, attrs) do
-    get_daily_review!(user_id, sheet_id, daily_review.id)
-
-    # don't allow overwriting owner or sheet
-    Map.drop(attrs, [:user_id, :sheet_id])
-
-    daily_review
-    |> DailyReview.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a daily_review.
-
-  ## Examples
-
-      iex> delete_daily_review(daily_review)
-      {:ok, %DailyReview{}}
-
-      iex> delete_daily_review(daily_review)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_daily_review!(user_id, sheet_id, %DailyReview{} = daily_review) do
-    get_daily_review!(user_id, sheet_id, daily_review.id)
-
-    Repo.delete(daily_review)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking daily_review changes.
-
-  ## Examples
-
-      iex> change_daily_review(daily_review)
-      %Ecto.Changeset{data: %DailyReview{}}
-
-  """
-  def change_daily_review(%DailyReview{} = daily_review, attrs \\ %{}) do
-    DailyReview.changeset(daily_review, attrs)
+  def review_upsert_changeset(attrs \\ %{}) do
+    DailyReview.upsert_changeset(%DailyReview{}, attrs)
   end
 
   def fill_daily_reviews(date_range) do
@@ -208,6 +115,12 @@ defmodule Habitsheet.Reviews do
     end)
   end
 
+  def send_email_for_daily_review_as(%User{} = current_user, %DailyReview{} = review) do
+    with :ok <- Bodyguard.permit(Reviews, :receive_review_emails, current_user, review) do
+      ReviewEmailSender.send_email_for_daily_review(review, current_user.email, :user)
+    end
+  end
+
   def get_daily_reviews_with_pending_attempts() do
     max_email_failure_count = Application.get_env(:habitsheet, :review_email_max_failure_count)
 
@@ -225,112 +138,45 @@ defmodule Habitsheet.Reviews do
     )
   end
 
-  def get_habits_for_daily_review(review) do
-    Repo.all(
-      from habit in Habit,
-        left_join: entry in HabitEntry,
-        on: entry.habit_id == habit.id,
-        select: %{habit | entry: entry},
-        # habit needs to either: not be archived, or have an entry
-        where:
-          habit.sheet_id == ^review.sheet_id and
-            habit.user_id == ^review.user_id and
-            (is_nil(entry.id) or entry.date == ^review.date) and
-            (is_nil(habit.archived_at) or not is_nil(entry.id))
-    )
+  def get_habits_for_daily_review(%DailyReview{} = review) do
+    {:ok,
+     Repo.all(
+       from habit in Habit,
+         left_join: entry in HabitEntry,
+         on: entry.habit_id == habit.id,
+         select: %{habit | entry: entry},
+         # habit needs to either: not be archived, or have an entry
+         where:
+           habit.sheet_id == ^review.sheet_id and
+             habit.user_id == ^review.user_id and
+             (is_nil(entry.id) or entry.date == ^review.date) and
+             (is_nil(habit.archived_at) or not is_nil(entry.id))
+     )}
   end
 
-  # @doc """
-  # Returns the list of daily_review_emails.
+  def get_habits_for_daily_review_as(%User{} = current_user, %DailyReview{} = review) do
+    # TODO reduce code duplication here
+    {:ok,
+     Repo.all(
+       from(
+         habit in Habit,
+         left_join: entry in HabitEntry,
+         on: entry.habit_id == habit.id,
+         select: %{habit | entry: entry},
+         # habit needs to either: not be archived, or have an entry
+         where:
+           habit.sheet_id == ^review.sheet_id and
+             habit.user_id == ^review.user_id and
+             (is_nil(entry.id) or entry.date == ^review.date) and
+             (is_nil(habit.archived_at) or not is_nil(entry.id))
+       )
+       |> Bodyguard.scope(current_user)
+     )}
+  end
 
-  # ## Examples
-
-  #     iex> list_daily_review_emails()
-  #     [%DailyReviewEmail{}, ...]
-
-  # """
-  # def list_daily_review_emails do
-  #   Repo.all(DailyReviewEmail)
-  # end
-
-  # @doc """
-  # Gets a single daily_review_email.
-
-  # Raises `Ecto.NoResultsError` if the Daily review email does not exist.
-
-  # ## Examples
-
-  #     iex> get_daily_review_email!(123)
-  #     %DailyReviewEmail{}
-
-  #     iex> get_daily_review_email!(456)
-  #     ** (Ecto.NoResultsError)
-
-  # """
-  # def get_daily_review_email!(id), do: Repo.get!(DailyReviewEmail, id)
-
-  # @doc """
-  # Creates a daily_review_email.
-
-  # ## Examples
-
-  #     iex> create_daily_review_email(%{field: value})
-  #     {:ok, %DailyReviewEmail{}}
-
-  #     iex> create_daily_review_email(%{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
-
-  # """
   def create_daily_review_email(attrs \\ %{}) do
     %DailyReviewEmail{}
     |> DailyReviewEmail.changeset(attrs)
     |> Repo.insert()
   end
-
-  # @doc """
-  # Updates a daily_review_email.
-
-  # ## Examples
-
-  #     iex> update_daily_review_email(daily_review_email, %{field: new_value})
-  #     {:ok, %DailyReviewEmail{}}
-
-  #     iex> update_daily_review_email(daily_review_email, %{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
-
-  # """
-  # def update_daily_review_email(%DailyReviewEmail{} = daily_review_email, attrs) do
-  #   daily_review_email
-  #   |> DailyReviewEmail.changeset(attrs)
-  #   |> Repo.update()
-  # end
-
-  # @doc """
-  # Deletes a daily_review_email.
-
-  # ## Examples
-
-  #     iex> delete_daily_review_email(daily_review_email)
-  #     {:ok, %DailyReviewEmail{}}
-
-  #     iex> delete_daily_review_email(daily_review_email)
-  #     {:error, %Ecto.Changeset{}}
-
-  # """
-  # def delete_daily_review_email(%DailyReviewEmail{} = daily_review_email) do
-  #   Repo.delete(daily_review_email)
-  # end
-
-  # @doc """
-  # Returns an `%Ecto.Changeset{}` for tracking daily_review_email changes.
-
-  # ## Examples
-
-  #     iex> change_daily_review_email(daily_review_email)
-  #     %Ecto.Changeset{data: %DailyReviewEmail{}}
-
-  # """
-  # def change_daily_review_email(%DailyReviewEmail{} = daily_review_email, attrs \\ %{}) do
-  #   DailyReviewEmail.changeset(daily_review_email, attrs)
-  # end
 end

@@ -1,6 +1,7 @@
 defmodule Habitsheet.Reviews.DailyReview do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
 
   alias Habitsheet.Users.User
   alias Habitsheet.Sheets.Sheet
@@ -25,8 +26,35 @@ defmodule Habitsheet.Reviews.DailyReview do
     timestamps()
   end
 
+  def scope(query, %User{id: user_id}, _) do
+    from review in query, where: review.user_id == ^user_id
+  end
+
   @doc false
   def changeset(daily_review, attrs) do
+    daily_review
+    |> cast(attrs, [
+      :date,
+      :notes,
+      :status,
+      :email_status,
+      :email_failure_count,
+      :email_attempt_count,
+      :user_id,
+      :sheet_id
+    ])
+    |> validate_required([
+      :date,
+      :status,
+      :email_status,
+      :email_failure_count,
+      :email_attempt_count,
+      :user_id,
+      :sheet_id
+    ])
+  end
+
+  def upsert_changeset(daily_review, attrs) do
     daily_review
     |> cast(attrs, [
       :date,

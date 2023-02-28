@@ -32,16 +32,16 @@ defmodule Habitsheet.Reviews.ReviewEmailSender do
     do: """
       HabitSheets Daily Review for #{review.date}
       =======================================
-    
+
       Sheet: #{review.sheet.title}
       Review URL: #{url_for_review(review)}
-    
-    
+
+
       Daily Habits
       ------------
-    
+
       Reinforced habits:
-    
+
       #{Enum.reduce(habits, "", fn habit, acc -> if habit.entry && habit.entry.value == 1 do
         """
         - #{habit.name}
@@ -49,9 +49,9 @@ defmodule Habitsheet.Reviews.ReviewEmailSender do
       else
         acc
       end end)}
-    
+
       Didn't reinforce habits:
-    
+
       #{Enum.reduce(habits, "", fn habit, acc -> if !habit.entry || habit.entry.value == 0 do
         """
         - #{habit.name}
@@ -63,7 +63,7 @@ defmodule Habitsheet.Reviews.ReviewEmailSender do
 
   def send_email_for_daily_review(review, email, trigger) do
     review = Repo.preload(review, :sheet)
-    habits = Reviews.get_habits_for_daily_review(review)
+    {:ok, habits} = Reviews.get_habits_for_daily_review(review)
 
     case deliver(email, subject(review), body(review, habits)) do
       {:ok, _email} -> {:ok, handle_success(review, email, trigger)}
