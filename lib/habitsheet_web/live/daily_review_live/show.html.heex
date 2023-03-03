@@ -4,6 +4,18 @@
   <li><.link navigate={Routes.daily_review_show_path(@socket, :show, @sheet.id, Date.to_iso8601(@review.date))}><%= @review.date %></.link></li>
 </UI.breadcrumbs>
 
+<p>
+  Set aside five minutes to reflect on the day. You can think about habits, or anything you feel like. Click Start to kick off a five minute timer. When you're done, click Finish.
+</p>
+
+<p>
+  Timer: <%= Time.to_string(Time.from_seconds_after_midnight(@time_remaining)) %>
+</p>
+
+<%= if @review.status != :finished do %>
+  <.link class="btn btn-primary" href="#" phx-click="advance"><%= if @review.status == :not_started, do: "Start", else: "Finish" %></.link>
+<% end %>
+
 <%= for habit <- @habits do %>
   <div class="flex flex-row">
     <UI.habit_label habit={habit} />
@@ -11,9 +23,6 @@
   </div>
 <% end %>
 
-<%= if @review.status != :finished do %>
-  <.link class="btn btn-primary" href="#" phx-click="advance"><%= if @review.status == :not_started, do: "Start", else: "Finish" %></.link>
-<% end %>
 
 <h3 class="text-xl font-bold pt-8 pb-4">Email history <.link phx-click="resend_email" class="btn btn-sm mx-8">Send another email</.link></h3>
 

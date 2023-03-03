@@ -16,7 +16,7 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
         user_id: current_user.id,
         sheet_id: sheet.id,
         date: date,
-        status: :started,
+        status: :not_started,
         email_status: :pending,
         email_failure_count: 0
       })
@@ -31,7 +31,9 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
        socket
        |> assign(:date, date)
        |> assign(:review, review)
-       |> assign(:habits, habits)}
+       |> assign(:habits, habits)
+       |> assign_new(:time_remaining, fn _ -> 300 end)
+       |> assign_timer_for_status(review.status)}
     else
       _ ->
         {:ok,
@@ -75,7 +77,37 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
       })
 
     with {:ok, review} <- Reviews.update_review_as(socket.assigns.current_user, changeset) do
-      {:noreply, socket |> assign(:review, review)}
+      {:noreply, socket |> assign(:review, review) |> assign_timer_for_status(review.status)}
+    end
+  end
+
+  @impl true
+  def handle_info(:tick_timer, socket) do
+    {:noreply, socket |> assign(:time_remaining, max(0, socket.assigns.time_remaining - 1))}
+  end
+
+  defp assign_timer(socket) do
+    socket = socket |> clear_timer()
+
+    with {:ok, tref} <- :timer.send_interval(1000, :tick_timer) do
+      socket |> assign(:time_ref, tref)
+    else
+      # TODO
+      _ -> socket
+    end
+  end
+
+  defp clear_timer(socket) do
+    tref = socket.assigns[:time_ref]
+    if tref, do: :timer.cancel(tref)
+    socket |> assign(:time_ref, nil)
+  end
+
+  defp assign_timer_for_status(socket, status) do
+    if status == :started do
+      assign_timer(socket)
+    else
+      clear_timer(socket)
     end
   end
 end
