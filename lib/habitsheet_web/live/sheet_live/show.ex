@@ -4,6 +4,8 @@ defmodule HabitsheetWeb.SheetLive.Show do
   alias Habitsheet.Sheets
   alias Habitsheet.Sheets.Habit
 
+  alias Habitsheet.Reviews
+
   @impl true
   def mount(_params, _session, socket) do
     full_week_view? = breakpoint?(socket, :md)
@@ -23,6 +25,7 @@ defmodule HabitsheetWeb.SheetLive.Show do
      socket
      |> assign(:date_range, date_range)
      |> assign_habits()
+     |> assign_reviews()
      |> assign_habit_entries()
      |> assign(:subtitle, socket.assigns.sheet.title || "Unnamed Sheet")}
   end
@@ -126,6 +129,21 @@ defmodule HabitsheetWeb.SheetLive.Show do
       {:ok, habits} -> assign(socket, :habits, habits)
       # TODO
       {:error, _} -> assign(socket, :habits, [])
+    end
+  end
+
+  defp assign_reviews(
+         %{assigns: %{current_user: current_user, sheet: sheet, date_range: date_range}} = socket
+       ) do
+    case Reviews.list_review_metadata_for_dates_as(current_user, sheet, date_range) do
+      {:ok, reviews} ->
+        socket
+        |> assign(:reviews, reviews)
+        |> assign(:review_map, Map.new(reviews, fn review -> {review.date, review} end))
+
+      # TODO
+      {:error, _} ->
+        assign(socket, :reviews, [])
     end
   end
 

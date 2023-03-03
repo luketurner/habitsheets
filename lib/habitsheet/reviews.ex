@@ -24,6 +24,7 @@ defmodule Habitsheet.Reviews do
   @behaviour Bodyguard.Policy
 
   def authorize(:get_review, %User{id: user_id}, %DailyReview{user_id: user_id}), do: :ok
+  def authorize(:update_review, %User{id: user_id}, %DailyReview{user_id: user_id}), do: :ok
 
   def authorize(:upsert_review, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}),
     do: :ok
@@ -31,7 +32,24 @@ defmodule Habitsheet.Reviews do
   def authorize(:receive_review_emails, %User{id: user_id}, %DailyReview{user_id: user_id}),
     do: :ok
 
+  def authorize(:list_reviews_for_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+
   def authorize(_, _, _), do: :error
+
+  def list_review_metadata_for_dates_as(%User{} = current_user, %Sheet{} = sheet, date_range) do
+    with(:ok <- Bodyguard.permit(Reviews, :list_reviews_for_sheet, current_user, sheet)) do
+      {:ok,
+       Repo.all(
+         from(review in DailyReview,
+           select: [:id, :date, :status, :user_id, :sheet_id],
+           where:
+             review.sheet_id == ^sheet.id and review.date >= ^date_range.first and
+               review.date <= ^date_range.last
+         )
+         |> Bodyguard.scope(current_user)
+       )}
+    end
+  end
 
   def upsert_review_for_date(%Changeset{} = changeset) do
     Repo.insert(
@@ -52,8 +70,29 @@ defmodule Habitsheet.Reviews do
     end
   end
 
-  def review_upsert_changeset(attrs \\ %{}) do
-    DailyReview.upsert_changeset(%DailyReview{}, attrs)
+  def review_upsert_changeset(%DailyReview{} = review, attrs \\ %{}) do
+    DailyReview.upsert_changeset(review, attrs)
+  end
+
+  def review_update_changeset(%DailyReview{} = review, attrs \\ %{}) do
+    DailyReview.update_changeset(review, attrs)
+  end
+
+  def update_review(%Changeset{data: %DailyReview{}} = changeset) do
+    Repo.update(changeset)
+  end
+
+  def update_review_as(
+        %User{} = current_user,
+        %Changeset{data: %DailyReview{} = review} = changeset
+      ) do
+    with(
+      :ok <- Bodyguard.permit(Reviews, :update_review, current_user, review),
+      {:ok, review} <- update_review(changeset),
+      :ok <- Bodyguard.permit(Reviews, :get_review, current_user, review)
+    ) do
+      {:ok, review}
+    end
   end
 
   def fill_daily_reviews(date_range) do

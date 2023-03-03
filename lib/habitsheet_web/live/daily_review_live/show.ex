@@ -2,6 +2,7 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
   use HabitsheetWeb, :live_view
 
   alias Habitsheet.Reviews
+  alias Habitsheet.Reviews.DailyReview
   alias Habitsheet.Repo
 
   @impl true
@@ -11,7 +12,7 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
     sheet = socket.assigns.sheet
 
     changeset =
-      Reviews.review_upsert_changeset(%{
+      Reviews.review_upsert_changeset(%DailyReview{}, %{
         user_id: current_user.id,
         sheet_id: sheet.id,
         date: date,
@@ -56,6 +57,25 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
          socket
          |> put_flash(:error, "Error sending email")
          |> assign(:review, Repo.preload(Repo.reload(review), :email, force: true))}
+    end
+  end
+
+  @impl true
+  def handle_event("advance", _params, socket) do
+    next_status =
+      case socket.assigns.review.status do
+        :not_started -> :started
+        :started -> :finished
+        default -> default
+      end
+
+    changeset =
+      Reviews.review_update_changeset(socket.assigns.review, %{
+        status: next_status
+      })
+
+    with {:ok, review} <- Reviews.update_review_as(socket.assigns.current_user, changeset) do
+      {:noreply, socket |> assign(:review, review)}
     end
   end
 end

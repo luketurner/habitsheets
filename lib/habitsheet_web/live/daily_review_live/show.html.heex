@@ -11,6 +11,10 @@
   </div>
 <% end %>
 
+<%= if @review.status != :finished do %>
+  <.link class="btn btn-primary" href="#" phx-click="advance"><%= if @review.status == :not_started, do: "Start", else: "Finish" %></.link>
+<% end %>
+
 <h3 class="text-xl font-bold pt-8 pb-4">Email history <.link phx-click="resend_email" class="btn btn-sm mx-8">Send another email</.link></h3>
 
 <%= for review_email <- @review.email do %>

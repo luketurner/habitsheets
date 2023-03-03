@@ -21,7 +21,7 @@
           </span>
         </div>
         <%= for col <- @cols do %>
-          <div class="mx-2 w-16 h-6 text-center flex-grow-0 flex-shrink-0">
+          <div class="mx-2 w-16 h-6 text-center flex-grow-0 flex-shrink-0 flex flex-row justify-center">
             <%= render_slot(@cell, {row, col}) %>
           </div>
         <% end %>

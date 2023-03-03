@@ -76,4 +76,16 @@ defmodule Habitsheet.Reviews.DailyReview do
       :sheet_id
     ])
   end
+
+  @doc false
+  def update_changeset(daily_review, attrs) do
+    daily_review
+    |> cast(attrs, [
+      :notes,
+      :status,
+      :email_status,
+      :email_failure_count,
+      :email_attempt_count
+    ])
+  end
 end

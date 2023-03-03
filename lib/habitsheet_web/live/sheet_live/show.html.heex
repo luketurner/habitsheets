@@ -60,31 +60,51 @@
 
 <%= if @browser_params_assigned? do %>
 
-  <UI.flex_table rows={@habits} cols={@date_range}>
+  <UI.flex_table rows={[:daily_review | @habits]} cols={@date_range}>
 
     <:col_label :let={date}>
-      <.link class="btn btn-ghost flex-col flex-nowrap justify-center" navigate={Routes.daily_review_show_path(@socket, :show, @sheet.id, Date.to_iso8601(date))}>
+      <.link class="btn btn-ghost flex-col flex-nowrap justify-center">
         <div class="mb-1"><%= short_date(date) %></div>
         <div><%= day_of_week(date) %></div>
       </.link>
     </:col_label>
 
     <:row_label :let={habit}>
+      <%= if habit == :daily_review do %>
+      <.link class="btn btn-ghost w-full justify-start normal-case">
+        Daily Review
+      </.link>
+      <% else %>
       <.link class="btn btn-ghost w-full justify-start normal-case" patch={Routes.sheet_show_path(@socket, :edit_habit, @sheet.id, habit.id)}>
         <UI.icon_pencil_square_mini class="w-5 h-5 mr-2" />
         <UI.habit_label habit={habit} />
       </.link>
+      <% end %>
     </:row_label>
 
     <:prev_btn><.link class="btn btn-ghost" phx-click="prev_week"><%= "<<" %></.link></:prev_btn>
     <:next_btn><.link class="btn btn-ghost" phx-click="next_week">>></.link></:next_btn>
 
     <:cell :let={{habit, date}}>
-      <UI.habit_entry_status
-        click="toggle_day"
-        entry={@habit_entries |> Map.get(habit.id, %{}) |> Map.get(date, nil)}
-        date={date}
-        habit_id={habit.id} />
+      <%= if habit == :daily_review do %>
+        <%= if review = Map.get(@review_map, date) do %>
+          <.link navigate={Routes.daily_review_show_path(@socket, :show, @sheet.id, Date.to_iso8601(date))}>
+            <%= case review.status do %>
+              <% :not_started -> %> <UI.icon_minus_circle_outline class="stroke-neutral-content w-8 h-8" />
+              <% :started -> %> <UI.icon_ellipsis_horizontal_circle_outline class="stroke-primary w-8 h-8" />
+              <% :finished -> %> <UI.icon_check_circle_solid class="fill-success w-8 h-8" />
+            <% end %>
+          </.link>
+        <% else %>
+          <UI.icon_minus_circle_outline class="stroke-neutral-content w-8 h-8" />
+        <% end %>
+      <% else %>
+        <UI.habit_entry_status
+          click="toggle_day"
+          entry={@habit_entries |> Map.get(habit.id, %{}) |> Map.get(date, nil)}
+          date={date}
+          habit_id={habit.id} />
+      <% end %>
     </:cell>
 
   </UI.flex_table>
