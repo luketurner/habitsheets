@@ -105,6 +105,7 @@ defmodule HabitsheetWeb.SheetLive.Show do
     {:noreply,
      socket
      |> assign(:date_range, new_range)
+     |> assign_reviews()
      |> assign_habit_entries()}
   end
 
@@ -121,6 +122,7 @@ defmodule HabitsheetWeb.SheetLive.Show do
     {:noreply,
      socket
      |> assign(:date_range, new_range)
+     |> assign_reviews()
      |> assign_habit_entries()}
   end
 
