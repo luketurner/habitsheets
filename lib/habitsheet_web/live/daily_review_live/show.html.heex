@@ -15,10 +15,7 @@
     <div class="stat-desc">
       <progress class="progress progress-primary" value={elapsed_time_percent(@default_time_remaining, @time_remaining)} max="100"></progress>
     </div>
-    <div class="stat-actions">
-      <.link class="btn btn-sm" href="#" phx-click="restart_timer">
-          <UI.icon_arrow_path_solid />
-      </.link>
+    <div class="stat-actions flex flex-row flex-nowrap justify-between">
       <.link class="btn btn-sm" href="#" phx-click="toggle_timer">
         <%= if is_nil(@timer) do %>
           <UI.icon_play_solid />
@@ -26,6 +23,11 @@
           <UI.icon_pause_solid />
         <% end %>
       </.link>
+      <%= if @time_remaining != @default_time_remaining do %>
+        <.link class="btn btn-sm" href="#" phx-click="restart_timer">
+            <UI.icon_arrow_path_solid />
+        </.link>
+      <% end %>
     </div>
   </div>
 
@@ -47,22 +49,48 @@
 
 <h3 class="text-xl font-bold pt-8 pb-4">Habits reinforced</h3>
 
-<%= for habit <- @habits do %>
-  <div class="flex flex-row">
-    <UI.habit_label habit={habit} />
-    <UI.habit_entry_status entry={habit.entry} readonly={true} />
-  </div>
-<% end %>
+
+<div class="overflow-x-auto">
+  <table class="table">
+    <tbody>
+      <%= for habit <- @habits do %>
+        <tr>
+          <td><UI.habit_entry_status entry={habit.entry} readonly={true} /></td>
+          <td><UI.habit_label habit={habit} /></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
 
 <h3 class="text-xl font-bold pt-8 pb-4">Email history <.link phx-click="resend_email" class="btn btn-sm mx-8">Send another email</.link></h3>
 
-<%= for review_email <- @review.email do %>
-  <div class="flex flex-row">
-    <%= review_email.email %>
-    <%= review_email.attempt %>
-    <%= review_email.trigger %>
-    <%= review_email.error_text %>
-    <%= review_email.status %>
-    <%= review_email.updated_at %>
-  </div>
-<% end %>
+<div class="overflow-x-auto">
+  <table class="table w-full table-compact table-zebra">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Status</th>
+        <th>Sent At</th>
+        <th>Email Address</th>
+        <th>Trigger</th>
+        <th>Error</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for review_email <- @review.email do %>
+        <tr>
+          <td><%= review_email.attempt %></td>
+          <td><%= review_email.status %></td>
+          <td><%= readable_timestamp(review_email.updated_at, @timezone) %></td>
+          <td><%= review_email.email %></td>
+          <td><%= case review_email.trigger do
+            :user -> "User-requested"
+            :fill_review -> "Automatic"
+          end %></td>
+          <td><%= review_email.error_text %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

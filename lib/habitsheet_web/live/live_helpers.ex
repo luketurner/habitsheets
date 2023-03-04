@@ -117,7 +117,16 @@ defmodule HabitsheetWeb.LiveHelpers do
     end
   end
 
-  # TODO -- abstract this stuff into a helper
+  def readable_timestamp(%DateTime{} = dt) do
+    Calendar.strftime(
+      dt,
+      "%c %Z"
+    )
+  end
+
+  def readable_timestamp(%NaiveDateTime{} = dt, tz) do
+    dt |> DateTime.from_naive!("Etc/UTC") |> DateTime.shift_zone!(tz) |> readable_timestamp()
+  end
 
   def breakpoint?(%{assigns: %{viewport: %{width: viewport_width}}} = _socket, breakpoint) do
     points = %{

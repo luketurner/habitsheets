@@ -104,8 +104,14 @@ defmodule HabitsheetWeb.DailyReviewLive.Show do
 
   @impl true
   def handle_info(:tick_timer, socket) do
-    new_time = Time.add(socket.assigns.time_remaining, -1)
-    # prevent time from rolling over
+    # Don't decrement if the timer has already been removed.
+    # This prevents an extra second from ticking off after the user clicks pause.
+    new_time =
+      if socket.assigns.timer,
+        do: Time.add(socket.assigns.time_remaining, -1),
+        else: socket.assigns.time_remaining
+
+    # prevent time from rolling over when it goes below midnight
     new_time = if new_time > socket.assigns.time_remaining, do: ~T[00:00:00], else: new_time
     {:noreply, socket |> assign(:time_remaining, new_time)}
   end
