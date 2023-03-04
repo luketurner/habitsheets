@@ -7,9 +7,6 @@ defmodule HabitsheetWeb.Components do
   def icon_minus_circle_outline(assigns)
 
   attr :rest, :global, default: %{class: "w-6 h-6"}
-  def icon_check_circle_solid(assigns)
-
-  attr :rest, :global, default: %{class: "w-6 h-6"}
   def icon_bars_three_outline(assigns)
 
   attr :rest, :global, default: %{class: "w-6 h-6"}
@@ -17,6 +14,18 @@ defmodule HabitsheetWeb.Components do
 
   attr :rest, :global, default: %{class: "w-6 h-6"}
   def icon_ellipsis_horizontal_circle_outline(assigns)
+
+  attr :rest, :global, default: %{class: "w-6 h-6"}
+  def icon_check_circle_solid(assigns)
+
+  attr :rest, :global, default: %{class: "w-6 h-6"}
+  def icon_play_solid(assigns)
+
+  attr :rest, :global, default: %{class: "w-6 h-6"}
+  def icon_pause_solid(assigns)
+
+  attr :rest, :global, default: %{class: "w-6 h-6"}
+  def icon_arrow_path_solid(assigns)
 
   attr :rest, :global, default: %{class: "w-5 h-5"}
   def icon_pencil_square_mini(assigns)

@@ -4,17 +4,48 @@
   <li><.link navigate={Routes.daily_review_show_path(@socket, :show, @sheet.id, Date.to_iso8601(@review.date))}><%= @review.date %></.link></li>
 </UI.breadcrumbs>
 
-<p>
-  Set aside five minutes to reflect on the day. You can think about habits, or anything you feel like. Click Start to kick off a five minute timer. When you're done, click Finish.
-</p>
+<div class="stats shadow bg-neutral text-neutral-content float-right m-4">
+  <div class="stat">
+    <div class="stat-title">Review timer</div>
+    <div class="stat-value">
+      <span class="countdown"><span style={"--value:#{@time_remaining.minute};"}></span></span>
+      :
+      <span class="countdown"><span style={"--value:#{@time_remaining.second};"}></span></span>
+    </div>
+    <div class="stat-desc">
+      <progress class="progress progress-primary" value={elapsed_time_percent(@default_time_remaining, @time_remaining)} max="100"></progress>
+    </div>
+    <div class="stat-actions">
+      <.link class="btn btn-sm" href="#" phx-click="restart_timer">
+          <UI.icon_arrow_path_solid />
+      </.link>
+      <.link class="btn btn-sm" href="#" phx-click="toggle_timer">
+        <%= if is_nil(@timer) do %>
+          <UI.icon_play_solid />
+        <% else %>
+          <UI.icon_pause_solid />
+        <% end %>
+      </.link>
+    </div>
+  </div>
 
-<p>
-  Timer: <%= Time.to_string(Time.from_seconds_after_midnight(@time_remaining)) %>
-</p>
+</div>
 
-<%= if @review.status != :finished do %>
-  <.link class="btn btn-primary" href="#" phx-click="advance"><%= if @review.status == :not_started, do: "Start", else: "Finish" %></.link>
-<% end %>
+<div class="prose">
+  <p>
+    This is your reminder to set aside a few minutes to reflect on the day. Think about your habits, or anything you like.
+  </p>
+  <p>
+   A five-minute timer is provided on the right; you can use it to timebox your review, or ignore it if you want.
+    When you're done, click the button below:
+  </p>
+</div>
+
+<div class="flex flex-row justify-center mt-2 clear-both">
+  <.link class="btn btn-primary" href="#" phx-click="finish_review">Finished with review</.link>
+</div>
+
+<h3 class="text-xl font-bold pt-8 pb-4">Habits reinforced</h3>
 
 <%= for habit <- @habits do %>
   <div class="flex flex-row">
@@ -22,7 +53,6 @@
     <UI.habit_entry_status entry={habit.entry} readonly={true} />
   </div>
 <% end %>
-
 
 <h3 class="text-xl font-bold pt-8 pb-4">Email history <.link phx-click="resend_email" class="btn btn-sm mx-8">Send another email</.link></h3>
 
