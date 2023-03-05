@@ -23,8 +23,7 @@ defmodule Habitsheet.Reviews.ReviewEmailSender do
   end
 
   defp url_for_review(review),
-    do:
-      Routes.daily_review_show_url(Endpoint, :show, review.sheet_id, Date.to_iso8601(review.date))
+    do: Routes.daily_review_path(Endpoint, :index, Date.to_iso8601(review.date))
 
   defp subject(review), do: "[#{review.sheet.title}] Daily Review: #{review.date}"
 

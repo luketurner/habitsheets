@@ -11,6 +11,13 @@ defmodule HabitsheetWeb.LiveInit do
       |> assign_user_for_session(session)
       |> assign_browser_params()
 
+    socket =
+      if params["date_or_today"] do
+        assign_date(socket, params["date_or_today"])
+      else
+        socket
+      end
+
     with {:ok, resources} <- get_resources_for_params(socket, params) do
       {:cont,
        socket

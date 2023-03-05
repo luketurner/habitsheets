@@ -84,6 +84,18 @@ defmodule HabitsheetWeb.LiveHelpers do
     assign(socket, :viewport, %{width: width, height: height})
   end
 
+  def assign_date(socket, "today") do
+    assign_date(socket, DateTime.to_date(DateTime.now!(socket.assigns.timezone)))
+  end
+
+  def assign_date(socket, date) when is_binary(date) do
+    assign_date(socket, Date.from_iso8601!(date))
+  end
+
+  def assign_date(socket, %Date{} = date) do
+    assign(socket, :date, date)
+  end
+
   def get_resources_for_params(%{assigns: %{current_user: current_user}} = _socket, params) do
     with(
       {:ok, sheet} <-

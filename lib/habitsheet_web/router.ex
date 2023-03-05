@@ -22,21 +22,25 @@ defmodule HabitsheetWeb.Router do
 
     get "/", HomeController, :index
 
-    scope "/sheets" do
+    scope "/" do
       live_session :user,
         on_mount: [HabitsheetWeb.LiveInit, {HabitsheetWeb.LiveInit, :require_authenticated_user}] do
         pipe_through :require_authenticated_user
-        live "/", SheetLive.Index, :index
-        live "/new", SheetLive.Index, :new
 
-        live "/:sheet_id", SheetLive.Show, :show
-        live "/:sheet_id/edit", SheetLive.Show, :edit
-        live "/:sheet_id/habits/new", SheetLive.Show, :new_habit
-        live "/:sheet_id/habits/:habit_id/edit", SheetLive.Show, :edit_habit
+        live "/:date_or_today", Live.DailyView, :index
+        live "/:date_or_today/review", Live.DailyReview, :index
 
-        live "/:sheet_id/day/:date", SheetLive.DayEditor, :index
+        # live "/", SheetLive.Index, :index
+        # live "/new", SheetLive.Index, :new
 
-        live "/:sheet_id/daily_review/:date", DailyReviewLive.Show, :show
+        # live "/:sheet_id", SheetLive.Show, :show
+        # live "/:sheet_id/edit", SheetLive.Show, :edit
+        # live "/:sheet_id/habits/new", SheetLive.Show, :new_habit
+        # live "/:sheet_id/habits/:habit_id/edit", SheetLive.Show, :edit_habit
+
+        # live "/:sheet_id/day/:date", SheetLive.DayEditor, :index
+
+        # live "/:sheet_id/daily_review/:date", DailyReviewLive.Show, :show
       end
     end
   end
