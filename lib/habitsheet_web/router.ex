@@ -31,17 +31,12 @@ defmodule HabitsheetWeb.Router do
 
         live "/:sheet_id", SheetLive.Show, :show
         live "/:sheet_id/edit", SheetLive.Show, :edit
-        live "/:sheet_id/share", SheetLive.Show, :share
         live "/:sheet_id/habits/new", SheetLive.Show, :new_habit
         live "/:sheet_id/habits/:habit_id/edit", SheetLive.Show, :edit_habit
 
-        live "/:sheet_id/daily_review/:date", DailyReviewLive.Show, :show
-      end
-    end
+        live "/:sheet_id/day/:date", SheetLive.DayEditor, :index
 
-    scope "/share" do
-      live_session :shared, on_mount: [HabitsheetWeb.LiveInit] do
-        live "/:share_id", SharedSheetLive.Show, :show
+        live "/:sheet_id/daily_review/:date", DailyReviewLive.Show, :show
       end
     end
   end

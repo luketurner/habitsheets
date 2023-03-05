@@ -58,12 +58,6 @@ defmodule HabitsheetWeb.SheetLive.Show do
     |> assign(:habit, nil)
   end
 
-  defp apply_action(socket, :share, _params) do
-    socket
-    |> assign(:page_title, "Share Sheet")
-    |> assign(:habit, nil)
-  end
-
   defp apply_action(socket, :edit, _params) do
     socket
     |> assign(:page_title, "Edit Sheet")

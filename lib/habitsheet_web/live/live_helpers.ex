@@ -90,11 +90,7 @@ defmodule HabitsheetWeb.LiveHelpers do
         if sheet_id = Map.get(params, "sheet_id") do
           Sheets.get_sheet_as(current_user, sheet_id)
         else
-          if share_id = Map.get(params, "share_id") do
-            Sheets.get_sheet_by_share_id_as(current_user, share_id)
-          else
-            {:ok, nil}
-          end
+          {:ok, nil}
         end
     ) do
       {:ok, %{sheet: sheet}}

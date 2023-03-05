@@ -32,25 +32,9 @@ defmodule Habitsheet.Sheets do
   def authorize(:list_habit_entries_for_sheet, %User{id: user_id}, %Sheet{user_id: user_id}),
     do: :ok
 
-  # Anyone can get a sheet (or related habits/entries) with a share ID
-  def authorize(:get_sheet, _user, %Sheet{share_id: share_id}) when not is_nil(share_id), do: :ok
-
-  def authorize(:list_habits_for_sheet, _user, %Sheet{share_id: share_id})
-      when not is_nil(share_id),
-      do: :ok
-
-  def authorize(:list_habit_entries_for_sheet, _user, %Sheet{share_id: share_id})
-      when not is_nil(share_id),
-      do: :ok
-
   # Only the owner can update/delete a sheet
   def authorize(:update_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
   def authorize(:delete_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
-
-  # Some special types of updates, because they change sheet visibility
-  # is there any point to handling these separately from :update_sheet?
-  def authorize(:share_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
-  def authorize(:unshare_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
 
   # Any logged-in user can create a sheet, but only for themselves
   def authorize(:create_sheet, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}),
@@ -109,28 +93,6 @@ defmodule Habitsheet.Sheets do
     else
       # return same error for missing sheet vs. unauthorized sheet
       {:error, :unauthorized} -> {:error, "sheet not found"}
-      error -> error
-    end
-  end
-
-  def get_sheet_by_share_id(share_id) do
-    if is_nil(share_id) do
-      {:error, "shared sheet not found"}
-    else
-      if sheet = Repo.get_by(Sheet, share_id: share_id) do
-        {:ok, sheet}
-      else
-        {:error, "shared sheet not found"}
-      end
-    end
-  end
-
-  def get_sheet_by_share_id_as(current_user, share_id) do
-    with {:ok, sheet} <- get_sheet_by_share_id(share_id),
-         :ok <- Bodyguard.permit(Sheets, :get_sheet, current_user, sheet) do
-      {:ok, sheet}
-    else
-      {:error, :unauthorized} -> {:error, "shared sheet not found"}
       error -> error
     end
   end
@@ -231,34 +193,6 @@ defmodule Habitsheet.Sheets do
   def delete_sheets_for_user_as(%User{} = current_user, %User{} = user) do
     with :ok <- Bodyguard.permit(Sheets, :delete_sheets_for_user, current_user, user) do
       delete_sheets_for_user(user)
-    end
-  end
-
-  def share_sheet(%Sheet{} = sheet) do
-    update_sheet(
-      sheet_update_changeset(sheet, %{
-        share_id: Ecto.UUID.generate()
-      })
-    )
-  end
-
-  def share_sheet_as(%User{} = current_user, %Sheet{} = sheet) do
-    with :ok <- Bodyguard.permit(Sheets, :share_sheet, current_user, sheet) do
-      share_sheet(sheet)
-    end
-  end
-
-  def unshare_sheet(%Sheet{} = sheet) do
-    update_sheet(
-      sheet_update_changeset(sheet, %{
-        share_id: nil
-      })
-    )
-  end
-
-  def unshare_sheet_as(%User{} = current_user, %Sheet{} = sheet) do
-    with :ok <- Bodyguard.permit(Sheets, :unshare_sheet, current_user, sheet) do
-      unshare_sheet(sheet)
     end
   end
 

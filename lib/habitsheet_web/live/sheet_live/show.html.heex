@@ -13,19 +13,6 @@
   </.modal>
 <% end %>
 
-<%= if @live_action == :share do %>
-  <.modal return_to={Routes.sheet_show_path(@socket, :show, @sheet.id)}>
-    <.live_component
-      module={HabitsheetWeb.SheetLive.SheetShare}
-      id={:share}
-      title={@page_title}
-      sheet={@sheet}
-      current_user={@current_user}
-      return_to={Routes.sheet_show_path(@socket, :show, @sheet.id)}
-    />
-  </.modal>
-<% end %>
-
 <%= if @live_action == :review_settings do %>
   <.modal return_to={Routes.sheet_show_path(@socket, :show, @sheet.id)}>
     <.live_component
@@ -114,7 +101,6 @@
   <div class="p-2 mt-4 flex flex-row flex-nowrap items-end">
     <.link class="btn btn-primary mr-4" patch={Routes.sheet_show_path(@socket, :new_habit, @sheet.id)}>New habit</.link>
     <.link class="btn btn-outline mr-4" patch={Routes.sheet_show_path(@socket, :edit, @sheet.id)}>Settings</.link>
-    <.link class="btn btn-outline mr-4" patch={Routes.sheet_show_path(@socket, :share, @sheet.id)}>Share</.link>
   </div>
 <% else %>
   <div class="hero min-h-64">
