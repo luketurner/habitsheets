@@ -10,11 +10,14 @@ defmodule Habitsheet.Habits.Habit do
 
   schema "habits" do
     field :name, :string
+    field :display_order, :integer
+    field :archived_at, :naive_datetime
+
+    # TODO use subschema
+    field :additional_data_spec, :map
 
     belongs_to :user, User
     has_many :entry, HabitEntry
-
-    field :archived_at, :naive_datetime
 
     timestamps()
   end
@@ -26,12 +29,12 @@ defmodule Habitsheet.Habits.Habit do
   @doc false
   def create_changeset(habit, attrs) do
     habit
-    |> cast(attrs, [:name, :user_id, :archived_at])
+    |> cast(attrs, [:name, :display_order, :archived_at, :additional_data_spec, :user_id])
     |> validate_required([:name, :user_id])
   end
 
   def update_changeset(habit, attrs) do
     habit
-    |> cast(attrs, [:name, :archived_at])
+    |> cast(attrs, [:name, :display_order, :archived_at, :additional_data_spec])
   end
 end

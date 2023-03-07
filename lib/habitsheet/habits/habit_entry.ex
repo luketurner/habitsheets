@@ -10,7 +10,9 @@ defmodule Habitsheet.Habits.HabitEntry do
 
   schema "habit_entries" do
     field :date, :date
-    field :value, :integer
+
+    # TODO use subschema
+    field :additional_data, :map
 
     belongs_to :habit, Habit
 
@@ -25,12 +27,12 @@ defmodule Habitsheet.Habits.HabitEntry do
   @doc false
   def create_changeset(habit_entry, attrs) do
     habit_entry
-    |> cast(attrs, [:date, :value, :habit_id])
-    |> validate_required([:date, :value, :habit_id])
+    |> cast(attrs, [:date, :additional_data, :habit_id])
+    |> validate_required([:date, :habit_id])
   end
 
   def update_changeset(habit_entry, attrs) do
     habit_entry
-    |> cast(attrs, [:value])
+    |> cast(attrs, [:additional_data])
   end
 end

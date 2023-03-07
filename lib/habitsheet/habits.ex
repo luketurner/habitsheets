@@ -181,8 +181,8 @@ defmodule Habitsheet.Habits do
     end
   end
 
-  # special override to delete entry when value is nil
-  def update_habit_entry_for_date(%Habit{} = habit, date, nil = _value) do
+  # special override to delete entry
+  def update_habit_entry_for_date(%Habit{} = habit, date, :delete) do
     {:ok,
      Repo.delete_all(
        from entry in HabitEntry,
@@ -192,12 +192,12 @@ defmodule Habitsheet.Habits do
      )}
   end
 
-  def update_habit_entry_for_date(%Habit{} = habit, date, value) do
+  def update_habit_entry_for_date(%Habit{} = habit, date, additional_data) do
     %HabitEntry{}
     |> HabitEntry.create_changeset(%{
       habit_id: habit.id,
       date: date,
-      value: value
+      additional_data: additional_data
     })
     |> Repo.insert(on_conflict: :replace_all, conflict_target: [:habit_id, :date])
   end

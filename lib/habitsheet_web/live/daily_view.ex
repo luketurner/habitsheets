@@ -22,7 +22,7 @@ defmodule HabitsheetWeb.Live.DailyView do
              socket.assigns.current_user,
              habit,
              socket.assigns.date,
-             if(entry, do: nil, else: 1)
+             if(entry, do: :delete, else: nil)
            ) do
       {:noreply,
        socket
