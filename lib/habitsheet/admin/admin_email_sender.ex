@@ -34,28 +34,25 @@ defmodule Habitsheet.Admin.AdminEmailSender do
     today = Date.utc_today()
     user_count = Repo.aggregate(Habitsheet.Users.User, :count)
     user_token_count = Repo.aggregate(Habitsheet.Users.UserToken, :count)
-    sheet_count = Repo.aggregate(Habitsheet.Sheets.Sheet, :count)
-    habit_count = Repo.aggregate(Habitsheet.Sheets.Habit, :count)
-    habit_entry_count = Repo.aggregate(Habitsheet.Sheets.HabitEntry, :count)
+    habit_count = Repo.aggregate(Habitsheet.Habits.Habit, :count)
+    habit_entry_count = Repo.aggregate(Habitsheet.Habits.HabitEntry, :count)
     daily_review_count = Repo.aggregate(Habitsheet.Reviews.DailyReview, :count)
     daily_review_email_count = Repo.aggregate(Habitsheet.Reviews.DailyReviewEmail, :count)
     home_url = Routes.home_url(Endpoint, :index)
 
-    subject =
-      "Digest #{today} - #{user_count} users, #{sheet_count} sheets, #{daily_review_email_count} review emails"
+    subject = "Digest #{today} - #{user_count} users, #{daily_review_email_count} review emails"
 
     body = """
     HabitSheets Admin Digest for #{today}
     =======================================
-    
+
     Website link: #{home_url}
-    
+
     Table counts
     ------------
-    
+
     User: #{user_count}
     UserToken: #{user_token_count}
-    Sheet: #{sheet_count}
     Habit: #{habit_count}
     HabitEntry: #{habit_entry_count}
     DailyReview: #{daily_review_count}

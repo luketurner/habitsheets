@@ -1,0 +1,40 @@
+<%= if Enum.empty? @habits do %>
+  <div class="hero h-48">
+    <div class="hero-content text-center">
+      <div class="max-w-md">
+        <h1 class="text-3xl font-bold">No Habits</h1>
+        <p class="py-6">You have no habits to display!</p>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="flex flex-col flex-nowrap">
+    <%= for habit <- @habits do %>
+      <div class="w-full min-h-16 my-2 p-2 rounded-lg shadow-lg flex flex-row flex-nowrap items-center bg-primary text-primary-content">
+        <div class="flex-grow p-2">
+          <%= habit.name %>
+        </div>
+        <%= if @live_action == :archived do %>
+          <div class="">
+            <.link class="btn btn-ghost" href="#" phx-click="unarchive" phx-value-id={habit.id}>Restore</.link>
+          </div>
+        <% else %>
+          <div class="">
+            <.link class="btn btn-ghost" navigate={Routes.habit_editor_path(@socket, :edit, habit.id)}>Edit</.link>
+          </div>
+          <div class="">
+            <.link class="btn btn-ghost" href="#" phx-click="archive" phx-value-id={habit.id}>Archive</.link>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+<div class="p-4">
+  <%= if @live_action == :archived do %>
+    <.link class="btn btn-ghost" navigate={Routes.habit_list_path(@socket, :index)}>Back</.link>
+  <% else %>
+    <.link class="btn btn-ghost" navigate={Routes.habit_editor_path(@socket, :new)}>New habit</.link>
+    <.link class="btn btn-ghost" navigate={Routes.habit_list_path(@socket, :archived)}>Archived habits</.link>
+  <% end %>
+</div>

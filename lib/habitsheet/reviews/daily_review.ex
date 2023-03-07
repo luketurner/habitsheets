@@ -4,7 +4,6 @@ defmodule Habitsheet.Reviews.DailyReview do
   import Ecto.Query
 
   alias Habitsheet.Users.User
-  alias Habitsheet.Sheets.Sheet
   alias Habitsheet.Reviews.DailyReviewEmail
 
   schema "daily_reviews" do
@@ -20,7 +19,6 @@ defmodule Habitsheet.Reviews.DailyReview do
     field :email_attempt_count, :integer, default: 0
 
     belongs_to :user, User
-    belongs_to :sheet, Sheet, type: :binary_id
     has_many :email, DailyReviewEmail
 
     timestamps()
@@ -40,8 +38,7 @@ defmodule Habitsheet.Reviews.DailyReview do
       :email_status,
       :email_failure_count,
       :email_attempt_count,
-      :user_id,
-      :sheet_id
+      :user_id
     ])
     |> validate_required([
       :date,
@@ -49,8 +46,7 @@ defmodule Habitsheet.Reviews.DailyReview do
       :email_status,
       :email_failure_count,
       :email_attempt_count,
-      :user_id,
-      :sheet_id
+      :user_id
     ])
   end
 
@@ -63,8 +59,7 @@ defmodule Habitsheet.Reviews.DailyReview do
       :email_status,
       :email_failure_count,
       :email_attempt_count,
-      :user_id,
-      :sheet_id
+      :user_id
     ])
     |> validate_required([
       :date,
@@ -72,8 +67,7 @@ defmodule Habitsheet.Reviews.DailyReview do
       :email_status,
       :email_failure_count,
       :email_attempt_count,
-      :user_id,
-      :sheet_id
+      :user_id
     ])
   end
 

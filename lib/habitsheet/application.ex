@@ -17,7 +17,9 @@ defmodule Habitsheet.Application do
       # Start the Endpoint (http/https)
       HabitsheetWeb.Endpoint,
       # Start background tasks
-      Habitsheet.Reviews.Scheduler,
+
+      # TODO -- temporarily disable review sending
+      # Habitsheet.Reviews.Scheduler,
       Habitsheet.Admin.AdminEmailSender
       # {Tz.WatchPeriodically, [interval_in_days: 7]}
     ]

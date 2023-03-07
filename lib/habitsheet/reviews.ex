@@ -11,15 +11,11 @@ defmodule Habitsheet.Reviews do
   alias Habitsheet.Reviews.DailyReview
   alias Habitsheet.Reviews.ReviewEmailSender
 
-  alias Habitsheet.Sheets
-  alias Habitsheet.Sheets.Sheet
-  alias Habitsheet.Sheets.Habit
-  alias Habitsheet.Sheets.HabitEntry
+  alias Habitsheet.Habits.Habit
+  alias Habitsheet.Habits.HabitEntry
 
   alias Habitsheet.Users
   alias Habitsheet.Users.User
-
-  alias __MODULE__
 
   @behaviour Bodyguard.Policy
 
@@ -32,18 +28,18 @@ defmodule Habitsheet.Reviews do
   def authorize(:receive_review_emails, %User{id: user_id}, %DailyReview{user_id: user_id}),
     do: :ok
 
-  def authorize(:list_reviews_for_sheet, %User{id: user_id}, %Sheet{user_id: user_id}), do: :ok
+  def authorize(:list_reviews_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
 
   def authorize(_, _, _), do: :error
 
-  def list_review_metadata_for_dates_as(%User{} = current_user, %Sheet{} = sheet, date_range) do
-    with(:ok <- Bodyguard.permit(Reviews, :list_reviews_for_sheet, current_user, sheet)) do
+  def list_review_metadata_for_dates_as(%User{} = current_user, %User{} = user, date_range) do
+    with(:ok <- Bodyguard.permit(__MODULE__, :list_reviews_for_user, current_user, user)) do
       {:ok,
        Repo.all(
          from(review in DailyReview,
-           select: [:id, :date, :status, :user_id, :sheet_id],
+           select: [:id, :date, :status, :user_id],
            where:
-             review.sheet_id == ^sheet.id and review.date >= ^date_range.first and
+             review.user_id == ^user.id and review.date >= ^date_range.first and
                review.date <= ^date_range.last
          )
          |> Bodyguard.scope(current_user)
@@ -55,16 +51,16 @@ defmodule Habitsheet.Reviews do
     Repo.insert(
       changeset,
       on_conflict: {:replace, [:updated_at]},
-      conflict_target: [:user_id, :sheet_id, :date],
+      conflict_target: [:user_id, :date],
       returning: true
     )
   end
 
   def upsert_review_for_date_as(%User{} = current_user, %Changeset{} = changeset) do
     with(
-      :ok <- Bodyguard.permit(Reviews, :upsert_review, current_user, changeset),
+      :ok <- Bodyguard.permit(__MODULE__, :upsert_review, current_user, changeset),
       {:ok, review} <- upsert_review_for_date(changeset),
-      :ok <- Bodyguard.permit(Reviews, :get_review, current_user, review)
+      :ok <- Bodyguard.permit(__MODULE__, :get_review, current_user, review)
     ) do
       {:ok, review}
     end
@@ -87,9 +83,9 @@ defmodule Habitsheet.Reviews do
         %Changeset{data: %DailyReview{} = review} = changeset
       ) do
     with(
-      :ok <- Bodyguard.permit(Reviews, :update_review, current_user, review),
+      :ok <- Bodyguard.permit(__MODULE__, :update_review, current_user, review),
       {:ok, review} <- update_review(changeset),
-      :ok <- Bodyguard.permit(Reviews, :get_review, current_user, review)
+      :ok <- Bodyguard.permit(__MODULE__, :get_review, current_user, review)
     ) do
       {:ok, review}
     end
@@ -102,23 +98,17 @@ defmodule Habitsheet.Reviews do
 
     reviews =
       Enum.flat_map(all_users, fn user ->
-        # TODO -- should handle errors better
-        {:ok, sheets} = Sheets.list_sheets_for_user(user)
-
-        Enum.flat_map(sheets, fn sheet ->
-          Enum.map(date_range, fn date ->
-            %{
-              user_id: sheet.user_id,
-              sheet_id: sheet.id,
-              date: date,
-              email_status: :pending,
-              email_failure_count: 0,
-              email_attempt_count: 0,
-              status: :not_started,
-              inserted_at: now,
-              updated_at: now
-            }
-          end)
+        Enum.map(date_range, fn date ->
+          %{
+            user_id: user.id,
+            date: date,
+            email_status: :pending,
+            email_failure_count: 0,
+            email_attempt_count: 0,
+            status: :not_started,
+            inserted_at: now,
+            updated_at: now
+          }
         end)
       end)
 
@@ -129,7 +119,7 @@ defmodule Habitsheet.Reviews do
         reviews,
         # {:replace, [:updated_at]},
         on_conflict: :nothing,
-        conflict_target: [:user_id, :sheet_id, :date],
+        conflict_target: [:user_id, :date],
         returning: [:id]
       )
 
@@ -155,7 +145,7 @@ defmodule Habitsheet.Reviews do
   end
 
   def send_email_for_daily_review_as(%User{} = current_user, %DailyReview{} = review) do
-    with :ok <- Bodyguard.permit(Reviews, :receive_review_emails, current_user, review) do
+    with :ok <- Bodyguard.permit(__MODULE__, :receive_review_emails, current_user, review) do
       ReviewEmailSender.send_email_for_daily_review(review, current_user.email, :user)
     end
   end
@@ -167,10 +157,8 @@ defmodule Habitsheet.Reviews do
       from review in DailyReview,
         join: user in User,
         on: review.user_id == user.id,
-        join: sheet in Sheet,
-        on: review.sheet_id == sheet.id,
         select:
-          {review, user.email, sheet.daily_review_email_enabled, sheet.daily_review_email_time},
+          {review, user.email, user.daily_review_email_enabled, user.daily_review_email_time},
         where:
           review.email_status in [:pending, :failed] and
             review.email_failure_count < ^max_email_failure_count
@@ -186,8 +174,7 @@ defmodule Habitsheet.Reviews do
          select: %{habit | entry: entry},
          # habit needs to either: not be archived, or have an entry
          where:
-           habit.sheet_id == ^review.sheet_id and
-             habit.user_id == ^review.user_id and
+           habit.user_id == ^review.user_id and
              (is_nil(entry.id) or entry.date == ^review.date) and
              (is_nil(habit.archived_at) or not is_nil(entry.id))
      )}
@@ -204,8 +191,7 @@ defmodule Habitsheet.Reviews do
          select: %{habit | entry: entry},
          # habit needs to either: not be archived, or have an entry
          where:
-           habit.sheet_id == ^review.sheet_id and
-             habit.user_id == ^review.user_id and
+           habit.user_id == ^review.user_id and
              (is_nil(entry.id) or entry.date == ^review.date) and
              (is_nil(habit.archived_at) or not is_nil(entry.id))
        )

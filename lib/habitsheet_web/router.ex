@@ -27,39 +27,18 @@ defmodule HabitsheetWeb.Router do
         on_mount: [HabitsheetWeb.LiveInit, {HabitsheetWeb.LiveInit, :require_authenticated_user}] do
         pipe_through :require_authenticated_user
 
-        live "/:date_or_today", Live.DailyView, :index
-        live "/:date_or_today/review", Live.DailyReview, :index
+        scope "/habits" do
+          live "/", Live.HabitList, :index
+          live "/archived", Live.HabitList, :archived
+          live "/add", Live.HabitEditor, :new
+          live "/:habit_id/edit", Live.HabitEditor, :edit
+        end
 
-        # live "/", SheetLive.Index, :index
-        # live "/new", SheetLive.Index, :new
-
-        # live "/:sheet_id", SheetLive.Show, :show
-        # live "/:sheet_id/edit", SheetLive.Show, :edit
-        # live "/:sheet_id/habits/new", SheetLive.Show, :new_habit
-        # live "/:sheet_id/habits/:habit_id/edit", SheetLive.Show, :edit_habit
-
-        # live "/:sheet_id/day/:date", SheetLive.DayEditor, :index
-
-        # live "/:sheet_id/daily_review/:date", DailyReviewLive.Show, :show
+        live "/:date", Live.DailyView, :index
+        live "/:date/review", Live.DailyReview, :index
       end
     end
   end
-
-  # defp fetch_current_user(conn, _opts) do
-  #   if user_id = get_session(conn, :user_id) do
-  #     assign(conn, :user_id, user_id)
-  #   else
-  #     temp_id = Ecto.UUID.generate()
-  #     conn
-  #     |> assign(:user_id, temp_id)
-  #     |> put_session(:user_id, temp_id)
-  #   end
-  # end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", HabitsheetWeb do
-  #   pipe_through :api
-  # end
 
   # Enables LiveDashboard only for development
   #

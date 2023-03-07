@@ -4,7 +4,6 @@ defmodule HabitsheetWeb.LiveHelpers do
   alias Phoenix.LiveView.JS
 
   alias Habitsheet.Users
-  alias Habitsheet.Sheets
 
   @doc """
   Renders a live component inside a modal.
@@ -94,19 +93,6 @@ defmodule HabitsheetWeb.LiveHelpers do
 
   def assign_date(socket, %Date{} = date) do
     assign(socket, :date, date)
-  end
-
-  def get_resources_for_params(%{assigns: %{current_user: current_user}} = _socket, params) do
-    with(
-      {:ok, sheet} <-
-        if sheet_id = Map.get(params, "sheet_id") do
-          Sheets.get_sheet_as(current_user, sheet_id)
-        else
-          {:ok, nil}
-        end
-    ) do
-      {:ok, %{sheet: sheet}}
-    end
   end
 
   def short_date(date) do

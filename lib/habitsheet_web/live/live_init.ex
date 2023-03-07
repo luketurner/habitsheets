@@ -1,6 +1,5 @@
 defmodule HabitsheetWeb.LiveInit do
   import Phoenix.LiveView
-  import Phoenix.Component
   import HabitsheetWeb.LiveHelpers
 
   alias HabitsheetWeb.Router.Helpers, as: Routes
@@ -12,23 +11,13 @@ defmodule HabitsheetWeb.LiveInit do
       |> assign_browser_params()
 
     socket =
-      if params["date_or_today"] do
-        assign_date(socket, params["date_or_today"])
+      if params["date"] do
+        assign_date(socket, params["date"])
       else
         socket
       end
 
-    with {:ok, resources} <- get_resources_for_params(socket, params) do
-      {:cont,
-       socket
-       |> assign(resources)}
-    else
-      _ ->
-        {:halt,
-         socket
-         |> put_flash(:error, "Error loading resources.")
-         |> redirect(to: Routes.home_path(socket, :index))}
-    end
+    {:cont, socket}
   end
 
   def on_mount(

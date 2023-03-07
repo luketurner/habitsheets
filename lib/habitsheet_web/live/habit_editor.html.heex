@@ -1,0 +1,21 @@
+<div>
+  <h2 class="text-lg font-bold pb-4"><%= if @live_action == :new, do: "New habit", else: @habit.name %></h2>
+
+  <.form
+    :let={f}
+    for={@changeset}
+    id="habit-form"
+    phx-change="validate"
+    phx-submit="save">
+
+    <div class="form-control w-full max-w-xs">
+      <%= label f, :name, class: "label label-text" %>
+      <%= text_input f, :name, required: true, class: "input input-bordered w-full max-w-xs" %>
+      <%= error_tag f, :name %>
+    </div>
+
+    <div class="modal-action">
+      <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
+    </div>
+  </.form>
+</div>

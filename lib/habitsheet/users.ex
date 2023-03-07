@@ -197,7 +197,7 @@ defmodule Habitsheet.Users do
   end
 
   def clear_user_data(user) do
-    Sheets.delete_sheets_for_user(user.id)
+    Habitsheet.Habits.delete_habits_for_user(user)
     {:ok, user}
   end
 

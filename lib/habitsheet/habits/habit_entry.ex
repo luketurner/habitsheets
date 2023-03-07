@@ -1,11 +1,11 @@
-defmodule Habitsheet.Sheets.HabitEntry do
+defmodule Habitsheet.Habits.HabitEntry do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query
 
   @behaviour Bodyguard.Schema
 
-  alias Habitsheet.Sheets.Habit
+  alias Habitsheet.Habits.Habit
   alias Habitsheet.Users.User
 
   schema "habit_entries" do

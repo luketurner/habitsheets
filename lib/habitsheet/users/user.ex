@@ -8,6 +8,8 @@ defmodule Habitsheet.Users.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     field :timezone, :string, default: "Etc/UTC"
+    field :daily_review_email_enabled, :boolean, default: false
+    field :daily_review_email_time, :time, default: ~T[00:00:00]
 
     timestamps()
   end
@@ -31,7 +33,13 @@ defmodule Habitsheet.Users.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :timezone])
+    |> cast(attrs, [
+      :email,
+      :password,
+      :timezone,
+      :daily_review_email_enabled,
+      :daily_review_email_time
+    ])
     |> validate_email()
     |> validate_password(opts)
     |> validate_required(:timezone)
@@ -40,7 +48,7 @@ defmodule Habitsheet.Users.User do
 
   def update_changeset(user, attrs) do
     user
-    |> cast(attrs, [:timezone])
+    |> cast(attrs, [:timezone, :daily_review_email_enabled, :daily_review_email_time])
     |> TzExtra.Changeset.validate_time_zone_identifier(:timezone)
   end
 
