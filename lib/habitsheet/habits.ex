@@ -18,6 +18,7 @@ defmodule Habitsheet.Habits do
   def authorize(:list_habits_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
   def authorize(:list_habit_entries_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
   def authorize(:delete_habits_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
+  def authorize(:reorder_habits_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
 
   # Habits can only be edited by their owner
   def authorize(:update_habit, %User{id: user_id}, %Habit{user_id: user_id}), do: :ok
@@ -56,7 +57,8 @@ defmodule Habitsheet.Habits do
          select: habit,
          where:
            habit.user_id == ^user.id and
-             is_nil(habit.archived_at)
+             is_nil(habit.archived_at),
+         order_by: [asc_nulls_last: habit.display_order]
      )}
   end
 
@@ -133,8 +135,34 @@ defmodule Habitsheet.Habits do
     Habit.create_changeset(habit, attrs)
   end
 
-  def create_habit(%Changeset{data: %Habit{}} = habit) do
-    Repo.insert(habit)
+  def create_habit(%Changeset{data: %Habit{}} = changeset) do
+    # TODO...
+    with(
+      {:ok, data} <- Ecto.Changeset.apply_action(changeset, :update),
+      timestamp = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+      {1, [habit]} <-
+        Repo.insert_all(
+          Habit,
+          [
+            data
+            |> Map.take(Habit.__schema__(:fields))
+            |> Map.drop([:id])
+            |> Map.put(
+              :display_order,
+              from(h in Habit,
+                select: coalesce(max(h.display_order) + 1, 0),
+                where: h.user_id == ^data.user_id and is_nil(h.archived_at)
+              )
+            )
+            |> Map.put(:display_color, Enum.random(Habit.color_choices()))
+            |> Map.put(:inserted_at, timestamp)
+            |> Map.put(:updated_at, timestamp)
+          ],
+          returning: true
+        )
+    ) do
+      {:ok, habit}
+    end
   end
 
   def create_habit_as(%User{} = current_user, %Changeset{data: %Habit{}} = habit) do
@@ -206,5 +234,49 @@ defmodule Habitsheet.Habits do
     with :ok <- Bodyguard.permit(__MODULE__, :update_entry_for_habit, current_user, habit) do
       update_habit_entry_for_date(habit, date, value)
     end
+  end
+
+  def reorder_habit_as(%User{} = current_user, %User{} = user, %Habit{} = habit, new_position) do
+    with :ok <- Bodyguard.permit(__MODULE__, :reorder_habits_for_user, current_user, user) do
+      reorder_habit(user, habit, new_position)
+    end
+  end
+
+  def reorder_habit(%User{} = user, %Habit{} = habit, new_position) do
+    old_position = habit.display_order
+
+    # TODO -- this should be in a multi
+    if new_position < old_position do
+      # handle upward moves
+      Repo.update_all(
+        from(h in Habit,
+          where:
+            h.display_order < ^old_position and h.display_order >= ^new_position and
+              is_nil(h.archived_at)
+        )
+        |> Bodyguard.scope(user),
+        inc: [display_order: 1]
+      )
+    else
+      # handle downward moves
+      Repo.update_all(
+        from(h in Habit,
+          where:
+            h.display_order > ^old_position and h.display_order <= ^new_position and
+              is_nil(h.archived_at)
+        )
+        |> Bodyguard.scope(user),
+        inc: [display_order: -1]
+      )
+    end
+
+    # update the thing itself
+    Repo.update_all(
+      from(h in Habit, where: h.id == ^habit.id)
+      |> Bodyguard.scope(user),
+      set: [display_order: new_position]
+    )
+
+    {:ok}
   end
 end
