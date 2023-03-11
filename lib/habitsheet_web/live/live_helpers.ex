@@ -137,7 +137,7 @@ defmodule HabitsheetWeb.LiveHelpers do
   end
 
   def classes_for_habit(%Habit{} = habit) do
-    # Note -- when editing this file, also update the comment in habit_list.hhtml.heex
+    # Note -- when editing this function, also update the safelist in tailwind.config.js
     if habit.display_color == :base do
       # Base color is a special case because the class names don't exactly match
       "bg-base-300 text-base-content"
