@@ -9,19 +9,6 @@
   </div>
 <% else %>
   <div class="flex flex-col flex-nowrap" phx-hook="SortableList" id="habitlist">
-    <!--
-      This is a comment to "register" dynamic classes so Tailwind JIT knows about them.
-      As described here: https://stackoverflow.com/questions/69687530/#comment125033103_69687962
-      bg-primary text-primary-content
-      bg-secondary text-secondary-content
-      bg-accent text-accent-content
-      bg-neutral text-neutral-content
-      bg-base-300 text-base-content
-      bg-info text-info-content
-      bg-success text-success-content
-      bg-warning text-warning-content
-      bg-error text-error-content
-    -->
     <%= for habit <- @habits do %>
       <div data-id={habit.id} class={"#{classes_for_habit(habit)} w-full min-h-16 my-2 p-2 rounded-lg shadow-lg flex flex-row flex-nowrap items-center"}>
         <div class="flex-grow p-2">
