@@ -45,13 +45,20 @@ defmodule Habitsheet.Habits.Habit do
   @doc false
   def create_changeset(habit, attrs) do
     habit
-    |> cast(attrs, [:name, :display_order, :archived_at, :additional_data_spec, :user_id])
+    |> cast(attrs, [
+      :name,
+      :display_order,
+      :archived_at,
+      :display_color,
+      :additional_data_spec,
+      :user_id
+    ])
     |> validate_required([:name, :user_id])
   end
 
   def update_changeset(habit, attrs) do
     habit
-    |> cast(attrs, [:name, :display_order, :archived_at, :additional_data_spec])
+    |> cast(attrs, [:name, :display_order, :archived_at, :display_color, :additional_data_spec])
   end
 
   def color_choices(), do: @color_choices

@@ -154,7 +154,7 @@ defmodule Habitsheet.Habits do
                 where: h.user_id == ^data.user_id and is_nil(h.archived_at)
               )
             )
-            |> Map.put(:display_color, Enum.random(Habit.color_choices()))
+            # |> Map.put(:display_color, Enum.random(Habit.color_choices()))
             |> Map.put(:inserted_at, timestamp)
             |> Map.put(:updated_at, timestamp)
           ],

@@ -14,6 +14,31 @@
       <%= error_tag f, :name %>
     </div>
 
+    <div class="form-control w-full max-w-xs">
+      <%= label f, :display_color, class: "label label-text" %>
+      <div class="flex flex-row flex-wrap">
+        <%= radio_button f, :display_color, :primary, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-primary-content border-primary appearance-none ring-base-content ring-offset-2 checked:ring" %>
+        <%= radio_button f, :display_color, :secondary, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-secondary-content border-secondary appearance-none ring-base-content ring-offset-2 checked:ring" %>
+        <%= radio_button f, :display_color, :accent, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-accent-content border-accent appearance-none ring-base-content ring-offset-2 checked:ring" %>
+        <%= radio_button f, :display_color, :neutral, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-neutral-content border-neutral appearance-none ring-base-content ring-offset-2 checked:ring" %>
+        <%= radio_button f, :display_color, :base, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-base-300-content border-base appearance-none ring-base-content ring-offset-2 checked:ring" %>
+        <%= radio_button f, :display_color, :info, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-info-content border-info appearance-none ring-base-content ring-offset-2 checked:ring" %>
+        <%= radio_button f, :display_color, :success, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-success-content border-success appearance-none ring-base-content ring-offset-2 checked:ring" %>
+        <%= radio_button f, :display_color, :warning, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-warning-content border-warning appearance-none ring-base-content ring-offset-2 checked:ring" %>
+        <%= radio_button f, :display_color, :error, style: "border-width: 20px;",
+        class: "cursor-pointer w-12 h-12 m-4 rounded bg-error-content border-error appearance-none ring-base-content ring-offset-2 checked:ring" %>
+      </div>
+      <%= error_tag f, :display_color %>
+    </div>
+
     <div class="modal-action">
       <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
     </div>
