@@ -7,12 +7,11 @@ defmodule Habitsheet.Habits.HabitEntry do
 
   alias Habitsheet.Habits.Habit
   alias Habitsheet.Users.User
+  alias Habitsheet.Habits.AdditionalData
 
   schema "habit_entries" do
     field :date, :date
-
-    # TODO use subschema
-    field :additional_data, :map
+    field :additional_data, {:map, AdditionalData}
 
     belongs_to :habit, Habit
 

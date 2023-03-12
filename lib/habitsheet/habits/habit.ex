@@ -6,6 +6,7 @@ defmodule Habitsheet.Habits.Habit do
   @behaviour Bodyguard.Schema
 
   alias Habitsheet.Habits.HabitEntry
+  alias Habitsheet.Habits.AdditionalDataSpec
   alias Habitsheet.Users.User
 
   @color_choices [
@@ -29,8 +30,7 @@ defmodule Habitsheet.Habits.Habit do
       values: @color_choices,
       default: :primary
 
-    # TODO use subschema
-    field :additional_data_spec, :map
+    field :additional_data_spec, {:array, AdditionalDataSpec}
 
     belongs_to :user, User
     has_many :entry, HabitEntry
