@@ -6,6 +6,7 @@ defmodule Habitsheet.Habits.Habit do
   @behaviour Bodyguard.Schema
 
   alias Habitsheet.Habits.HabitEntry
+  alias Habitsheet.Habits.RecurringInterval
   alias Habitsheet.Habits.AdditionalDataSpec
   alias Habitsheet.Users.User
 
@@ -31,6 +32,7 @@ defmodule Habitsheet.Habits.Habit do
       default: :primary
 
     field :additional_data_spec, {:array, AdditionalDataSpec}
+    field :notify_at, {:array, RecurringInterval}
 
     belongs_to :user, User
     has_many :entry, HabitEntry
