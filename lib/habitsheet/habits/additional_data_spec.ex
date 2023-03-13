@@ -1,26 +1,22 @@
 defmodule Habitsheet.Habits.AdditionalDataSpec do
-  use Ecto.Type
+  use Ecto.Schema
+  import Ecto.Changeset
 
-  defstruct data_type: nil, default_value: nil, label: nil
+  @data_types [:numeric]
 
-  # public API
+  @primary_key {:id, Ecto.UUID, autogenerate: true}
 
-  def new(data_type, label, opts \\ []) do
-    %__MODULE__{data_type: data_type, label: label, default_value: opts[:default_value]}
+  embedded_schema do
+    field :data_type, Ecto.Enum, values: @data_types, default: :numeric
+    field :label, :string
+    field :default_value, :binary
   end
 
-  ## Ecto.Type callbacks
+  def data_types, do: @data_types
 
-  def type, do: :map
-
-  def cast(%__MODULE__{} = data), do: {:ok, data}
-
-  def cast(_), do: {:error, :invalid_additional_data_spec}
-
-  def load(%{"data_type" => data_type, "label" => label, "default_value" => default_value}) do
-    {:ok, new(data_type, label, default_value: default_value)}
+  def changeset(%__MODULE__{} = spec, attrs \\ %{}) do
+    spec
+    |> cast(attrs, [:id, :data_type, :label, :default_value])
+    |> validate_required([:id, :data_type, :label])
   end
-
-  def dump(%__MODULE__{} = data), do: {:ok, Map.from_struct(data)}
-  def dump(_), do: :error
 end

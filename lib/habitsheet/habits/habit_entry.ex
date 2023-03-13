@@ -11,7 +11,7 @@ defmodule Habitsheet.Habits.HabitEntry do
 
   schema "habit_entries" do
     field :date, :date
-    field :additional_data, {:map, AdditionalData}
+    embeds_many :additional_data, AdditionalData
 
     belongs_to :habit, Habit
 

@@ -1,30 +1,19 @@
 defmodule Habitsheet.Habits.RecurringInterval do
-  use Ecto.Type
+  use Ecto.Schema
+  import Ecto.Changeset
 
-  defstruct start: nil, interval: nil
+  @zero_time ~N[2000-01-01 00:00:00]
 
-  # public API
+  @primary_key {:id, Ecto.UUID, autogenerate: true}
 
-  def new(%DateTime{} = start, %DateTime{} = interval) do
-    %__MODULE__{start: start, interval: interval}
+  embedded_schema do
+    field :start, :naive_datetime, default: @zero_time
+    field :interval, :naive_datetime, default: @zero_time
   end
 
-  ## Ecto.Type callbacks
-
-  def type, do: :map
-
-  # def cast(%{start: %DateTime{} = start, interval: %DateTime{} = interval}) do
-  #   {:ok, new(start, interval)}
-  # end
-
-  def cast(%__MODULE__{} = interval), do: {:ok, interval}
-
-  def cast(_), do: {:error, :invalid_recurring_interval}
-
-  def load(%{"start" => start, "interval" => interval}) do
-    {:ok, new(start, interval)}
+  def changeset(attrs \\ %{}) do
+    %__MODULE__{}
+    |> cast(attrs, [:id, :start, :interval])
+    |> validate_required([:id, :start, :interval])
   end
-
-  def dump(%__MODULE__{} = data), do: {:ok, Map.from_struct(data)}
-  def dump(_), do: :error
 end
