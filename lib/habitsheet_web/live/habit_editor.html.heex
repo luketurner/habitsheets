@@ -39,6 +39,24 @@
       <%= error_tag f, :display_color %>
     </div>
 
+    <%= inputs_for f, :additional_data_spec, fn spec -> %>
+      <%= hidden_input spec, :id %>
+      <div class="form-control w-full max-w-xs">
+        <%= label spec, :label, class: "label label-text" %>
+        <%= text_input spec, :label, required: true, class: "input input-bordered w-full max-w-xs" %>
+        <%= error_tag spec, :label %>
+      </div>
+      <div class="form-control w-full max-w-xs">
+        <%= label spec, :data_type, class: "label label-text" %>
+        <%= select spec, :data_type, AdditionalDataSpec.data_types(), required: true, class: "input input-bordered w-full max-w-xs" %>
+        <%= error_tag spec, :label %>
+      </div>
+      <.link phx-click="delete_spec" phx-value-id={Changeset.get_field(spec.source, :id)} class="btn btn-primary">Delete</.link>
+    <% end %>
+    <div>
+      <.link phx-click="add_spec" class="btn btn-primary">Add</.link>
+    </div>
+
     <div class="modal-action">
       <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
     </div>
