@@ -196,9 +196,19 @@ defmodule Habitsheet.Habits do
   end
 
   def unarchive_habit(%Habit{} = habit) do
+    # TODO - multi me, I guess?
+    next_display_order =
+      Repo.one!(
+        from(h in Habit,
+          select: coalesce(max(h.display_order) + 1, 0),
+          where: h.user_id == ^habit.user_id and is_nil(h.archived_at)
+        )
+      )
+
     update_habit(
       habit_update_changeset(habit, %{
-        archived_at: nil
+        archived_at: nil,
+        display_order: next_display_order
       })
     )
   end
