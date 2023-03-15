@@ -140,7 +140,7 @@ defmodule HabitsheetWeb.LiveHelpers do
     # Note -- when editing this function, also update the safelist in tailwind.config.js
     if habit.display_color == :base do
       # Base color is a special case because the class names don't exactly match
-      "bg-base-300 text-base-content"
+      "bg-base-200 text-base-content hover:bg-base-300"
     else
       color =
         case habit.display_color do
@@ -148,14 +148,14 @@ defmodule HabitsheetWeb.LiveHelpers do
           :secondary -> "secondary"
           :accent -> "accent"
           :neutral -> "neutral"
-          :info -> "info"
-          :success -> "success"
-          :warning -> "warning"
-          :error -> "error"
+          # :info -> "info"
+          # :success -> "success"
+          # :warning -> "warning"
+          # :error -> "error"
           _ -> "primary"
         end
 
-      "bg-#{color} text-#{color}-content"
+      "bg-#{color} text-#{color}-content hover:bg-#{color}-focus"
     end
   end
 

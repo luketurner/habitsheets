@@ -15,11 +15,11 @@ defmodule Habitsheet.Habits.Habit do
     :secondary,
     :accent,
     :neutral,
-    :base,
-    :info,
-    :success,
-    :warning,
-    :error
+    :base
+    # :info,
+    # :success,
+    # :warning,
+    # :error
   ]
 
   schema "habits" do

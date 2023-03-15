@@ -11,7 +11,7 @@
   <div class="flex flex-col flex-nowrap">
     <%= for habit <- @habits do %>
       <div
-       class={"#{classes_for_habit(habit)} w-full min-h-16 my-2 py-2 px-4 rounded-lg shadow-lg flex flex-row flex-nowrap items-center select-none pointer-events-auto cursor-pointer"}
+       class={"#{classes_for_habit(habit)} w-100 min-h-16 my-2 mx-4 px-4 rounded-lg shadow-xl flex flex-row flex-nowrap items-center select-none pointer-events-auto cursor-pointer"}
        phx-click="toggle_entry"
        phx-value-id={habit.id}>
         <%= if @entry_map[habit.id] do %>
