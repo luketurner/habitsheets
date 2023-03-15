@@ -240,9 +240,14 @@ defmodule Habitsheet.Habits do
     |> Repo.insert(on_conflict: :replace_all, conflict_target: [:habit_id, :date])
   end
 
-  def update_habit_entry_for_date_as(%User{} = current_user, %Habit{} = habit, date, value) do
+  def update_habit_entry_for_date_as(
+        %User{} = current_user,
+        %Habit{} = habit,
+        date,
+        additional_data
+      ) do
     with :ok <- Bodyguard.permit(__MODULE__, :update_entry_for_habit, current_user, habit) do
-      update_habit_entry_for_date(habit, date, value)
+      update_habit_entry_for_date(habit, date, additional_data)
     end
   end
 

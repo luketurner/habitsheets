@@ -17,12 +17,14 @@ defmodule HabitsheetWeb.Live.DailyView do
     habit = get_habit_from_socket(socket, habit_id)
     entry = socket.assigns.entry_map[String.to_integer(habit_id)]
 
+    additional_data = if(entry, do: :delete, else: [])
+
     with {:ok, _entry} <-
            Habits.update_habit_entry_for_date_as(
              socket.assigns.current_user,
              habit,
              socket.assigns.date,
-             if(entry, do: :delete, else: nil)
+             additional_data
            ) do
       {:noreply,
        socket

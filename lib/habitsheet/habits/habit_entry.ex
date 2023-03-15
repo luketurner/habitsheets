@@ -11,7 +11,7 @@ defmodule Habitsheet.Habits.HabitEntry do
 
   schema "habit_entries" do
     field :date, :date
-    embeds_many :additional_data, AdditionalData
+    embeds_many :additional_data, AdditionalData, on_replace: :delete
 
     belongs_to :habit, Habit
 
@@ -26,12 +26,14 @@ defmodule Habitsheet.Habits.HabitEntry do
   @doc false
   def create_changeset(habit_entry, attrs) do
     habit_entry
-    |> cast(attrs, [:date, :additional_data, :habit_id])
+    |> cast(attrs, [:date, :habit_id])
+    |> cast_embed(:additional_data)
     |> validate_required([:date, :habit_id])
   end
 
   def update_changeset(habit_entry, attrs) do
     habit_entry
-    |> cast(attrs, [:additional_data])
+    |> cast(attrs, [])
+    |> cast_embed(:additional_data)
   end
 end
