@@ -138,12 +138,9 @@ fly ssh console -C "/app/bin/habitsheet remote"
 For example, once connected with `iex`, we can use Ecto to inspect state in the production DB:
 
 ```bash
-# Count of sheets
-Habitsheet.Repo.aggregate(Habitsheet.Sheets.Sheet, :count)
-
 # List all users
 Habitsheet.Repo.all(Habitsheet.Users.User)
 
 # Delete all habits
-Habitsheet.Repo.delete_all(Habitsheet.Sheets.Habit)
+Habitsheet.Repo.delete_all(Habitsheet.Habits.Habit)
 ```
