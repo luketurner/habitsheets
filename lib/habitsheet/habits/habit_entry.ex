@@ -31,7 +31,7 @@ defmodule Habitsheet.Habits.HabitEntry do
     |> validate_required([:date, :habit_id])
   end
 
-  def update_changeset(habit_entry, attrs) do
+  def changeset(habit_entry, attrs \\ %{}) do
     habit_entry
     |> cast(attrs, [])
     |> cast_embed(:additional_data)

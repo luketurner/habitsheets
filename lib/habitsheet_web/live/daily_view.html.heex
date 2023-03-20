@@ -11,16 +11,61 @@
   <div class="flex flex-col flex-nowrap">
     <%= for habit <- @habits do %>
       <div
-       class={"#{classes_for_habit(habit)} w-100 min-h-16 my-2 mx-4 px-4 rounded-lg shadow-xl flex flex-row flex-nowrap items-center select-none pointer-events-auto cursor-pointer"}
-       phx-click="toggle_entry"
-       phx-value-id={habit.id}>
-        <%= if @entry_map[habit.id] do %>
-          <UI.icon_check_circle_solid class="w-8 h-8" />
-        <% else %>
-          <UI.icon_minus_circle_outline class="w-8 h-8" />
-        <% end %>
-        <div class="flex-grow py-2 px-4 text-lg">
-          <%= habit.name %>
+       class={"#{classes_for_habit(habit)} w-100 min-h-16 my-2 mx-4 rounded-lg shadow-xl flex flex-col flex-nowrap justify-center select-none pointer-events-auto cursor-pointer"}
+       phx-value-id={habit.id}
+       {if Enum.empty?(habit.additional_data_spec || []), do: [phx_click: "toggle_entry"], else: []}>
+        <div class="flex flex-row flex-nowrap items-center mx-4">
+          <%= if @entry_map[habit.id] do %>
+            <UI.icon_check_circle_solid class="w-8 h-8" />
+          <% else %>
+            <UI.icon_minus_circle_outline class="w-8 h-8" />
+          <% end %>
+          <div class="flex-grow py-2 px-4 text-lg">
+            <%= habit.name %>
+          </div>
+        </div>
+        <div>
+          <.form
+            :let={f}
+            for={changeset_for_entry(@entry_map, habit, @date)}
+            id={"habit_#{habit.id}"}
+            phx-change="update_entry">
+            <%= hidden_input f, :id %>
+            <%= hidden_input f, :habit_id %>
+            <%= hidden_input f, :date %>
+            <%= inputs_for f, :additional_data, fn data -> %>
+              <%= hidden_input data, :id %>
+              <%= hidden_input data, :data_type %>
+              <%= case Changeset.get_field(data.source, :data_type) do %>
+
+              <% :count -> %>
+                <div class="form-control mb-2 mx-2 w-100 max-w-xs">
+                  <%= label data, :value, Enum.find(habit.additional_data_spec, nil, fn v -> v.id == Changeset.get_field(data.source, :id) end).label, class: "label label-text text-inherit" %>
+                  <%= number_input data, :value, class: "input input-bordered text-base-content", min: 0, step: 1 %>
+                </div>
+
+              <% :measurement -> %>
+                <div class="form-control mb-2 mx-2 w-100 max-w-xs">
+                  <%= label data, :value, Enum.find(habit.additional_data_spec, nil, fn v -> v.id == Changeset.get_field(data.source, :id) end).label, class: "label label-text text-inherit" %>
+                  <%= number_input data, :value, class: "input input-bordered text-base-content", step: "0.001" %>
+                </div>
+
+              <% :duration -> %>
+                <div class="form-control mb-2 mx-2 w-100 max-w-xs">
+                  <%= label data, :value, Enum.find(habit.additional_data_spec, nil, fn v -> v.id == Changeset.get_field(data.source, :id) end).label, class: "label label-text text-inherit" %>
+                  <!-- TODO: Some kind of duration input -->
+                  <%= text_input data, :value, class: "input input-bordered text-base-content" %>
+                </div>
+
+              <% :text -> %>
+                <div class="form-control mb-2 mx-2 w-100 max-w-xs">
+                  <%= label data, :value, Enum.find(habit.additional_data_spec, nil, fn v -> v.id == Changeset.get_field(data.source, :id) end).label, class: "label label-text text-inherit" %>
+                  <%= text_input data, :value, class: "input input-bordered text-base-content" %>
+                </div>
+
+              <% end %>
+            <% end %>
+          </.form>
         </div>
       </div>
     <% end %>

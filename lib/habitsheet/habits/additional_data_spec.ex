@@ -2,14 +2,15 @@ defmodule Habitsheet.Habits.AdditionalDataSpec do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @data_types [:numeric]
+  @data_types [:count, :measurement, :duration, :text]
 
   @primary_key {:id, Ecto.UUID, autogenerate: true}
 
   embedded_schema do
-    field :data_type, Ecto.Enum, values: @data_types, default: :numeric
+    field :data_type, Ecto.Enum, values: @data_types, default: :count
     field :label, :string
     field :default_value, :binary
+    field :display_order, :integer
   end
 
   def data_types, do: @data_types

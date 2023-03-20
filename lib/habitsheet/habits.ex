@@ -9,6 +9,7 @@ defmodule Habitsheet.Habits do
 
   alias Habitsheet.Habits.Habit
   alias Habitsheet.Habits.HabitEntry
+  alias Habitsheet.Habits.AdditionalData
   alias Habitsheet.Users.User
 
   @behaviour Bodyguard.Policy
@@ -228,6 +229,19 @@ defmodule Habitsheet.Habits do
            entry.habit_id == ^habit.id and
              entry.date == ^date
      )}
+  end
+
+  def update_habit_entry_for_date(
+        %Habit{} = habit,
+        date,
+        [%AdditionalData{} | _] = additional_data
+      ) do
+    update_habit_entry_for_date(
+      habit,
+      date,
+      additional_data
+      |> Enum.map(fn data -> Map.take(data, AdditionalData.__schema__(:fields)) end)
+    )
   end
 
   def update_habit_entry_for_date(%Habit{} = habit, date, additional_data) do
