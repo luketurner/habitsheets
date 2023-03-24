@@ -30,6 +30,14 @@ defmodule HabitsheetWeb.Live.HabitEditor do
 
   @impl true
   def handle_event("validate", %{"habit" => habit_params}, socket) do
+    # TODO -- this is necessary because if no additional_data_specs are specified,
+    # the habit_params, and therefore the changeset, won't have any changes when the last spec is deleted.
+    # When in fact, we do want there to be a change, which is to empty out the list.
+    habit_params =
+      if socket.assigns[:spec_deleted?],
+        do: Map.put_new(habit_params, "additional_data_spec", []),
+        else: habit_params
+
     changeset =
       if socket.assigns.live_action == :new do
         Habits.habit_create_changeset(socket.assigns.habit, habit_params)
@@ -53,10 +61,9 @@ defmodule HabitsheetWeb.Live.HabitEditor do
 
     # TODO -- autogenerate IDs better?
     new_spec =
-      AdditionalDataSpec.changeset(%AdditionalDataSpec{}, %{
+      AdditionalDataSpec.changeset(%AdditionalDataSpec{id: Ecto.UUID.generate()}, %{
         label: "Label me",
-        data_type: :numeric,
-        id: Ecto.UUID.generate()
+        data_type: :count
       })
 
     existing_specs = Changeset.get_field(changeset, :additional_data_spec, [])
@@ -76,21 +83,19 @@ defmodule HabitsheetWeb.Live.HabitEditor do
 
     changeset = Changeset.put_embed(changeset, :additional_data_spec, new_specs)
 
-    {:noreply, socket |> assign(:changeset, changeset)}
+    {:noreply, socket |> assign(:changeset, changeset) |> assign(:spec_deleted?, true)}
   end
 
   defp save_habit(socket, :edit, habit_params) do
-    changeset = Habit.update_changeset(socket.assigns.habit, habit_params)
-
     # TODO -- this is necessary because if no additional_data_specs are specified,
-    # the habit_params, and therefore the changeset, won't have any changes. When
-    # in fact, we do want there to be a change, which is to empty out the list.
-    changeset =
-      if Changeset.get_change(changeset, :additional_data_spec) do
-        changeset
-      else
-        Changeset.put_embed(changeset, :additional_data_spec, [])
-      end
+    # the habit_params, and therefore the changeset, won't have any changes when the last spec is deleted.
+    # When in fact, we do want there to be a change, which is to empty out the list.
+    habit_params =
+      if socket.assigns[:spec_deleted?],
+        do: Map.put_new(habit_params, "additional_data_spec", []),
+        else: habit_params
+
+    changeset = Habit.update_changeset(socket.assigns.habit, habit_params)
 
     case Habits.update_habit_as(socket.assigns.current_user, changeset) do
       {:ok, _habit} ->
