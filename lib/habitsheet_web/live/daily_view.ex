@@ -1,6 +1,8 @@
 defmodule HabitsheetWeb.Live.DailyView do
   use HabitsheetWeb, :live_view
 
+  alias Habitsheet.Reviews
+  alias Habitsheet.Reviews.DailyReview
   alias Ecto.Changeset
 
   alias Habitsheet.Habits
@@ -8,12 +10,13 @@ defmodule HabitsheetWeb.Live.DailyView do
   alias Habitsheet.Habits.AdditionalData
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(%{"date" => date_param} = _params, _session, socket) do
     {:ok,
      socket
-     |> assign(:date_range, Date.range(socket.assigns.date, socket.assigns.date))
+     |> assign(:date_param, date_param)
      |> assign_habits()
-     |> assign_entries()}
+     |> assign_entries()
+     |> assign_review()}
   end
 
   @impl true
@@ -80,15 +83,30 @@ defmodule HabitsheetWeb.Live.DailyView do
     end
   end
 
-  def assign_entries(%{assigns: %{current_user: current_user, date_range: date_range}} = socket) do
+  def assign_entries(%{assigns: %{current_user: current_user, date: date}} = socket) do
     with {:ok, entries} <-
-           Habits.list_entries_for_user_as(current_user, current_user, date_range) do
+           Habits.list_entries_for_user_as(current_user, current_user, date) do
       socket
       |> assign(:entries, entries)
       |> assign(
         :entry_map,
         Habits.entry_map(entries)
       )
+    end
+  end
+
+  defp assign_review(%{assigns: %{current_user: current_user, date: date}} = socket) do
+    changeset =
+      Reviews.review_upsert_changeset(%DailyReview{}, %{
+        date: date,
+        user_id: current_user.id
+      })
+
+    # TODO I don't want to actually create a review until the user does some modification
+    with {:ok, review} <- Reviews.upsert_review_for_date_as(current_user, changeset) do
+      socket |> assign(:review, review)
+    else
+      _ -> socket
     end
   end
 

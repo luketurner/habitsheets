@@ -86,7 +86,7 @@ defmodule Habitsheet.Habits do
     end
   end
 
-  def list_entries_for_user(%User{} = user, date_range) do
+  def list_entries_for_user(%User{} = user, %Date.Range{} = dates) do
     {:ok,
      Repo.all(
        from entry in HabitEntry,
@@ -95,14 +95,18 @@ defmodule Habitsheet.Habits do
          where:
            habit.user_id == ^user.id and
              is_nil(habit.archived_at) and
-             entry.date >= ^date_range.first and
-             entry.date <= ^date_range.last
+             entry.date >= ^dates.first and
+             entry.date <= ^dates.last
      )}
   end
 
-  def list_entries_for_user_as(%User{} = current_user, %User{} = user, date_range) do
+  def list_entries_for_user(%User{} = user, %Date{} = dates) do
+    list_entries_for_user(user, Date.range(dates, dates))
+  end
+
+  def list_entries_for_user_as(%User{} = current_user, %User{} = user, dates) do
     with :ok <- Bodyguard.permit(__MODULE__, :list_habit_entries_for_user, current_user, user) do
-      list_entries_for_user(user, date_range)
+      list_entries_for_user(user, dates)
     end
   end
 
