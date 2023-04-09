@@ -1,0 +1,11 @@
+{
+  "short_name": "HabitSheets",
+  "name": "HabitSheets",
+  "description": "Habit tracking",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F1F1F1",
+  "theme_color": "#826A5C"
+}
