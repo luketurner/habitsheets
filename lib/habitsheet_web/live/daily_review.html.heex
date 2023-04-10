@@ -1,4 +1,32 @@
-hi
+<div class="stats shadow bg-neutral text-neutral-content float-right m-4">
+  <div class="stat">
+    <div class="stat-title">Review timer</div>
+    <div class="stat-value">
+      <span class="countdown"><span style={"--value:#{@time_remaining.minute};"}></span></span>
+      :
+      <span class="countdown"><span style={"--value:#{@time_remaining.second};"}></span></span>
+    </div>
+    <div class="stat-desc">
+      <progress class="progress progress-primary" value={elapsed_time_percent(@default_time_remaining, @time_remaining)} max="100"></progress>
+    </div>
+    <div class="stat-actions flex flex-row flex-nowrap justify-between">
+      <.link class="btn btn-sm" href="#" phx-click="toggle_timer">
+        <%= if is_nil(@timer) do %>
+          <UI.icon_play_solid />
+        <% else %>
+          <UI.icon_pause_solid />
+        <% end %>
+      </.link>
+      <%= if @time_remaining != @default_time_remaining do %>
+        <.link class="btn btn-sm" href="#" phx-click="restart_timer">
+            <UI.icon_arrow_path_solid />
+        </.link>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+
 
 <.link class="btn btn-ghost" navigate={Routes.daily_view_path(@socket, :index, @date_param)}>Back</.link>
 
