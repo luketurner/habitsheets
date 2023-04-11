@@ -1,3 +1,9 @@
+
+<div class="btn-group w-full px-4">
+  <div class="btn btn-ghost flex-grow pointer-events-none text-xl capitalize">
+      <%= day_of_week(@date) %>. <%= short_date(@date) %>
+  </div>
+</div>
 <div class="stats shadow bg-neutral text-neutral-content float-right m-4">
   <div class="stat">
     <div class="stat-title">Review timer</div>
@@ -25,8 +31,6 @@
     </div>
   </div>
 </div>
-
-
 
 <.link class="btn btn-ghost" navigate={Routes.daily_view_path(@socket, :index, @date_param)}>Back</.link>
 
