@@ -17,7 +17,11 @@ defmodule HabitsheetWeb.LiveInit do
         socket
       end
 
-    {:cont, socket}
+    if params["date"] != "today" && today?(socket.assigns.date, socket.assigns.timezone) do
+      {:halt, socket |> push_navigate(to: Routes.daily_view_path(socket, :index, "today"))}
+    else
+      {:cont, socket}
+    end
   end
 
   def on_mount(

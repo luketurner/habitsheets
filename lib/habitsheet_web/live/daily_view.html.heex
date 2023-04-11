@@ -1,3 +1,13 @@
+<div class="btn-group w-full px-4">
+  <.link class="btn btn-ghost text-xl" navigate={Routes.daily_view_path(@socket, :index, date_param_add(@date, -1))}>&lt;&lt;</.link>
+  <div class="btn btn-ghost flex-grow pointer-events-none text-xl capitalize">
+      <%= day_of_week(@date) %>. <%= short_date(@date) %>
+  </div>
+  <.link class="btn btn-ghost text-xl" navigate={Routes.daily_view_path(@socket, :index, date_param_add(@date, 1))}>&gt;&gt;</.link>
+</div>
+<%= if not today?(@date, @timezone) do %>
+  <div class="w-full px-4"><.link class="btn btn-ghost w-full" navigate={Routes.daily_view_path(@socket, :index, "today")}>Return to today</.link></div>
+<% end %>
 <%= if Enum.empty? @habits do %>
   <div class="hero h-48">
     <div class="hero-content text-center">

@@ -85,7 +85,7 @@ defmodule HabitsheetWeb.LiveHelpers do
   end
 
   def assign_date(socket, "today") do
-    assign_date(socket, DateTime.to_date(DateTime.now!(socket.assigns.timezone)))
+    assign_date(socket, today(socket.assigns.timezone))
   end
 
   def assign_date(socket, date) when is_binary(date) do
@@ -102,13 +102,13 @@ defmodule HabitsheetWeb.LiveHelpers do
 
   def day_of_week(date) do
     case Date.day_of_week(date) do
-      1 -> "M"
-      2 -> "T"
-      3 -> "W"
-      4 -> "T"
-      5 -> "F"
-      6 -> "S"
-      7 -> "S"
+      1 -> "Mon"
+      2 -> "Tues"
+      3 -> "Wed"
+      4 -> "Thurs"
+      5 -> "Fri"
+      6 -> "Sat"
+      7 -> "Sun"
     end
   end
 
@@ -121,6 +121,14 @@ defmodule HabitsheetWeb.LiveHelpers do
 
   def readable_timestamp(%NaiveDateTime{} = dt, tz) do
     dt |> DateTime.from_naive!("Etc/UTC") |> DateTime.shift_zone!(tz) |> readable_timestamp()
+  end
+
+  def today(tz \\ "Etc/UTC") do
+    DateTime.to_date(DateTime.now!(tz))
+  end
+
+  def today?(%Date{} = date, tz \\ "Etc/UTC") do
+    date == today(tz)
   end
 
   def breakpoint?(%{assigns: %{viewport: %{width: viewport_width}}} = _socket, breakpoint) do

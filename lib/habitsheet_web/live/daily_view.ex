@@ -137,4 +137,8 @@ defmodule HabitsheetWeb.Live.DailyView do
     |> AdditionalData.zip_spec(habit.additional_data_spec)
     |> Enum.map(fn {data, _spec} -> Map.take(data, AdditionalData.__schema__(:fields)) end)
   end
+
+  defp date_param_add(date, days) do
+    date |> Date.add(days) |> Date.to_iso8601()
+  end
 end
