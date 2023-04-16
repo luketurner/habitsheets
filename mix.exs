@@ -57,7 +57,8 @@ defmodule Habitsheet.MixProject do
       {:quantum, "~> 3.0"},
       {:tz, "~> 0.24.0"},
       {:tz_extra, "~> 0.24.0"},
-      {:bodyguard, "~> 2.4"}
+      {:bodyguard, "~> 2.4"},
+      {:earmark, "~> 1.4"}
     ]
   end
 

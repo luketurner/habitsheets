@@ -1,0 +1,19 @@
+<div class="drawer drawer-end">
+  <%= if Map.has_key?(assigns, :checked) do %>
+    <input id={@id} type="checkbox" class="drawer-toggle" checked={@checked} />
+  <% else %>
+    <input id={@id} type="checkbox" class="drawer-toggle" />
+  <% end %>
+  <div class="drawer-content flex flex-col">
+    <%= render_slot(@inner_block) %>
+  </div>
+
+  <div class="drawer-side">
+    <%= if Map.has_key?(assigns, :close_href) do %>
+      <a class="drawer-overlay" href={@close_href}></a>
+    <% else %>
+      <label for={@id} class="drawer-overlay"></label>
+    <% end %>
+    <%= render_slot(@drawer) %>
+  </div>
+</div>

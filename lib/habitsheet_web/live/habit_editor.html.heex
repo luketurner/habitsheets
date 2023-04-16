@@ -32,7 +32,11 @@
     </div>
 
     <div class="form-control w-full max-w-xs mb-4">
-      <%= label f, :additional_data_spec, "Additional Data", class: "label label-text" %>
+      <%= label f, :additional_data_spec, class: "mb-2" do %>
+        Additional Data
+        <.link class="btn btn-xs btn-info btn-circle ml-2" href={manpage_path("additional_data")}>?</.link>
+      <% end %>
+
       <%= inputs_for f, :additional_data_spec, fn spec -> %>
         <div class="form-control w-full max-w-xs">
           <div class="input-group input-group-sm input-group-vertical mb-4">

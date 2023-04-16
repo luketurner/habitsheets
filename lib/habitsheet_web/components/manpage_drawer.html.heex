@@ -1,0 +1,11 @@
+<UI.drawer id="manpage_drawer" checked={!!@manpage} close_href="?">
+
+  <:drawer>
+    <div class="p-4 w-80 bg-base-100 prose prose-sm">
+      <%= raw if @manpage, do: load_manpage(@manpage) %>
+    </div>
+  </:drawer>
+
+  <%= render_slot(@inner_block) %>
+
+</UI.drawer>

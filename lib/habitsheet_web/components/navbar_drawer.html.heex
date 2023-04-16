@@ -1,0 +1,34 @@
+<UI.drawer id="navbar_drawer">
+
+  <:drawer>
+    <ul class="menu p-4 w-80 bg-base-100">
+      <%= render_slot(@menu) %>
+    </ul>
+  </:drawer>
+
+  <nav class=" w-full navbar bg-neutral text-neutral-content shadow-lg">
+    <ul class="menu menu-horizontal text-xl">
+      <li><%= render_slot(@title) %></li>
+    </ul>
+    <div class="flex-grow p-2">
+      <%= render_slot(@subtitle) %>
+    </div>
+    <div class="flex-none md:hidden">
+      <ul class="menu menu-horizontal text-xl">
+        <li>
+          <label for="navbar_drawer" class="btn btn-ghost">
+            <UI.icon_bars_three_outline class="w-5 h-5" />
+          </label>
+        </li>
+      </ul>
+    </div>
+    <div class="flex-none hidden md:block">
+      <ul class="menu menu-horizontal font-semibold">
+        <%= render_slot(@menu) %>
+      </ul>
+    </div>
+  </nav>
+
+  <%= render_slot(@inner_block) %>
+
+</UI.drawer>

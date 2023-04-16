@@ -7,6 +7,8 @@ defmodule HabitsheetWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
+    plug :fetch_query_params
+    plug :assign_manpage
     plug :put_root_layout, {HabitsheetWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
@@ -102,5 +104,9 @@ defmodule HabitsheetWeb.Router do
     post "/users/confirm", UserConfirmationController, :create
     get "/users/confirm/:token", UserConfirmationController, :edit
     post "/users/confirm/:token", UserConfirmationController, :update
+  end
+
+  def assign_manpage(conn, _) do
+    assign(conn, :manpage, Map.get(conn.query_params, "manpage"))
   end
 end

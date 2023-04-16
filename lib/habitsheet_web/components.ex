@@ -62,6 +62,7 @@ defmodule HabitsheetWeb.Components do
   def flex_table(assigns)
 
   attr :conn_or_socket, :any, required: true
+  attr :manpage, :string
   slot(:inner_block, required: true)
   slot(:nav_menu, required: true)
   slot(:nav_title, required: true)
@@ -72,4 +73,21 @@ defmodule HabitsheetWeb.Components do
   slot(:inner_block)
   attr :rest, :global, default: %{class: "breadcrumbs text-sm font-semibold mx-3 mt-2 mb-4"}
   def breadcrumbs(assign)
+
+  slot(:inner_block)
+  slot(:drawer)
+  attr :id, :any, required: true
+  attr :checked, :boolean
+  attr :close_href, :string
+  def drawer(assigns)
+
+  slot(:inner_block)
+  slot(:title)
+  slot(:subtitle)
+  slot(:menu)
+  def navbar_drawer(assigns)
+
+  attr :manpage, :string
+  slot(:inner_block)
+  def manpage_drawer(assigns)
 end

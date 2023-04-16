@@ -167,6 +167,22 @@ defmodule HabitsheetWeb.LiveHelpers do
     end
   end
 
+  def manpage_path(manpage) do
+    "?#{URI.encode_query(%{manpage: manpage})}"
+  end
+
+  def load_manpage(manpage) do
+    # TODO -- avoid running ls on every request
+    valid_files = File.ls!("priv/manpage")
+
+    # An allow-list of valid files is used to prevent attacks with ..
+    if Enum.member?(valid_files, "#{manpage}.md") do
+      Earmark.from_file!("priv/manpage/#{manpage}.md")
+    else
+      "Unknown manpage"
+    end
+  end
+
   # TODO -- this event needs to be implemented client-side before it'll do anything.
   # @impl true
   # def handle_event("viewport_resize", viewport, socket) do
