@@ -37,6 +37,7 @@ let Hooks = {};
 Hooks.SortableList = {
   mounted() {
     Sortable.create(this.el, {
+      handle: '.sortable-list-handle',
       onUpdate: (event) => {
         this.pushEvent("sortable_update", {
           id: event.item.dataset.id,
