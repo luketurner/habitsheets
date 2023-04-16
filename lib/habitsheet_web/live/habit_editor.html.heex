@@ -32,9 +32,9 @@
     </div>
 
     <div class="form-control w-full max-w-xs mb-4">
-      <%= label f, :additional_data_spec, class: "mb-2" do %>
+      <%= label f, :additional_data_spec, class: "mb-2 flex flex-row items-center" do %>
         Additional Data
-        <.link class="btn btn-xs btn-info btn-circle ml-2" href={manpage_path("additional_data")}>?</.link>
+        <UI.manpage_link to="additional_data" />
       <% end %>
 
       <%= inputs_for f, :additional_data_spec, fn spec -> %>

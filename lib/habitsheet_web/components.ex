@@ -90,4 +90,7 @@ defmodule HabitsheetWeb.Components do
   attr :manpage, :string
   slot(:inner_block)
   def manpage_drawer(assigns)
+
+  attr :to, :string
+  def manpage_link(assigns)
 end
