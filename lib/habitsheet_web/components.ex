@@ -63,6 +63,7 @@ defmodule HabitsheetWeb.Components do
 
   attr :conn_or_socket, :any, required: true
   attr :manpage, :string
+  attr :theme, :string, required: true
   slot(:inner_block, required: true)
   slot(:nav_menu, required: true)
   slot(:nav_title, required: true)

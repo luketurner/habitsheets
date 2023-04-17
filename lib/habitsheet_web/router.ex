@@ -13,6 +13,7 @@ defmodule HabitsheetWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug :assign_user_theme
   end
 
   pipeline :api do
@@ -108,5 +109,14 @@ defmodule HabitsheetWeb.Router do
 
   def assign_manpage(conn, _) do
     assign(conn, :manpage, Map.get(conn.query_params, "manpage"))
+  end
+
+  # TODO -- this doesn't do browser-based theme detection.
+  def assign_user_theme(%{assigns: %{current_user: %{color_scheme: :dark}}} = conn, _) do
+    assign(conn, :theme, HabitsheetWeb.LiveHelpers.theme_for_scheme(:dark))
+  end
+
+  def assign_user_theme(conn, _) do
+    assign(conn, :theme, HabitsheetWeb.LiveHelpers.theme_for_scheme(:light))
   end
 end

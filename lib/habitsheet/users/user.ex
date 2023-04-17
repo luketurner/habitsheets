@@ -10,7 +10,7 @@ defmodule Habitsheet.Users.User do
     field :timezone, :string, default: "Etc/UTC"
     field :daily_review_email_enabled, :boolean, default: false
     field :daily_review_email_time, :time, default: ~T[00:00:00]
-
+    field :color_scheme, Ecto.Enum, values: [:browser, :light, :dark], default: :browser
     timestamps()
   end
 
@@ -38,7 +38,8 @@ defmodule Habitsheet.Users.User do
       :password,
       :timezone,
       :daily_review_email_enabled,
-      :daily_review_email_time
+      :daily_review_email_time,
+      :color_scheme
     ])
     |> validate_email()
     |> validate_password(opts)
@@ -48,7 +49,12 @@ defmodule Habitsheet.Users.User do
 
   def update_changeset(user, attrs) do
     user
-    |> cast(attrs, [:timezone, :daily_review_email_enabled, :daily_review_email_time])
+    |> cast(attrs, [
+      :timezone,
+      :daily_review_email_enabled,
+      :daily_review_email_time,
+      :color_scheme
+    ])
     |> TzExtra.Changeset.validate_time_zone_identifier(:timezone)
   end
 

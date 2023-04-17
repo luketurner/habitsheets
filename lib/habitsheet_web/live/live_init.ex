@@ -10,6 +10,9 @@ defmodule HabitsheetWeb.LiveInit do
       socket
       |> assign_user_for_session(session)
       |> assign_browser_params()
+      |> assign_color_scheme()
+      |> assign_theme()
+      |> assign(:manpage, params["manpage"])
 
     socket =
       if params["date"] do
@@ -17,8 +20,6 @@ defmodule HabitsheetWeb.LiveInit do
       else
         socket
       end
-
-    socket = assign(socket, :manpage, params["manpage"])
 
     if params["date"] != "today" && Map.has_key?(socket.assigns, :date) &&
          today?(socket.assigns.date, Map.get(socket.assigns, :timezone, "Etc/UTC")) do

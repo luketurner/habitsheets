@@ -75,6 +75,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
       height: window.innerHeight
     },
     browser_timezone: tz,
+    browser_prefers_color_scheme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
     loaded: true
   }
 })

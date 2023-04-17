@@ -22,7 +22,7 @@ module.exports = {
     plugin(({ addVariant }) => addVariant('phx-change-loading', ['&.phx-change-loading', '.phx-change-loading &']))
   ],
   daisyui: {
-    themes: ['autumn']
+    themes: ['cupcake', 'dracula']
   },
   safelist: [
     'bg-primary', 'text-primary-content', 'hover:bg-primary-focus',

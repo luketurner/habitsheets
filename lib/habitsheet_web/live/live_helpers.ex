@@ -67,6 +67,7 @@ defmodule HabitsheetWeb.LiveHelpers do
     |> assign(:browser_params_assigned?, loaded?)
     |> assign_timezone()
     |> assign_viewport()
+    |> assign_browser_preferred_color_scheme()
   end
 
   def assign_timezone(socket) do
@@ -83,6 +84,34 @@ defmodule HabitsheetWeb.LiveHelpers do
     height = socket.private.connect_params["viewport"]["height"]
     assign(socket, :viewport, %{width: width, height: height})
   end
+
+  def assign_browser_preferred_color_scheme(socket) do
+    scheme = socket.private.connect_params["browser_prefers_color_scheme"]
+    assign(socket, :browser_prefers_color_scheme, scheme)
+  end
+
+  def assign_color_scheme(socket), do: assign(socket, :color_scheme, get_color_scheme(socket))
+
+  def assign_theme(socket), do: assign(socket, :theme, theme_for_scheme(get_color_scheme(socket)))
+
+  def get_color_scheme(%{assigns: %{color_scheme: scheme}}), do: scheme
+
+  def get_color_scheme(%{
+        assigns: %{current_user: %{color_scheme: :browser}},
+        browser_prefers_color_scheme: browser_scheme
+      }),
+      do: browser_scheme
+
+  def get_color_scheme(%{assigns: %{current_user: %{color_scheme: :browser}}}), do: :light
+  def get_color_scheme(%{assigns: %{current_user: %{color_scheme: scheme}}}), do: scheme
+
+  def get_color_scheme(%{assigns: %{browser_prefers_color_scheme: browser_scheme}}),
+    do: browser_scheme
+
+  def get_color_scheme(_socket), do: :light
+
+  def theme_for_scheme(:dark), do: "dracula"
+  def theme_for_scheme(_), do: "cupcake"
 
   def assign_date(socket, "today") do
     assign_date(socket, today(socket.assigns.timezone))
