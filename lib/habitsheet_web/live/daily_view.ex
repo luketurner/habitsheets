@@ -118,24 +118,12 @@ defmodule HabitsheetWeb.Live.DailyView do
     get_habit_from_socket(socket, String.to_integer(habit_id))
   end
 
-  defp changeset_for_entry(entry_map, habit, date) do
-    if entry = entry_map[habit.id] do
-      HabitEntry.changeset(entry, %{
-        additional_data: build_additional_data(entry.additional_data, habit)
-      })
-    else
-      HabitEntry.create_changeset(%HabitEntry{}, %{
-        habit_id: habit.id,
-        date: date,
-        additional_data: build_additional_data([], habit)
-      })
-    end
+  defp get_entry_from_socket(socket, entry_id) when is_integer(entry_id) do
+    Enum.find(socket.assigns.entries, &(&1.id == entry_id))
   end
 
-  defp build_additional_data(current_data, habit) do
-    current_data
-    |> AdditionalData.zip_spec(habit.additional_data_spec)
-    |> Enum.map(fn {data, _spec} -> Map.take(data, AdditionalData.__schema__(:fields)) end)
+  defp get_entry_from_socket(socket, entry_id) when is_binary(entry_id) do
+    get_entry_from_socket(socket, String.to_integer(entry_id))
   end
 
   defp date_param_add(date, days) do
