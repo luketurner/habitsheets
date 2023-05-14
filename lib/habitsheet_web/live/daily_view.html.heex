@@ -37,7 +37,7 @@
     <%= for habit <- @habits do %>
       <UI.habit_entry_row
         habit={habit}
-        entry={Map.get(@entry_map, habit.id)}
+        entry={Sheet.get_entry(@sheet, habit, @date)}
         date={@date}
         on_toggle="toggle_entry"
         on_additional_data_change="update_entry" />

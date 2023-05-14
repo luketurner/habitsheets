@@ -32,6 +32,21 @@ defmodule Habitsheet.Reviews do
 
   def authorize(_, _, _), do: :error
 
+  def list_reviews_for_dates_as(%User{} = current_user, %User{} = user, date_range) do
+    with(:ok <- Bodyguard.permit(__MODULE__, :list_reviews_for_user, current_user, user)) do
+      {:ok,
+       Repo.all(
+         from(review in DailyReview,
+           select: review,
+           where:
+             review.user_id == ^user.id and review.date >= ^date_range.first and
+               review.date <= ^date_range.last
+         )
+         |> Bodyguard.scope(current_user)
+       )}
+    end
+  end
+
   def list_review_metadata_for_dates_as(%User{} = current_user, %User{} = user, date_range) do
     with(:ok <- Bodyguard.permit(__MODULE__, :list_reviews_for_user, current_user, user)) do
       {:ok,

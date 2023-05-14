@@ -118,6 +118,18 @@ defmodule Habitsheet.Habits do
     )
   end
 
+  def entry_index_date_first(habit_entries) do
+    Enum.reduce(habit_entries, %{}, fn %{habit_id: habit_id, date: date} = entry, acc ->
+      Map.update(acc, date, %{habit_id => entry}, &Map.put(&1, habit_id, entry))
+    end)
+  end
+
+  def entry_index_habit_first(habit_entries) do
+    Enum.reduce(habit_entries, %{}, fn %{habit_id: habit_id, date: date} = entry, acc ->
+      Map.update(acc, habit_id, %{date => entry}, &Map.put(&1, date, entry))
+    end)
+  end
+
   def delete_habits_for_user(%User{id: user_id}) do
     {:ok,
      Repo.delete_all(
