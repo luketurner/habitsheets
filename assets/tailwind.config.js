@@ -22,7 +22,12 @@ module.exports = {
     plugin(({ addVariant }) => addVariant('phx-change-loading', ['&.phx-change-loading', '.phx-change-loading &']))
   ],
   daisyui: {
-    themes: ['cupcake', 'dracula']
+    themes: [
+      {
+        cupcake: removeThemeVariables(require("daisyui/src/colors/themes")["[data-theme=cupcake]"]),
+        dracula: removeThemeVariables(require("daisyui/src/colors/themes")["[data-theme=dracula]"]),
+      }
+    ]
   },
   safelist: [
     'bg-primary', 'text-primary-content', 'hover:bg-primary-focus',
@@ -31,4 +36,8 @@ module.exports = {
     'bg-neutral', 'text-neutral-content', 'hover:bg-neutral-focus',
     'bg-base-200', 'text-base-content', 'hover:bg-base-300',
   ]
+}
+
+function removeThemeVariables(theme) {
+  return Object.entries(theme).reduce((theme, [key, value]) => key.startsWith('--') ? theme : { ...theme, [key]: value }, {})
 }
