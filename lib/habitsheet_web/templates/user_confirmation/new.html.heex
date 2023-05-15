@@ -1,6 +1,6 @@
 <h1 class="text-xl font-bold pb-4">Resend confirmation instructions</h1>
 
-<.form :let={f} for={:user} action={Routes.user_confirmation_path(@conn, :create)}>
+<.form :let={f} for={%{}} as={:user} action={Routes.user_confirmation_path(@conn, :create)}>
 
   <div class="form-control w-full max-w-xs">
     <%= label f, :email, class: "label label-text" %>
