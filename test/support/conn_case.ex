@@ -61,4 +61,12 @@ defmodule HabitsheetWeb.ConnCase do
     |> Phoenix.ConnTest.init_test_session(%{})
     |> Plug.Conn.put_session(:user_token, token)
   end
+
+  def add_timezones_to_conn(%{conn: conn}) do
+    %{conn: assign_timezones(conn)}
+  end
+
+  defp assign_timezones(conn) do
+    Plug.Conn.assign(conn, :timezones, TzExtra.time_zone_identifiers())
+  end
 end
