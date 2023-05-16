@@ -40,7 +40,7 @@ defmodule HabitsheetWeb.UserSettingsController do
     end
   end
 
-  def update(conn, %{"action" => "update_settings", "user" => user_params} = params) do
+  def update(conn, %{"action" => "update_settings", "user" => user_params} = _params) do
     user = conn.assigns.current_user
 
     # TODO

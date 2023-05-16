@@ -118,7 +118,7 @@ defmodule Habitsheet.Sheet do
     sheet.review_index |> Map.get(date)
   end
 
-  def get_habits_for_date(%__MODULE__{} = sheet, %Date{} = date) do
+  def get_habits_for_date(%__MODULE__{} = sheet, %Date{} = _date) do
     # Eventually, this should omit expired or recurring habits that aren't applicable for the date
     sheet.habits
   end

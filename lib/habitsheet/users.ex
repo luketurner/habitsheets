@@ -7,7 +7,6 @@ defmodule Habitsheet.Users do
   alias Habitsheet.Repo
 
   alias Habitsheet.Users.{User, UserToken, UserNotifier}
-  alias Habitsheet.Sheets
 
   ## Database getters
 
