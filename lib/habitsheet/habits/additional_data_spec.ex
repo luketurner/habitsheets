@@ -10,7 +10,6 @@ defmodule Habitsheet.Habits.AdditionalDataSpec do
     field :data_type, Ecto.Enum, values: @data_types, default: :count
     field :label, :string
     field :default_value, :binary
-    field :display_order, :integer
   end
 
   def data_types, do: @data_types

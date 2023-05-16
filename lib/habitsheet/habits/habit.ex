@@ -8,31 +8,26 @@ defmodule Habitsheet.Habits.Habit do
   alias Habitsheet.Habits.HabitEntry
   alias Habitsheet.Habits.RecurringInterval
   alias Habitsheet.Habits.AdditionalDataSpec
+  alias Habitsheet.Habits.Notes
+  alias Habitsheet.Habits.HabitTrigger
   alias Habitsheet.Users.User
 
-  @color_choices [
-    :primary,
-    :secondary,
-    :accent,
-    :neutral,
-    :base
-    # :info,
-    # :success,
-    # :warning,
-    # :error
-  ]
+  @habit_types [:action, :attitude]
+  @habit_senses [:positive, :negative]
 
   schema "habits" do
     field :name, :string
     field :display_order, :integer
     field :archived_at, :naive_datetime
-
-    field :display_color, Ecto.Enum,
-      values: @color_choices,
-      default: :primary
+    field :important, :boolean
+    field :type, Ecto.Enum, values: @habit_types
+    field :sense, Ecto.Enum, values: @habit_senses
+    field :expiration, :integer
 
     embeds_many :additional_data_spec, AdditionalDataSpec, on_replace: :delete
-    embeds_many :notify_at, RecurringInterval, on_replace: :delete
+    embeds_many :recurrence, RecurringInterval, on_replace: :delete
+    embeds_many :triggers, HabitTrigger, on_replace: :delete
+    embeds_one :notes, Notes, on_replace: :delete
 
     belongs_to :user, User
     has_many :entry, HabitEntry
@@ -51,11 +46,16 @@ defmodule Habitsheet.Habits.Habit do
       :name,
       :display_order,
       :archived_at,
-      :display_color,
+      :important,
+      :type,
+      :sense,
+      :expiration,
       :user_id
     ])
     |> cast_embed(:additional_data_spec)
-    |> cast_embed(:notify_at)
+    |> cast_embed(:recurrence)
+    |> cast_embed(:notes)
+    |> cast_embed(:triggers)
     |> validate_required([:name, :user_id])
   end
 
@@ -65,11 +65,17 @@ defmodule Habitsheet.Habits.Habit do
       :name,
       :display_order,
       :archived_at,
-      :display_color
+      :important,
+      :type,
+      :sense,
+      :expiration
     ])
     |> cast_embed(:additional_data_spec)
-    |> cast_embed(:notify_at)
+    |> cast_embed(:recurrence)
+    |> cast_embed(:notes)
+    |> cast_embed(:triggers)
   end
 
-  def color_choices(), do: @color_choices
+  def habit_types(), do: @habit_types
+  def habit_senses(), do: @habit_senses
 end

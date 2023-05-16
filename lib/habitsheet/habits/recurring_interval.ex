@@ -2,18 +2,26 @@ defmodule Habitsheet.Habits.RecurringInterval do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @zero_time ~N[2000-01-01 00:00:00]
-
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
-
   embedded_schema do
-    field :start, :naive_datetime, default: @zero_time
-    field :interval, :naive_datetime, default: @zero_time
+    field :type, Ecto.Enum, values: [:weekly, :monthly]
+    field :every, :integer
+    field :start, :date
   end
 
-  def changeset(attrs \\ %{}) do
-    %__MODULE__{}
-    |> cast(attrs, [:id, :start, :interval])
-    |> validate_required([:id, :start, :interval])
+  def changeset(%__MODULE__{} = interval, attrs \\ %{}) do
+    interval
+    |> cast(attrs, [:type, :every, :start])
+    |> validate_required([:type, :every, :start])
+  end
+
+  def recurs_on(%__MODULE__{start: start, every: every, type: type}, %Date{} = date) do
+    case type do
+      :weekly ->
+        rem(Date.diff(start, date), 7 * every) == 0
+
+      :monthly ->
+        date.day == start.day and
+          rem((date.month - start.month) * 12 + (date.month - start.month), every) == 0
+    end
   end
 end

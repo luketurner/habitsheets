@@ -110,7 +110,7 @@ defmodule HabitsheetWeb.Components do
 
     ~H"""
     <div
-      class={"#{classes_for_habit(@habit)} w-100 min-h-16 my-2 mx-4 rounded-lg shadow-xl flex flex-col flex-nowrap justify-center select-none pointer-events-auto cursor-pointer"}
+      class={"bg-neutral text-neutral-content hover:bg-neutral-focus w-100 min-h-16 my-2 mx-4 rounded-lg shadow-xl flex flex-col flex-nowrap justify-center select-none pointer-events-auto cursor-pointer"}
       phx-value-id={@habit.id}
       {if Enum.empty?(@habit.additional_data_spec || []), do: [phx_click: @on_toggle], else: []}>
       <div class="flex flex-row flex-nowrap items-center mx-4">

@@ -15,23 +15,6 @@
     </div>
 
     <div class="form-control w-full max-w-xs mb-4">
-      <%= label f, :display_color, class: "label label-text" %>
-      <div class="flex flex-row flex-wrap">
-        <%= radio_button f, :display_color, :primary, style: "border-width: 20px;",
-        class: "cursor-pointer w-12 h-12 m-2 rounded bg-primary-content border-primary appearance-none ring-base-content ring-offset-2 checked:ring" %>
-        <%= radio_button f, :display_color, :secondary, style: "border-width: 20px;",
-        class: "cursor-pointer w-12 h-12 m-2 rounded bg-secondary-content border-secondary appearance-none ring-base-content ring-offset-2 checked:ring" %>
-        <%= radio_button f, :display_color, :accent, style: "border-width: 20px;",
-        class: "cursor-pointer w-12 h-12 m-2 rounded bg-accent-content border-accent appearance-none ring-base-content ring-offset-2 checked:ring" %>
-        <%= radio_button f, :display_color, :base, style: "border-width: 20px;",
-        class: "cursor-pointer w-12 h-12 m-2 rounded bg-base-300-content border-base appearance-none ring-base-content ring-offset-2 checked:ring" %>
-        <%= radio_button f, :display_color, :neutral, style: "border-width: 20px;",
-        class: "cursor-pointer w-12 h-12 m-2 rounded bg-neutral-content border-neutral appearance-none ring-base-content ring-offset-2 checked:ring" %>
-      </div>
-      <%= error_tag f, :display_color %>
-    </div>
-
-    <div class="form-control w-full max-w-xs mb-4">
       <%= label f, :additional_data_spec, class: "mb-2 flex flex-row items-center" do %>
         Additional Data
         <UI.manpage_link to="additional_data" />

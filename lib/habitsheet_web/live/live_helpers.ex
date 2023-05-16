@@ -4,7 +4,6 @@ defmodule HabitsheetWeb.LiveHelpers do
   alias Phoenix.LiveView.JS
 
   alias Habitsheet.Users
-  alias Habitsheet.Habits.Habit
 
   @doc """
   Renders a live component inside a modal.
@@ -171,29 +170,6 @@ defmodule HabitsheetWeb.LiveHelpers do
 
     width = points[breakpoint]
     !is_nil(viewport_width) && width <= viewport_width
-  end
-
-  def classes_for_habit(%Habit{} = habit) do
-    # Note -- when editing this function, also update the safelist in tailwind.config.js
-    if habit.display_color == :base do
-      # Base color is a special case because the class names don't exactly match
-      "bg-base-200 text-base-content hover:bg-base-300"
-    else
-      color =
-        case habit.display_color do
-          :primary -> "primary"
-          :secondary -> "secondary"
-          :accent -> "accent"
-          :neutral -> "neutral"
-          # :info -> "info"
-          # :success -> "success"
-          # :warning -> "warning"
-          # :error -> "error"
-          _ -> "primary"
-        end
-
-      "bg-#{color} text-#{color}-content hover:bg-#{color}-focus"
-    end
   end
 
   def manpage_path(manpage) do
