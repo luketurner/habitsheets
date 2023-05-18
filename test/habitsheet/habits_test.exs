@@ -22,7 +22,8 @@ defmodule Habitsheet.HabitsTest do
                 id: Ecto.UUID.generate(),
                 data_type: :count,
                 default_value: "0",
-                label: "Test data"
+                label: "Test data",
+                display_order: 1
               }
             ]
           })

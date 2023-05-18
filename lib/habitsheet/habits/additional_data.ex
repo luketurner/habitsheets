@@ -25,7 +25,7 @@ defmodule Habitsheet.Habits.AdditionalData do
 
   def zip_spec(additional_data, spec) do
     spec
-    |> Enum.sort_by(& &1.display_order, :asc)
+    |> AdditionalDataSpec.sort_by_display_order()
     |> Enum.map(fn spec ->
       {Enum.find(
          additional_data,
