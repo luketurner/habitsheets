@@ -107,31 +107,45 @@ defmodule Habitsheet.Habits.Habit do
   end
 
   @doc """
-  Returns true if the habit would be expired, given the previous date the habit was performed
-  and the current date.
+  Returns true if the habit would be cooled down on a given date, given the previous date the habit was performed.
 
   # Examples
 
-      iex> Habit.expired(%Habit{expiration: 2}, ~D[2022-01-01], ~D[2022-01-04])
+      iex> Habit.cooled_down(%Habit{expiration: 2}, ~D[2022-01-01], ~D[2022-01-04])
       true
 
-      iex> Habit.expired(%Habit{expiration: 2}, ~D[2022-01-01], ~D[2022-01-03])
+      iex> Habit.cooled_down(%Habit{expiration: 2}, ~D[2022-01-01], ~D[2022-01-03])
       true
 
-      iex> Habit.expired(%Habit{expiration: 2}, ~D[2022-01-01], ~D[2022-01-02])
+      iex> Habit.cooled_down(%Habit{expiration: 2}, ~D[2022-01-01], ~D[2022-01-02])
       false
 
-      iex> Habit.expired(%Habit{expiration: 1}, ~D[2022-01-01], ~D[2022-01-02])
+      iex> Habit.cooled_down(%Habit{expiration: 1}, ~D[2022-01-01], ~D[2022-01-02])
       true
 
-      iex> Habit.expired(%Habit{}, ~D[2022-01-01], ~D[2022-01-02])
+      iex> Habit.cooled_down(%Habit{}, ~D[2022-01-01], ~D[2022-01-02])
+      true
+
+      iex> Habit.cooled_down(%Habit{expiration: 2}, ~D[2022-12-31], ~D[2023-01-01])
       false
+
+      iex> Habit.cooled_down(%Habit{}, nil, ~D[2022-01-01])
+      true
+
+      iex> Habit.cooled_down(%Habit{expiration: 2}, %HabitEntry{date: ~D[2022-01-01]}, ~D[2022-01-03])
+      true
   """
-  def expired(
+  def cooled_down(
         %__MODULE__{} = habit,
-        %Date{} = last_habit_date,
+        %Date{} = latest_date,
         %Date{} = check_date
       ) do
-    Date.diff(check_date, last_habit_date) >= Map.get(habit, :expiration, 1)
+    Date.diff(check_date, latest_date) >= (Map.get(habit, :expiration) || 1)
   end
+
+  def cooled_down(%__MODULE__{} = habit, %HabitEntry{} = latest_entry, %Date{} = date) do
+    cooled_down(habit, latest_entry.date, date)
+  end
+
+  def cooled_down(%__MODULE__{}, nil, %Date{}), do: true
 end

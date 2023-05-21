@@ -4,13 +4,15 @@ defmodule Habitsheet.HabitsFixtures do
   entities via the `Habitsheet.Habits` context.
   """
 
-  alias Habitsheet.UsersFixtures
+  import Habitsheet.UsersFixtures
   alias Habitsheet.Habits
   alias Habitsheet.Habits.Habit
 
   def create_habit_attributes(attrs \\ %{}) do
+    user = attrs[:user] || user_fixture()
+
     Enum.into(attrs, %{
-      user_id: UsersFixtures.user_fixture().id,
+      user_id: user.id,
       name: "Test Habit"
     })
   end
@@ -26,5 +28,11 @@ defmodule Habitsheet.HabitsFixtures do
       |> Habits.create_habit()
 
     habit
+  end
+
+  def habit_entry_fixture(habit \\ nil, date \\ ~D[2023-01-01], additional_data \\ []) do
+    habit = habit || habit_fixture()
+    {:ok, entry} = Habits.update_habit_entry_for_date(habit, date, additional_data)
+    entry
   end
 end

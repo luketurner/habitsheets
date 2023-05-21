@@ -1,4 +1,14 @@
 defmodule Habitsheet.Sheet do
+  @moduledoc """
+  A Sheet struct encapsulates all the preloaded data that's needed for viewing habits over a date range.
+  Phoenix views, email handlers, etc. can create a sheet and then easily "ask the sheet" for whatever data is needed to render the UI / email / etc.
+  
+  # Examples (wip)
+  
+  sheet = Sheet.new(user, Date.range(~D[2022-01-01], ~D[2022-01-08]))
+  Sheet.get_habits_for_date(sheet, ~D[2022-01-03])
+  
+  """
   alias Habitsheet.Users.User
   alias Habitsheet.Habits
   alias Habitsheet.Habits.Habit
@@ -6,6 +16,8 @@ defmodule Habitsheet.Sheet do
   alias Habitsheet.Reviews
 
   alias Ecto.Changeset
+
+  @derive {Inspect, only: [:user, :dates]}
 
   defstruct [
     :user,
@@ -16,7 +28,8 @@ defmodule Habitsheet.Sheet do
     :entry_index_date_first,
     :entry_index_habit_first,
     :habit_index,
-    :review_index
+    :review_index,
+    :habit_latest_entries
   ]
 
   def new(%User{} = user, %Date.Range{} = dates) do
@@ -28,7 +41,8 @@ defmodule Habitsheet.Sheet do
     with(
       {:ok, sheet} <- load_habits(sheet),
       {:ok, sheet} <- load_entries(sheet),
-      {:ok, sheet} <- load_reviews(sheet)
+      {:ok, sheet} <- load_reviews(sheet),
+      {:ok, sheet} <- load_latest_entries(sheet)
     ) do
       {:ok, sheet}
     end
@@ -63,6 +77,12 @@ defmodule Habitsheet.Sheet do
        sheet
        |> Map.put(:reviews, reviews)
        |> Map.put(:review_index, Map.new(reviews, &{&1.date, &1}))}
+    end
+  end
+
+  def load_latest_entries(%__MODULE__{user: user, habits: habits, dates: dates} = sheet) do
+    with {:ok, entries} <- Habits.get_latest_entry_dates_before_as(user, habits, dates.first) do
+      {:ok, %{sheet | habit_latest_entries: entries}}
     end
   end
 
@@ -118,8 +138,47 @@ defmodule Habitsheet.Sheet do
     sheet.review_index |> Map.get(date)
   end
 
-  def get_habits_for_date(%__MODULE__{} = sheet, %Date{} = _date) do
-    # Eventually, this should omit expired or recurring habits that aren't applicable for the date
+  @doc """
+  Returns the latest HabitEntry that occured before the given date. For example, if the date is 2022-01-10,
+  and there was an entry on 2022-01-01, 2022-01-05, and 2022-01-11, the 2022-01-05 entry will be returned.
+  This information is used to determine whether the habit is cooling down as of a given date.
+  Note that the returned entry may be outside the date span of the Sheet.
+  There may also be no returned entries if the habit has never had entries created for it.
+  """
+  def get_latest_entry_date_before(
+        %__MODULE__{
+          habit_latest_entries: latest_entries,
+          entry_index_habit_first: entry_index
+        },
+        %Habit{} = habit,
+        %Date{} = date
+      ) do
+    Map.get(entry_index, habit.id, %{})
+    |> Map.values()
+    |> Enum.map(fn entry -> entry.date end)
+    |> Enum.filter(fn d -> d < date end)
+    |> Enum.max(fn -> Map.get(latest_entries, habit.id) end)
+  end
+
+  def habit_recurs_on(%__MODULE__{}, %Habit{} = habit, %Date{} = date) do
+    Habit.recurs_on(habit, date)
+  end
+
+  def habit_cooled_down_on(%__MODULE__{} = sheet, %Habit{} = habit, %Date{} = date) do
+    Habit.cooled_down(habit, get_latest_entry_date_before(sheet, habit, date), date)
+  end
+
+  @doc """
+  Returns whether or not a habit should be "shown" on a given date. Habits are generally
+  always shown, unless they are cooling down, or they are recurring and the date isn't part
+  of the recurring interval.
+  """
+  def habit_shown_on(%__MODULE__{} = sheet, %Habit{} = habit, %Date{} = date) do
+    habit_recurs_on(sheet, habit, date) and habit_cooled_down_on(sheet, habit, date)
+  end
+
+  def get_habits_for_date(%__MODULE__{} = sheet, %Date{} = date) do
     sheet.habits
+    |> Enum.filter(&habit_shown_on(sheet, &1, date))
   end
 end

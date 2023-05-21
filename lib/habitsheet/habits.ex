@@ -215,10 +215,9 @@ defmodule Habitsheet.Habits do
     # TODO - multi me, I guess?
     next_display_order =
       Repo.one!(
-        from(h in Habit,
+        from h in Habit,
           select: coalesce(max(h.display_order) + 1, 0),
           where: h.user_id == ^habit.user_id and is_nil(h.archived_at)
-        )
       )
 
     update_habit(
@@ -322,5 +321,29 @@ defmodule Habitsheet.Habits do
     )
 
     {:ok}
+  end
+
+  def get_latest_entry_dates_before(habits, %Date{} = date) do
+    try do
+      entries =
+        Repo.all(
+          from entry in HabitEntry,
+            group_by: entry.habit_id,
+            select: {entry.habit_id, max(entry.date)},
+            where: entry.habit_id in ^Enum.map(habits, &Map.get(&1, :id)) and entry.date < ^date
+        )
+        |> Map.new()
+
+      {:ok, entries}
+    rescue
+      e -> {:error, e}
+    end
+  end
+
+  def get_latest_entry_dates_before_as(%User{} = current_user, habits, %Date{} = date) do
+    with :ok <-
+           Bodyguard.permit(__MODULE__, :list_habit_entries_for_user, current_user, current_user) do
+      get_latest_entry_dates_before(habits, date)
+    end
   end
 end
