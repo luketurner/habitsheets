@@ -4,6 +4,79 @@ HabitSheets is a Web application for habit tracking. A demo instance is availabl
 
 HabitSheets is open-source (MIT Licensed) and it's easy to deploy your own instance on [Fly.io](https://fly.io/) with just a few commands. See [Development](#development) section for details.
 
+## Getting Started Guide (WIP)
+
+To make best use of HabitSheets (or any habit-tracking software), your first task, _before even opening the app_, is to set aside a few minutes a day for reflection. Without a habit of daily reflection, the full benefit of habit tracking can't be realized.
+
+To get started building the habit of daily reflection, I recommend using **habit chaining**:
+
+Find a habit you already have -- something you do daily, ideally in the evening -- that you can use as a reminder to reflect on the day. Examples:
+
+- Just finished dinner
+- Before brushing your teeth
+- After walking your dog
+
+Create a **link** in your mind between the existing habit and the new habit (reflecting on the day).  
+
+When reflecting at first, just let your mind think about the day in whatever way is easiest for you. Sometimes, tracking can feel stressful and get in the way of reflection. I especially recommend this if you've struggled with habit tracking in the past.
+
+Once you get used to reflecting daily -- which likely won't take long, if you _chained the habit_ and _made it easy_ -- you might start to feel like it would be easier to reflect if you had a checklist. This is a good time to start using an app.
+
+## Effectively building habits
+
+To build a habit, setting intent is not enough. You need a trigger, internal or external, to bring up a thought at the appropriate time. There are two kinds of triggers you can use:
+
+- **Existing habits** (referred to as _habit chaining_)
+- **Reminders/Notifications**
+
+Using existing habits is the more natural-feeling method in most cases, and the one I recommend using when possible.
+
+Reminders from external systems like HabitSheets should only be used for triggering habits that (a) only recur infrequently or (b) must happen at a specific time.
+
+One other essential concern:
+
+- **Keep it easy**
+
+Have you ever experienced a kind of inertia when starting a new habit? Not that you don't remember to do it, but somehow even though you _know_ you should... you just don't? That's a sign -- it means the habit is too difficult.
+
+#### Habit chaining
+
+When using an existing habit as a trigger for a new habit, there are two things to consider:
+
+- **Good trigger** - The existing habit should happen consistently at the right time and place.
+- **Good coupling** - The existing habit should somehow "bring to mind" the new habit.
+
+When selecting the existing habit, you're looking for a good trigger. Since many habits operate below conscious awareness, one technique to find good triggers is to write down all your habits throughout the day.
+
+Once you've selected the habit, form a mental linkage -- a good coupling -- with the new desired habit. Any two habits can be coupled together by use of the **link** mneumonic technique (see The Memory Book).
+
+
+#### References / Further Reading
+
+- Atomic Habits
+- Getting Things Done
+- The Memory Book
+
+## Usage notes
+
+(WIP - to be incorporated into in-app documentation.)
+
+In HabitSheets, a Habit is any kind of behavior you want to bring to conscious awareness through tracking and reflection. A habit could be specific (e.g. "meditate for at least 15 minutes before bed") or it could be a general point for reflection (e.g. "Was I generous today?")
+
+### Habit Data
+
+Habits can have additional data fields associated with them beyond a yes/no status:
+
+- **Count** fields record positive integer like: number of squats, number of times you said thank you, etc.
+- **Measurement** fields record continuous quantities from some measurement or calculation, like: weight, number of calories, distance walked, etc.
+- **Duration** fields record durations, like: duration of run, duration of meditation, etc.
+- **Text** fields record arbitrary textual data, like: notes about weather, mood, etc.
+
+Would also like to add:
+
+- **Sets** fields record zero-or-more "sets" of exercises, e.g. 3x10 squats or 1, 2, 3, 2, 1 bench presses
+
+
 ## Tech notes
 
 An experiment with the so-called PETAL (Phoenix, Elixir, TailwindCSS, AlpineJS, LiveView) stack.
