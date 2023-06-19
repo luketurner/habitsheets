@@ -123,6 +123,13 @@ defmodule HabitsheetWeb.Components do
           <%= @habit.name %>
         </div>
       </div>
+      <div class="flex flex-row flex-wrap">
+        <%= for recurrence <- @habit.recurrence do %>
+          <div class="badge badge-accent" title={Habitsheet.Habits.RecurringInterval.to_display_sentence(recurrence)}>
+            <%= Habitsheet.Habits.RecurringInterval.to_display_string(recurrence) %>
+          </div>
+        <% end %>
+      </div>
       <div>
         <UI.additional_data_editor
           changeset={@changeset}
@@ -144,7 +151,7 @@ defmodule HabitsheetWeb.Components do
       for={@changeset}
       id={"habit_#{@habit.id}"}
       phx-change={@on_change}>
-    
+
       <%= hidden_input f, :id %>
       <%= hidden_input f, :habit_id %>
       <%= hidden_input f, :date %>
@@ -152,7 +159,7 @@ defmodule HabitsheetWeb.Components do
         <%= hidden_input data, :id %>
         <%= hidden_input data, :data_type %>
         <%= case Changeset.get_field(data.source, :data_type) do %>
-    
+
         <% :count -> %>
           <div class="form-control mb-2 mx-2 w-100 max-w-xs">
             <%= label data, :value, Enum.find(@habit.additional_data_spec, nil, fn v -> v.id == Changeset.get_field(data.source, :id) end).label, class: "label label-text text-inherit" %>
@@ -162,26 +169,26 @@ defmodule HabitsheetWeb.Components do
               <button class="btn" onclick={"document.getElementById('#{input_id(data, :value)}').stepUp(); document.getElementById('#{input_id(data, :value)}').dispatchEvent(new Event('input', {bubbles: true})); event.stopPropagation(); event.preventDefault();"}>+</button>
             </div>
           </div>
-    
+
         <% :measurement -> %>
           <div class="form-control mb-2 mx-2 w-100 max-w-xs">
             <%= label data, :value, Enum.find(@habit.additional_data_spec, nil, fn v -> v.id == Changeset.get_field(data.source, :id) end).label, class: "label label-text text-inherit" %>
             <%= number_input data, :value, class: "input input-bordered text-base-content", step: "0.001" %>
           </div>
-    
+
         <% :duration -> %>
           <div class="form-control mb-2 mx-2 w-100 max-w-xs">
             <%= label data, :value, Enum.find(@habit.additional_data_spec, nil, fn v -> v.id == Changeset.get_field(data.source, :id) end).label, class: "label label-text text-inherit" %>
             <!-- TODO: Some kind of duration input -->
             <%= text_input data, :value, class: "input input-bordered text-base-content" %>
           </div>
-    
+
         <% :text -> %>
           <div class="form-control mb-2 mx-2 w-100 max-w-xs">
             <%= label data, :value, Enum.find(@habit.additional_data_spec, nil, fn v -> v.id == Changeset.get_field(data.source, :id) end).label, class: "label label-text text-inherit" %>
             <%= text_input data, :value, class: "input input-bordered text-base-content" %>
           </div>
-    
+
         <% end %>
       </.inputs_for>
     </.form>
