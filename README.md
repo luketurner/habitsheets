@@ -114,7 +114,7 @@ For local development (running `mix phx.server` to test HabitSheets locally), yo
 
 1. [Node](https://nodejs.org/en/) v12+ w/NPM
 2. A [Postgresql](https://www.postgresql.org/) server running at `localhost:5432` with username `postgres` and password `postgres`
-   - The project includes mix tasks to run development database with [Docker](https://www.docker.com/) (or equivalent, e.g. [Podman](https://podman.io/)).
+   - The project includes mix tasks to run development database with [Podman](https://podman.io/).
 
 For deployment, you don't need Node/Postgres, but you _do_ still need Git/Elixir, as well as:
 
