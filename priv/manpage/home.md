@@ -11,3 +11,4 @@ Table of Contents:
 
 1. [About](?manpage=about)
 1. [Additional Data](?manpage=additional_data)
+1. [Recurring Intervals](?manpage=recurrence)

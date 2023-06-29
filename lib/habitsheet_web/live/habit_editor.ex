@@ -5,6 +5,7 @@ defmodule HabitsheetWeb.Live.HabitEditor do
 
   alias Habitsheet.Habits
   alias Habitsheet.Habits.AdditionalDataSpec
+  alias Habitsheet.Habits.RecurringInterval
   alias Habitsheet.Habits.Habit
 
   @impl true
@@ -86,6 +87,39 @@ defmodule HabitsheetWeb.Live.HabitEditor do
     {:noreply, socket |> assign(:changeset, changeset) |> assign(:spec_deleted?, true)}
   end
 
+  @impl true
+  def handle_event("add_recurrence", _, socket) do
+    changeset = socket.assigns.changeset
+
+    new_recurrence =
+      RecurringInterval.changeset(%RecurringInterval{}, %{
+        type: :weekly,
+        every: 1,
+        start: DateHelpers.today(socket.assigns.timezone)
+      })
+
+      IO.inspect(new_recurrence)
+
+    existing = Changeset.get_field(changeset, :recurrence, [])
+
+    changeset =
+      Changeset.put_embed(changeset, :recurrence, existing ++ [new_recurrence])
+
+    {:noreply, socket |> assign(:changeset, changeset)}
+  end
+
+  @impl true
+  def handle_event("delete_recurrence", %{"id" => id}, socket) do
+    changeset = socket.assigns.changeset
+
+    existing = Changeset.get_field(changeset, :recurrence, [])
+    new = Enum.reject(existing, &(&1.id == id))
+
+    changeset = Changeset.put_embed(changeset, :recurrence, new)
+
+    {:noreply, socket |> assign(:changeset, changeset) |> assign(:recurrence_deleted?, true)}
+  end
+
   defp save_habit(socket, :edit, habit_params) do
     # TODO -- this is necessary because if no additional_data_specs are specified,
     # the habit_params, and therefore the changeset, won't have any changes when the last spec is deleted.
@@ -95,7 +129,14 @@ defmodule HabitsheetWeb.Live.HabitEditor do
         do: Map.put_new(habit_params, "additional_data_spec", []),
         else: habit_params
 
+    habit_params =
+      if socket.assigns[:recurrence_deleted?],
+        do: Map.put_new(habit_params, "recurrence", []),
+        else: habit_params
+
     changeset = Habit.update_changeset(socket.assigns.habit, habit_params)
+
+    IO.inspect(changeset)
 
     case Habits.update_habit_as(socket.assigns.current_user, changeset) do
       {:ok, _habit} ->

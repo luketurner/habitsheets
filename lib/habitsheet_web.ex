@@ -101,7 +101,7 @@ defmodule HabitsheetWeb do
       alias HabitsheetWeb.Router.Helpers, as: Routes
 
       alias HabitsheetWeb.Components, as: UI
-      alias Habitsheet.DateHelpers, as: DateHelpers
+      alias Habitsheet.DateHelpers
     end
   end
 

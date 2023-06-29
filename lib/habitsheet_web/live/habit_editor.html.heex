@@ -9,12 +9,42 @@
     phx-submit="save">
 
     <div class="form-control w-full max-w-xs">
-      <%= label f, :name, class: "label label-text" %>
+      <%= label f, :name, class: "label label-text text-lg" %>
       <%= text_input f, :name, required: true, class: "input input-bordered w-full max-w-xs" %>
       <%= error_tag f, :name %>
     </div>
 
-    <div class="form-control w-full max-w-xs mb-4">
+    <div class="form-control w-full max-w-xs my-8">
+      <%= label f, :recurrence, class: "mb-2 flex flex-row items-center text-lg" do %>
+        Recurring Intervals
+        <UI.manpage_link to="recurrence" />
+      <% end %>
+
+      <%= inputs_for f, :recurrence, fn recurrence -> %>
+        <div class="form-control w-full max-w-xs">
+          <div class="input-group input-group-sm input-group-vertical mb-4">
+            <%= select recurrence, :type, RecurringInterval.interval_types(), required: true, class: "input input-bordered" %>
+            <%= error_tag recurrence, :type %>
+
+            <%= number_input recurrence, :every, required: true, class: "input input-bordered" %>
+            <%= error_tag recurrence, :every %>
+
+            <%= date_input recurrence, :start, required: true, class: "input input-bordered" %>
+            <%= error_tag recurrence, :start %>
+
+            <.link phx-click="delete_recurrence" phx-value-id={Changeset.get_field(recurrence.source, :id)} class="btn btn-xs">
+              Remove
+            </.link>
+          </div>
+        </div>
+      <% end %>
+      <div>
+        <.link phx-click="add_recurrence" class="btn btn-sm">Add Recurrence</.link>
+      </div>
+      <%= error_tag f, :recurrence %>
+    </div>
+
+    <div class="form-control w-full max-w-xs my-8 text-lg">
       <%= label f, :additional_data_spec, class: "mb-2 flex flex-row items-center" do %>
         Additional Data
         <UI.manpage_link to="additional_data" />
