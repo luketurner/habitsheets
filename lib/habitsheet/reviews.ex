@@ -22,7 +22,7 @@ defmodule Habitsheet.Reviews do
   def authorize(:get_review, %User{id: user_id}, %DailyReview{user_id: user_id}), do: :ok
   def authorize(:update_review, %User{id: user_id}, %DailyReview{user_id: user_id}), do: :ok
 
-  def authorize(:upsert_review, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}),
+  def authorize(:upsert_review, %User{id: user_id}, %Changeset{data: %DailyReview{}, changes: %{user_id: user_id}}),
     do: :ok
 
   def authorize(:receive_review_emails, %User{id: user_id}, %DailyReview{user_id: user_id}),

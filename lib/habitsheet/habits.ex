@@ -29,7 +29,7 @@ defmodule Habitsheet.Habits do
   def authorize(:update_entry_for_habit, %User{id: user_id}, %Habit{user_id: user_id}), do: :ok
 
   # Any logged-in user can create a habit, but only for themselves
-  def authorize(:create_habit, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}),
+  def authorize(:create_habit, %User{id: user_id}, %Changeset{data: %Habit{}, changes: %{user_id: user_id}}),
     do: :ok
 
   # Fallback policy
