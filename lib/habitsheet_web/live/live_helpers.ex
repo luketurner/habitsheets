@@ -4,6 +4,7 @@ defmodule HabitsheetWeb.LiveHelpers do
   alias Phoenix.LiveView.JS
 
   alias Habitsheet.Users
+  alias Habitsheet.DateHelpers
 
   @doc """
   Renders a live component inside a modal.
@@ -109,11 +110,11 @@ defmodule HabitsheetWeb.LiveHelpers do
 
   def get_color_scheme(_socket), do: :light
 
-  def theme_for_scheme(:dark), do: "dracula"
-  def theme_for_scheme(_), do: "cupcake"
+  def theme_for_scheme(:dark), do: Habitsheet.Theme.theme(:dark)
+  def theme_for_scheme(_), do: Habitsheet.Theme.theme(:light)
 
   def assign_date(socket, "today") do
-    assign_date(socket, today(socket.assigns.timezone))
+    assign_date(socket, DateHelpers.today(socket.assigns.timezone))
   end
 
   def assign_date(socket, date) when is_binary(date) do
@@ -122,41 +123,6 @@ defmodule HabitsheetWeb.LiveHelpers do
 
   def assign_date(socket, %Date{} = date) do
     assign(socket, :date, date)
-  end
-
-  def short_date(date) do
-    "#{date.month}/#{date.day}"
-  end
-
-  def day_of_week(date) do
-    case Date.day_of_week(date) do
-      1 -> "Mon"
-      2 -> "Tues"
-      3 -> "Wed"
-      4 -> "Thurs"
-      5 -> "Fri"
-      6 -> "Sat"
-      7 -> "Sun"
-    end
-  end
-
-  def readable_timestamp(%DateTime{} = dt) do
-    Calendar.strftime(
-      dt,
-      "%c %Z"
-    )
-  end
-
-  def readable_timestamp(%NaiveDateTime{} = dt, tz) do
-    dt |> DateTime.from_naive!("Etc/UTC") |> DateTime.shift_zone!(tz) |> readable_timestamp()
-  end
-
-  def today(tz \\ "Etc/UTC") do
-    DateTime.to_date(DateTime.now!(tz))
-  end
-
-  def today?(%Date{} = date, tz \\ "Etc/UTC") do
-    date == today(tz)
   end
 
   def breakpoint?(%{assigns: %{viewport: %{width: viewport_width}}} = _socket, breakpoint) do
@@ -177,17 +143,7 @@ defmodule HabitsheetWeb.LiveHelpers do
   end
 
   def load_manpage(manpage) do
-    manpage_dir = Application.app_dir(:habitsheet, "priv/manpage")
-    manpage_file = "#{manpage}.md"
-    # TODO -- avoid running ls on every request
-    valid_files = File.ls!(manpage_dir)
-
-    # An allow-list of valid files is used to prevent attacks with ..
-    if Enum.member?(valid_files, manpage_file) do
-      Earmark.from_file!(Path.join(manpage_dir, manpage_file))
-    else
-      "Unknown manpage"
-    end
+    Habitsheet.Manual.load_manpage(manpage)
   end
 
   # TODO -- this event needs to be implemented client-side before it'll do anything.

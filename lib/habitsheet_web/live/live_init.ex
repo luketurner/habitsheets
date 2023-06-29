@@ -4,6 +4,7 @@ defmodule HabitsheetWeb.LiveInit do
   import Phoenix.Component
 
   alias HabitsheetWeb.Router.Helpers, as: Routes
+  alias Habitsheet.DateHelpers
 
   def on_mount(:default, params, session, socket) do
     socket =
@@ -22,7 +23,7 @@ defmodule HabitsheetWeb.LiveInit do
       end
 
     if params["date"] != "today" && Map.has_key?(socket.assigns, :date) &&
-         today?(socket.assigns.date, Map.get(socket.assigns, :timezone, "Etc/UTC")) do
+        DateHelpers.today?(socket.assigns.date, Map.get(socket.assigns, :timezone, "Etc/UTC")) do
       {:halt, socket |> push_navigate(to: Routes.daily_view_path(socket, :index, "today"))}
     else
       {:cont, socket}
