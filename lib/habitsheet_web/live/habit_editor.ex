@@ -39,6 +39,11 @@ defmodule HabitsheetWeb.Live.HabitEditor do
         do: Map.put_new(habit_params, "additional_data_spec", []),
         else: habit_params
 
+    habit_params =
+      if socket.assigns[:recurrence_deleted?],
+        do: Map.put_new(habit_params, "recurrence", []),
+        else: habit_params
+
     changeset =
       if socket.assigns.live_action == :new do
         Habits.habit_create_changeset(socket.assigns.habit, habit_params)
@@ -135,8 +140,6 @@ defmodule HabitsheetWeb.Live.HabitEditor do
         else: habit_params
 
     changeset = Habit.update_changeset(socket.assigns.habit, habit_params)
-
-    IO.inspect(changeset)
 
     case Habits.update_habit_as(socket.assigns.current_user, changeset) do
       {:ok, _habit} ->

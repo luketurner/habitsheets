@@ -1,0 +1,50 @@
+<%= if Enum.empty? @tasks do %>
+  <div class="hero h-48">
+    <div class="hero-content text-center">
+      <div class="max-w-md">
+        <h1 class="text-3xl font-bold">No Tasks</h1>
+        <p class="py-6">You have no tasks to display!</p>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="flex flex-col flex-nowrap" phx-hook={unless @live_action == :archived, do: "SortableList"} id="tasklist">
+    <%= for task <- @tasks do %>
+      <div data-id={task.id} class={"bg-neutral text-neutral-content hover:bg-neutral-focus w-100 min-h-16 my-2 p-2 rounded-lg shadow-lg flex flex-row flex-nowrap items-center mx-4 #{unless @live_action == :archived, do: "cursor-pointer"}"}>
+        <%= unless @live_action == :archived || @live_action == :completed do %>
+          <div class="sortable-list-handle">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mx-2">
+              <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        <% end %>
+        <div class="flex-grow p-2 text-lg">
+          <%= task.name %>
+        </div>
+        <%= case @live_action do %>
+        <% :archived -> %>
+          <div class="">
+            <.link class="btn btn-ghost" href="#" phx-click="unarchive" phx-value-id={task.id}>Restore</.link>
+          </div>
+        <% :completed -> %> <div></div>
+        <% _ -> %>
+          <div class="">
+            <.link class="btn btn-ghost" navigate={Routes.task_editor_path(@socket, :edit, task.id)}>Edit</.link>
+          </div>
+          <div class="">
+            <.link class="btn btn-ghost" href="#" phx-click="archive" phx-value-id={task.id}>Archive</.link>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+<div class="p-4">
+  <%= if @live_action == :archived || @live_action == :completed do %>
+    <.link class="btn btn-ghost" navigate={Routes.task_list_path(@socket, :index)}>Back</.link>
+  <% else %>
+    <.link class="btn btn-ghost" navigate={Routes.task_editor_path(@socket, :new)}>New task</.link>
+    <.link class="btn btn-ghost" navigate={Routes.task_list_path(@socket, :completed)}>Completed tasks</.link>
+    <.link class="btn btn-ghost" navigate={Routes.task_list_path(@socket, :archived)}>Archived tasks</.link>
+  <% end %>
+</div>

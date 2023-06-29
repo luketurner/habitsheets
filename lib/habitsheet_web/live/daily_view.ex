@@ -13,6 +13,19 @@ defmodule HabitsheetWeb.Live.DailyView do
 
   @impl true
   def handle_event(
+        "complete_task",
+        %{"id" => task_id},
+        %{assigns: %{sheet: sheet, date: date}} = socket
+      ) do
+    task = get_task_from_socket(socket, task_id)
+
+    with {:ok, sheet} <- Sheet.complete_task(sheet, task, date) do
+      {:noreply, assign_sheet(socket, sheet)}
+    end
+  end
+
+  @impl true
+  def handle_event(
         "toggle_entry",
         %{"id" => habit_id},
         %{assigns: %{sheet: sheet, date: date}} = socket
@@ -46,21 +59,36 @@ defmodule HabitsheetWeb.Live.DailyView do
     end
   end
 
-  defp assign_sheet(%{assigns: %{current_user: current_user, date: date}} = socket) do
-    {:ok, sheet} = Sheet.new(current_user, date)
-
+  defp assign_sheet(%{assigns: %{date: date}} = socket, %Sheet{} = sheet) do
     socket
     |> assign(:sheet, sheet)
     |> assign(:habits, Sheet.get_habits_for_date(sheet, date))
     |> assign(:review, Sheet.get_review(sheet, date) || %{})
+    |> assign(:tasks, Sheet.get_tasks_for_date(sheet, date))
+  end
+
+  defp assign_sheet(%{assigns: %{current_user: current_user, date: date}} = socket) do
+    {:ok, sheet} = Sheet.new(current_user, date)
+
+    assign_sheet(socket, sheet)
   end
 
   defp get_habit_from_socket(socket, habit_id) when is_integer(habit_id) do
+    # TODO -- should use habit_index
     Enum.find(socket.assigns.sheet.habits, &(&1.id == habit_id))
   end
 
   defp get_habit_from_socket(socket, habit_id) when is_binary(habit_id) do
     get_habit_from_socket(socket, String.to_integer(habit_id))
+  end
+
+  defp get_task_from_socket(socket, task_id) when is_integer(task_id) do
+    # TODO -- should use task_index
+    Enum.find(socket.assigns.sheet.tasks, &(&1.id == task_id))
+  end
+
+  defp get_task_from_socket(socket, task_id) when is_binary(task_id) do
+    get_task_from_socket(socket, String.to_integer(task_id))
   end
 
   defp date_param_add(date, days) do

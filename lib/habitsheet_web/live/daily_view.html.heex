@@ -44,3 +44,14 @@
     <% end %>
   </div>
 <% end %>
+<%= if !Enum.empty?(@tasks) do %>
+  <h2 class="text-lg my-4">Tasks</h2>
+  <div class="flex flex-col flex-nowrap">
+    <%= for task <- @tasks do %>
+      <UI.task_entry_row
+        task={task}
+        date={@date}
+        on_toggle="complete_task" />
+    <% end %>
+  </div>
+<% end %>

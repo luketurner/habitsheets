@@ -1,4 +1,4 @@
-defmodule Habitsheet.Habits.Notes do
+defmodule Habitsheet.Notes do
   use Ecto.Schema
   import Ecto.Changeset
 

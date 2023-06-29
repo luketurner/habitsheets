@@ -37,6 +37,14 @@ defmodule HabitsheetWeb.Router do
           live "/:habit_id/edit", Live.HabitEditor, :edit
         end
 
+        scope "/tasks" do
+          live "/", Live.TaskList, :index
+          live "/done", Live.TaskList, :completed
+          live "/archived", Live.TaskList, :archived
+          live "/add", Live.TaskEditor, :new
+          live "/:task_id/edit", Live.TaskEditor, :edit
+        end
+
         live "/:date", Live.DailyView, :index
         live "/:date/review", Live.DailyReview, :index
       end

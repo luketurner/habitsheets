@@ -219,4 +219,28 @@ defmodule HabitsheetWeb.Components do
     |> AdditionalData.zip_spec(habit.additional_data_spec)
     |> Enum.map(fn {data, _spec} -> Map.take(data, AdditionalData.__schema__(:fields)) end)
   end
+
+  attr(:task, Habitsheet.Tasks.Task, required: true)
+  attr(:date, Date, required: true)
+  attr(:on_toggle, :string, required: true)
+
+  def task_entry_row(assigns) do
+    ~H"""
+    <div
+      class={"bg-neutral text-neutral-content hover:bg-neutral-focus w-100 min-h-16 my-2 mx-4 rounded-lg shadow-xl flex flex-col flex-nowrap justify-center select-none pointer-events-auto cursor-pointer"}
+      phx-value-id={@task.id}
+      phx-click={@on_toggle}>
+      <div class="flex flex-row flex-nowrap items-center mx-4">
+        <%= if @task.completed_at do %>
+          <UI.icon_check_circle_solid class="w-8 h-8" />
+        <% else %>
+          <UI.icon_minus_circle_outline class="w-8 h-8" />
+        <% end %>
+        <div class="flex-grow py-2 px-4 text-lg">
+          <%= @task.name %>
+        </div>
+      </div>
+    </div>
+    """
+  end
 end

@@ -41,4 +41,8 @@ defmodule Habitsheet.DateHelpers do
   def today?(%Date{} = date, tz \\ @default_timezone) do
     date == today(tz)
   end
+
+  def date_to_naive_date_time!(%Date{} = date) do
+    NaiveDateTime.new!(date, ~T[00:00:00])
+  end
 end

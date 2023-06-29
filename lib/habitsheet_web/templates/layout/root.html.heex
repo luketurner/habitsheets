@@ -8,7 +8,8 @@
 
 <:nav_menu>
   <%= if @current_user do %>
-    <li><.link href={Routes.habit_list_path(@conn, :index)}>Manage Habits</.link></li>
+    <li><.link href={Routes.task_list_path(@conn, :index)}>Tasks</.link></li>
+    <li><.link href={Routes.habit_list_path(@conn, :index)}>Habits</.link></li>
     <li><.link href={Routes.daily_view_path(@conn, :index, "today")}>Today</.link></li>
     <li><.link href={Routes.user_settings_path(@conn, :edit)}>Settings</.link></li>
     <li><.link href={Routes.user_session_path(@conn, :delete)} method="delete">Log out</.link></li>

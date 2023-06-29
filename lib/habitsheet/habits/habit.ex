@@ -8,7 +8,7 @@ defmodule Habitsheet.Habits.Habit do
   alias Habitsheet.Habits.HabitEntry
   alias Habitsheet.Habits.RecurringInterval
   alias Habitsheet.Habits.AdditionalDataSpec
-  alias Habitsheet.Habits.Notes
+  alias Habitsheet.Notes
   alias Habitsheet.Habits.HabitTrigger
   alias Habitsheet.Users.User
 

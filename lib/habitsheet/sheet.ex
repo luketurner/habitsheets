@@ -2,18 +2,21 @@ defmodule Habitsheet.Sheet do
   @moduledoc """
   A Sheet struct encapsulates all the preloaded data that's needed for viewing habits over a date range.
   Phoenix views, email handlers, etc. can create a sheet and then easily "ask the sheet" for whatever data is needed to render the UI / email / etc.
-  
+
   # Examples (wip)
-  
+
   sheet = Sheet.new(user, Date.range(~D[2022-01-01], ~D[2022-01-08]))
   Sheet.get_habits_for_date(sheet, ~D[2022-01-03])
-  
+
   """
   alias Habitsheet.Users.User
   alias Habitsheet.Habits
   alias Habitsheet.Habits.Habit
   alias Habitsheet.Habits.HabitEntry
   alias Habitsheet.Reviews
+  alias Habitsheet.Tasks
+  alias Habitsheet.Tasks.Task
+  alias Habitsheet.DateHelpers
 
   alias Ecto.Changeset
 
@@ -25,11 +28,13 @@ defmodule Habitsheet.Sheet do
     :habits,
     :dates,
     :reviews,
+    :tasks,
     :entry_index_date_first,
     :entry_index_habit_first,
     :habit_index,
     :review_index,
-    :habit_latest_entries
+    :task_index,
+    :habit_latest_entries,
   ]
 
   def new(%User{} = user, %Date.Range{} = dates) do
@@ -42,7 +47,8 @@ defmodule Habitsheet.Sheet do
       {:ok, sheet} <- load_habits(sheet),
       {:ok, sheet} <- load_entries(sheet),
       {:ok, sheet} <- load_reviews(sheet),
-      {:ok, sheet} <- load_latest_entries(sheet)
+      {:ok, sheet} <- load_latest_entries(sheet),
+      {:ok, sheet} <- load_tasks(sheet)
     ) do
       {:ok, sheet}
     end
@@ -83,6 +89,15 @@ defmodule Habitsheet.Sheet do
   def load_latest_entries(%__MODULE__{user: user, habits: habits, dates: dates} = sheet) do
     with {:ok, entries} <- Habits.get_latest_entry_dates_before_as(user, habits, dates.first) do
       {:ok, %{sheet | habit_latest_entries: entries}}
+    end
+  end
+
+  def load_tasks(%__MODULE__{user: user} = sheet) do
+    with {:ok, tasks} <- Tasks.list_incomplete_tasks_for_user_as(user, user) do
+      {:ok,
+       sheet
+       |> Map.put(:tasks, tasks)
+       |> Map.put(:task_index, Map.new(tasks, &{&1.id, &1}))}
     end
   end
 
@@ -180,5 +195,19 @@ defmodule Habitsheet.Sheet do
   def get_habits_for_date(%__MODULE__{} = sheet, %Date{} = date) do
     sheet.habits
     |> Enum.filter(&habit_shown_on(sheet, &1, date))
+  end
+
+  def get_tasks_for_date(%__MODULE__{} = sheet, %Date{} = _date) do
+    sheet.tasks
+  end
+
+  def complete_task(%__MODULE__{} = sheet, %Task{} = task, %Date{} = date) do
+    # TODO
+    changeset = Tasks.task_update_changeset(task, %{
+      completed_at: DateHelpers.date_to_naive_date_time!(date)
+    })
+    {:ok, _task} = Tasks.update_task(changeset)
+    {:ok, sheet} = load_tasks(sheet)
+    {:ok, sheet}
   end
 end
