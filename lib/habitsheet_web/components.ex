@@ -124,6 +124,11 @@ defmodule HabitsheetWeb.Components do
         </div>
       </div>
       <div class="flex flex-row flex-wrap">
+        <%= if @habit.expiration && @habit.expiration > 1 do %>
+          <div class="badge badge-primary m-1">
+            <%= @habit.expiration %> day expiration
+          </div>
+        <% end %>
         <%= for recurrence <- @habit.recurrence do %>
           <div class="badge badge-accent m-1" title={Habitsheet.Habits.RecurringInterval.to_display_sentence(recurrence)}>
             <%= Habitsheet.Habits.RecurringInterval.to_display_string(recurrence) %>
