@@ -14,6 +14,18 @@
       <%= error_tag f, :name %>
     </div>
 
+    <div class="form-control w-full max-w-xs">
+      <%= label f, :important, class: "label label-text" %>
+      <%= checkbox f, :important %>
+      <%= error_tag f, :important %>
+    </div>
+
+    <div class="form-control w-full max-w-xs">
+      <%= label f, :urgent, class: "label label-text" %>
+      <%= checkbox f, :urgent %>
+      <%= error_tag f, :urgent %>
+    </div>
+
     <div class="modal-action">
       <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
     </div>

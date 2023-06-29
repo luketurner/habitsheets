@@ -240,6 +240,18 @@ defmodule HabitsheetWeb.Components do
           <%= @task.name %>
         </div>
       </div>
+      <div class="flex flex-row flex-wrap">
+        <%= if @task.important do %>
+          <div class="badge badge-primary m-1">
+            important
+          </div>
+        <% end %>
+        <%= if @task.urgent do %>
+          <div class="badge badge-accent m-1">
+            urgent
+          </div>
+        <% end %>
+      </div>
     </div>
     """
   end
