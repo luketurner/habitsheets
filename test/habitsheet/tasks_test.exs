@@ -11,4 +11,12 @@ defmodule Habitsheet.TasksTest do
     @invalid_attrs %{name: nil}
 
   end
+
+  describe "agendas" do
+    alias Habitsheet.Tasks.Agenda
+
+    import Habitsheet.TasksFixtures
+
+    @invalid_attrs %{date: nil}
+  end
 end

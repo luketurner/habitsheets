@@ -9,6 +9,7 @@ defmodule Habitsheet.Tasks do
 
   alias Habitsheet.Tasks.Task
   alias Habitsheet.Users.User
+  alias Habitsheet.Tasks.Agenda
 
   @behaviour Bodyguard.Policy
 
@@ -25,8 +26,18 @@ defmodule Habitsheet.Tasks do
   def authorize(:unarchive_task, %User{id: user_id}, %Task{user_id: user_id}), do: :ok
 
   # Any logged-in user can create a task, but only for themselves
-  def authorize(:create_task, %User{id: user_id}, %Changeset{changes: %{user_id: user_id}}),
+  def authorize(:create_task, %User{id: user_id}, %Changeset{data: %Task{}, changes: %{user_id: user_id}}),
     do: :ok
+
+  # Agendas
+  def authorize(:list_agendas_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
+  def authorize(:build_agendas_for_user, %User{id: user_id}, %User{id: user_id}), do: :ok
+  # def authorize(:get_agenda, %User{id: user_id}, %Agenda{user_id: user_id}), do: :ok
+  # def authorize(:update_agenda, %User{id: user_id}, %Agenda{user_id: user_id}), do: :ok
+
+  # def authorize(:create_agenda, %User{id: user_id}, %Changeset{data: %Agenda{}, changes: %{user_id: user_id}}),
+  #   do: :ok
+
 
   # Fallback policy
   def authorize(_, _, _), do: :error
@@ -266,5 +277,49 @@ defmodule Habitsheet.Tasks do
     )
 
     {:ok}
+  end
+
+  def list_agendas_for_user(%User{} = user, %Date.Range{} = dates) do
+    {:ok,
+     Repo.all(
+       from agenda in Agenda,
+         select: agenda,
+         where:
+          agenda.user_id == ^user.id and
+          agenda.date >= ^dates.first and
+          agenda.date <= ^dates.last,
+         order_by: [asc: agenda.date]
+     )}
+  end
+
+  def list_agendas_for_user_as(%User{} = current_user, %User{} = user, %Date.Range{} = dates) do
+    with :ok <- Bodyguard.permit(__MODULE__, :list_agendas_for_user, current_user, user) do
+      list_agendas_for_user(user, dates)
+    end
+  end
+
+  def build_agendas(%User{} = user, %Date.Range{} = dates) do
+    {:ok, all_tasks} = list_incomplete_tasks_for_user(user)
+    {:ok, Enum.map(dates, fn date ->
+
+      if existing_agenda = Repo.one(from a in Agenda, where: a.date == ^date and a.user_id == ^user.id) do
+        Repo.preload(existing_agenda, :tasks)
+      else
+        {:ok, agenda} = %Agenda{}
+          |> Agenda.create_changeset(%{
+            user_id: user.id,
+            date: date
+          })
+          |> Repo.insert(returning: true)
+        Agenda.assoc_tasks(agenda, all_tasks)
+        %{agenda | tasks: all_tasks}
+      end
+    end)}
+  end
+
+  def build_agendas_as(%User{} = current_user, %User{} = user, %Date.Range{} = dates) do
+    with :ok <- Bodyguard.permit(__MODULE__, :build_agendas_for_user, current_user, user) do
+      build_agendas(user, dates)
+    end
   end
 end

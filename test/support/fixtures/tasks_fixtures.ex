@@ -17,4 +17,18 @@ defmodule Habitsheet.TasksFixtures do
 
     task
   end
+
+  @doc """
+  Generate a agenda.
+  """
+  def agenda_fixture(attrs \\ %{}) do
+    {:ok, agenda} =
+      attrs
+      |> Enum.into(%{
+        date: ~D[2023-06-28]
+      })
+      |> Habitsheet.Tasks.create_agenda()
+
+    agenda
+  end
 end

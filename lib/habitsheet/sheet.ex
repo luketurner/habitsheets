@@ -29,11 +29,13 @@ defmodule Habitsheet.Sheet do
     :dates,
     :reviews,
     :tasks,
+    :agendas,
     :entry_index_date_first,
     :entry_index_habit_first,
     :habit_index,
     :review_index,
     :task_index,
+    :agenda_index,
     :habit_latest_entries,
   ]
 
@@ -48,7 +50,8 @@ defmodule Habitsheet.Sheet do
       {:ok, sheet} <- load_entries(sheet),
       {:ok, sheet} <- load_reviews(sheet),
       {:ok, sheet} <- load_latest_entries(sheet),
-      {:ok, sheet} <- load_tasks(sheet)
+      {:ok, sheet} <- load_tasks(sheet),
+      {:ok, sheet} <- load_agendas(sheet)
     ) do
       {:ok, sheet}
     end
@@ -98,6 +101,15 @@ defmodule Habitsheet.Sheet do
        sheet
        |> Map.put(:tasks, tasks)
        |> Map.put(:task_index, Map.new(tasks, &{&1.id, &1}))}
+    end
+  end
+
+  def load_agendas(%__MODULE__{user: user, dates: dates} = sheet) do
+    with {:ok, agendas} <- Tasks.build_agendas_as(user, user, dates) do
+      {:ok,
+       sheet
+       |> Map.put(:agendas, agendas)
+       |> Map.put(:agenda_index, Map.new(agendas, &{&1.date, &1}))}
     end
   end
 
@@ -197,8 +209,13 @@ defmodule Habitsheet.Sheet do
     |> Enum.filter(&habit_shown_on(sheet, &1, date))
   end
 
-  def get_tasks_for_date(%__MODULE__{} = sheet, %Date{} = _date) do
-    sheet.tasks
+  def get_agenda_for_date(%__MODULE__{} = sheet, %Date{} = date) do
+    Map.get(sheet.agenda_index, date)
+  end
+
+  def get_tasks_for_date(%__MODULE__{} = sheet, %Date{} = date) do
+    agenda = get_agenda_for_date(sheet, date)
+    agenda.tasks
   end
 
   def complete_task(%__MODULE__{} = sheet, %Task{} = task, %Date{} = date) do
