@@ -10,7 +10,7 @@ defmodule Habitsheet.Notes do
   def changeset(%__MODULE__{} = notes, attrs \\ %{}) do
     notes
     |> cast(attrs, [:format, :content])
-    |> validate_required([:format, :content])
+    |> validate_required([:format])
   end
 
   def render(%__MODULE__{format: :md, content: content}) do
