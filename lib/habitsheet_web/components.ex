@@ -141,6 +141,9 @@ defmodule HabitsheetWeb.Components do
           habit={@habit}
           on_change={@on_additional_data_change} />
       </div>
+      <div class="prose text-neutral-content m-1" style="--tw-prose-links: --text-neutral-content">
+        <%= raw Habitsheet.Notes.render(@habit.notes) %>
+      </div>
     </div>
     """
   end
@@ -251,6 +254,9 @@ defmodule HabitsheetWeb.Components do
             urgent
           </div>
         <% end %>
+      </div>
+      <div class="prose text-neutral-content m-1" style="--tw-prose-links: --text-neutral-content">
+        <%= raw Habitsheet.Notes.render(@task.notes) %>
       </div>
     </div>
     """

@@ -81,6 +81,18 @@
       <%= error_tag f, :additional_data_spec %>
     </div>
 
+    <div class="form-control w-full max-w-xs my-4">
+      <%= label f, :notes, class: "mb-2 flex flex-row items-center" do %>
+        Notes
+        <UI.manpage_link to="notes" />
+      <% end %>
+      <%= inputs_for f, :notes, fn notes -> %>
+        <%= textarea notes, :content %>
+        <%= error_tag f, :content %>
+      <% end %>
+      <%= error_tag f, :notes %>
+    </div>
+
     <div class="modal-action">
       <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary" %>
     </div>

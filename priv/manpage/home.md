@@ -13,3 +13,4 @@ Table of Contents:
 1. [Additional Data](?manpage=additional_data)
 1. [Recurring Intervals](?manpage=recurrence)
 1. [Expiration](?manpage=expiration)
+1. [Notes](?manpage=notes)
