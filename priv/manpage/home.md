@@ -14,3 +14,4 @@ Table of Contents:
 1. [Recurring Intervals](?manpage=recurrence)
 1. [Expiration](?manpage=expiration)
 1. [Notes](?manpage=notes)
+1. [Tasks and Agendas](?manpage=tasks)

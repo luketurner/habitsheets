@@ -311,8 +311,13 @@ defmodule Habitsheet.Tasks do
             date: date
           })
           |> Repo.insert(returning: true)
-        Agenda.assoc_tasks(agenda, all_tasks)
-        %{agenda | tasks: all_tasks}
+
+        urgent_tasks = Enum.filter(all_tasks, &(&1.urgent))
+        important_tasks = all_tasks |> Enum.filter(&(&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(2)
+        other_tasks = all_tasks |> Enum.filter(&(!&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(2)
+        agenda_tasks = urgent_tasks ++ important_tasks ++ other_tasks
+        Agenda.assoc_tasks(agenda, agenda_tasks)
+        %{agenda | tasks: agenda_tasks}
       end
     end)}
   end
