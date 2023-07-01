@@ -37,6 +37,18 @@ defmodule HabitsheetWeb.Components do
   attr(:rest, :global, default: %{class: "w-5 h-5"})
   def icon_academic_cap_mini(assigns)
 
+  attr(:rest, :global, default: %{class: "w-6 h-6"})
+  def icon_bell_snooze_outline(assigns)
+
+  attr(:rest, :global, default: %{class: "w-6 h-6"})
+  def icon_clock_outline(assigns)
+
+  attr(:rest, :global, default: %{class: "w-6 h-6"})
+  def icon_exclamation_circle_outline(assigns)
+
+  attr(:rest, :global, default: %{class: "w-6 h-6"})
+  def icon_fire_outline(assigns)
+
   attr(:rest, :global, default: %{class: "text-xl font-bold pb-4"})
   slot(:inner_block)
   def page_title(assigns)
@@ -125,12 +137,14 @@ defmodule HabitsheetWeb.Components do
       </div>
       <div class="flex flex-row flex-wrap">
         <%= if @habit.expiration && @habit.expiration > 1 do %>
-          <div class="badge badge-primary m-1">
-            <%= @habit.expiration %> day expiration
+          <div class="badge badge-primary m-1" title={"#{@habit.expiration} day expiration"}>
+            <.icon_bell_snooze_outline />
+            <%= @habit.expiration %> days
           </div>
         <% end %>
         <%= for recurrence <- @habit.recurrence do %>
           <div class="badge badge-accent m-1" title={Habitsheet.Habits.RecurringInterval.to_display_sentence(recurrence)}>
+            <.icon_clock_outline />
             <%= Habitsheet.Habits.RecurringInterval.to_display_string(recurrence) %>
           </div>
         <% end %>
@@ -141,9 +155,15 @@ defmodule HabitsheetWeb.Components do
           habit={@habit}
           on_change={@on_additional_data_change} />
       </div>
-      <div class="prose text-neutral-content m-1" style="--bc: --text-neutral-content">
-        <%= raw Habitsheet.Notes.render(@habit.notes) %>
-      </div>
+
+      <%= unless Habitsheet.Notes.empty?(@habit.notes) do %>
+        <div class="flex flex-row">
+          <.icon_pencil_square_outline />
+          <div class="prose text-neutral-content m-1" style="--bc: --text-neutral-content">
+            <%= raw Habitsheet.Notes.render(@habit.notes) %>
+          </div>
+        </div>
+      <% end %>
     </div>
     """
   end
@@ -246,11 +266,13 @@ defmodule HabitsheetWeb.Components do
       <div class="flex flex-row flex-wrap">
         <%= if @task.important do %>
           <div class="badge badge-primary m-1">
+            <.icon_exclamation_circle_outline />
             important
           </div>
         <% end %>
         <%= if @task.urgent do %>
           <div class="badge badge-accent m-1">
+            <.icon_fire_outline />
             urgent
           </div>
         <% end %>
