@@ -64,15 +64,15 @@ defmodule HabitsheetWeb.Live.HabitEditor do
   @impl true
   def handle_event("add_spec", _, socket) do
     changeset = socket.assigns.changeset
+    existing_specs = Changeset.get_field(changeset, :additional_data_spec, [])
 
     # TODO -- autogenerate IDs better?
     new_spec =
       AdditionalDataSpec.changeset(%AdditionalDataSpec{id: Ecto.UUID.generate()}, %{
         label: "Label me",
-        data_type: :count
+        data_type: :count,
+        display_order: Enum.count(existing_specs)
       })
-
-    existing_specs = Changeset.get_field(changeset, :additional_data_spec, [])
 
     changeset =
       Changeset.put_embed(changeset, :additional_data_spec, existing_specs ++ [new_spec])
@@ -103,8 +103,6 @@ defmodule HabitsheetWeb.Live.HabitEditor do
         start: DateHelpers.today(socket.assigns.timezone)
       })
 
-      IO.inspect(new_recurrence)
-
     existing = Changeset.get_field(changeset, :recurrence, [])
 
     changeset =
@@ -131,12 +129,12 @@ defmodule HabitsheetWeb.Live.HabitEditor do
     # When in fact, we do want there to be a change, which is to empty out the list.
     habit_params =
       if socket.assigns[:spec_deleted?],
-        do: Map.put_new(habit_params, "additional_data_spec", []),
+        do: Map.put(habit_params, "additional_data_spec", []),
         else: habit_params
 
     habit_params =
       if socket.assigns[:recurrence_deleted?],
-        do: Map.put_new(habit_params, "recurrence", []),
+        do: Map.put(habit_params, "recurrence", []),
         else: habit_params
 
     changeset = Habit.update_changeset(socket.assigns.habit, habit_params)

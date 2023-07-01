@@ -53,14 +53,15 @@
       <%= error_tag f, :recurrence %>
     </div>
 
-    <div class="form-control w-full max-w-xs my-8 text-lg">
-      <%= label f, :additional_data_spec, class: "mb-2 flex flex-row items-center" do %>
+    <div class="form-control w-full max-w-xs my-8">
+      <%= label f, :additional_data_spec, class: "mb-2 flex flex-row items-center text-lg" do %>
         Additional Data
         <UI.manpage_link to="additional_data" />
       <% end %>
 
       <%= inputs_for f, :additional_data_spec, fn spec -> %>
         <%= hidden_input spec, :id %>
+        <%= hidden_input spec, :display_order %>
         <div class="form-control w-full max-w-xs">
           <div class="input-group input-group-sm input-group-vertical mb-4">
             <%= select spec, :data_type, AdditionalDataSpec.data_types(), required: true, class: "input input-bordered" %>
@@ -82,7 +83,7 @@
     </div>
 
     <div class="form-control w-full max-w-xs my-4">
-      <%= label f, :notes, class: "mb-2 flex flex-row items-center" do %>
+      <%= label f, :notes, class: "mb-2 flex flex-row items-center text-lg" do %>
         Notes
         <UI.manpage_link to="notes" />
       <% end %>
