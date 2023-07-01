@@ -13,6 +13,8 @@ defmodule Habitsheet.Notes do
     |> validate_required([:format])
   end
 
+  def render(%__MODULE__{format: :md, content: content}) when is_nil(content), do: ""
+
   def render(%__MODULE__{format: :md, content: content}) do
     case Earmark.as_html(content, compact_output: true, postprocessor: fn node ->
       # We want to only allow certain nodes to render. Everything else gets replaced with an empty string.
