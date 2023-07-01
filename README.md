@@ -4,6 +4,8 @@ HabitSheets is a Web application for habit tracking. A demo instance is availabl
 
 HabitSheets is open-source (MIT Licensed) and it's easy to deploy your own instance on [Fly.io](https://fly.io/) with just a few commands. See [Development](#development) section for details.
 
+The in-app help documentation can also be [read on Github](priv/manpage), although cross-page links won't work outside of the app.
+
 ## Getting Started Guide (WIP)
 
 To make best use of HabitSheets (or any habit-tracking software), your first task, _before even opening the app_, is to set aside a few minutes a day for reflection. Without a habit of daily reflection, the full benefit of habit tracking can't be realized.
