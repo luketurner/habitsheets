@@ -13,6 +13,10 @@ defmodule Habitsheet.Notes do
     |> validate_required([:format])
   end
 
+  def empty?(%__MODULE__{content: content}) when is_binary(content), do: content == ""
+  def empty?(%__MODULE__{content: content}) when is_nil(content), do: true
+  def empty?(nil), do: true
+
   def render(%__MODULE__{format: :md, content: content}) when is_nil(content), do: ""
 
   def render(%__MODULE__{format: :md, content: content}) do
