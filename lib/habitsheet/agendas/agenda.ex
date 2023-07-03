@@ -1,4 +1,4 @@
-defmodule Habitsheet.Tasks.Agenda do
+defmodule Habitsheet.Agendas.Agenda do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query

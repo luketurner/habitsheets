@@ -16,6 +16,7 @@ defmodule Habitsheet.Sheet do
   alias Habitsheet.Reviews
   alias Habitsheet.Tasks
   alias Habitsheet.Tasks.Task
+  alias Habitsheet.Agendas
   alias Habitsheet.DateHelpers
 
   alias Ecto.Changeset
@@ -105,7 +106,7 @@ defmodule Habitsheet.Sheet do
   end
 
   def load_agendas(%__MODULE__{user: user, dates: dates} = sheet) do
-    with {:ok, agendas} <- Tasks.build_agendas_as(user, user, dates) do
+    with {:ok, agendas} <- Agendas.build_agendas_as(user, user, dates) do
       {:ok,
        sheet
        |> Map.put(:agendas, agendas)

@@ -2,7 +2,7 @@ defmodule HabitsheetWeb.Live.DailyView do
   use HabitsheetWeb, :live_view
 
   alias Habitsheet.Sheet
-  alias Habitsheet.Tasks.Agenda
+  alias Habitsheet.Agendas.Agenda
 
   @impl true
   def mount(%{"date" => date_param} = _params, _session, socket) do
