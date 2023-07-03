@@ -218,13 +218,27 @@ defmodule Habitsheet.Sheet do
     agenda.tasks
   end
 
-  def complete_task(%__MODULE__{} = sheet, %Task{} = task, %Date{} = date) do
+  def get_incomplete_tasks_for_date(%__MODULE__{} = sheet, %Date{} = date) do
+    agenda = get_agenda_for_date(sheet, date)
+    agenda.tasks |> Enum.filter(&(Map.get(&1, :completed_at) == nil))
+  end
+
+  def toggle_task_completed(%__MODULE__{} = sheet, %Task{} = task, %Date{} = date) do
     # TODO
     changeset = Tasks.task_update_changeset(task, %{
-      completed_at: DateHelpers.date_to_naive_date_time!(date)
+      completed_at: if(task.completed_at, do: nil, else: DateHelpers.date_to_naive_date_time!(date))
     })
     {:ok, _task} = Tasks.update_task(changeset)
     {:ok, sheet} = load_tasks(sheet)
+    {:ok, sheet} = load_agendas(sheet)
     {:ok, sheet}
+  end
+
+  def get_task(%__MODULE__{} = sheet, task_id) when is_integer(task_id) do
+    Map.get(sheet.task_index, task_id)
+  end
+
+  def get_task(%__MODULE__{} = sheet, task_id) when is_binary(task_id) do
+    get_task(sheet, String.to_integer(task_id))
   end
 end

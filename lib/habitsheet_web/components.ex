@@ -121,16 +121,15 @@ defmodule HabitsheetWeb.Components do
     assigns = assign(assigns, :changeset, changeset_for_entry(entry, habit, date))
 
     ~H"""
-    <div
-      class={"bg-neutral text-neutral-content hover:bg-neutral-focus w-100 min-h-16 my-2 mx-4 rounded-lg shadow-xl flex flex-col flex-nowrap justify-center select-none pointer-events-auto cursor-pointer"}
-      phx-value-id={@habit.id}
-      {if Enum.empty?(@habit.additional_data_spec || []), do: [phx_click: @on_toggle], else: []}>
+    <div class="bg-neutral text-neutral-content hover:bg-neutral-focus w-100 min-h-16 my-2 mx-4 rounded-lg shadow-xl flex flex-col flex-nowrap justify-center">
       <div class="flex flex-row flex-nowrap items-center mx-4">
-        <%= if @entry do %>
-          <UI.icon_check_circle_solid class="w-8 h-8" />
-        <% else %>
-          <UI.icon_minus_circle_outline class="w-8 h-8" />
-        <% end %>
+        <div class="pointer-events-auto cursor-pointer" phx-value-id={@habit.id} {if Enum.empty?(@habit.additional_data_spec || []), do: [phx_click: @on_toggle], else: []}>
+          <%= if @entry do %>
+            <UI.icon_check_circle_solid class="w-8 h-8" />
+          <% else %>
+            <UI.icon_minus_circle_outline class="w-8 h-8" />
+          <% end %>
+        </div>
         <div class="flex-grow py-2 px-4 text-lg">
           <%= @habit.name %>
         </div>
@@ -249,16 +248,15 @@ defmodule HabitsheetWeb.Components do
 
   def task_entry_row(assigns) do
     ~H"""
-    <div
-      class={"bg-neutral text-neutral-content hover:bg-neutral-focus w-100 min-h-16 my-2 mx-4 rounded-lg shadow-xl flex flex-col flex-nowrap justify-center select-none pointer-events-auto cursor-pointer"}
-      phx-value-id={@task.id}
-      phx-click={@on_toggle}>
+    <div class="bg-neutral text-neutral-content hover:bg-neutral-focus w-100 min-h-16 my-2 mx-4 rounded-lg shadow-xl flex flex-col flex-nowrap justify-center">
       <div class="flex flex-row flex-nowrap items-center mx-4">
-        <%= if @task.completed_at do %>
-          <UI.icon_check_circle_solid class="w-8 h-8" />
-        <% else %>
-          <UI.icon_minus_circle_outline class="w-8 h-8" />
-        <% end %>
+        <div class="pointer-events-auto cursor-pointer" phx-value-id={@task.id} phx-click={@on_toggle}>
+          <%= if @task.completed_at do %>
+            <UI.icon_check_circle_solid class="w-8 h-8" />
+          <% else %>
+            <UI.icon_minus_circle_outline class="w-8 h-8" />
+          <% end %>
+        </div>
         <div class="flex-grow py-2 px-4 text-lg">
           <%= @task.name %>
         </div>

@@ -2,6 +2,7 @@ defmodule HabitsheetWeb.Live.DailyView do
   use HabitsheetWeb, :live_view
 
   alias Habitsheet.Sheet
+  alias Habitsheet.Tasks.Agenda
 
   @impl true
   def mount(%{"date" => date_param} = _params, _session, socket) do
@@ -13,13 +14,13 @@ defmodule HabitsheetWeb.Live.DailyView do
 
   @impl true
   def handle_event(
-        "complete_task",
+        "toggle_task_completed",
         %{"id" => task_id},
         %{assigns: %{sheet: sheet, date: date}} = socket
       ) do
     task = get_task_from_socket(socket, task_id)
 
-    with {:ok, sheet} <- Sheet.complete_task(sheet, task, date) do
+    with {:ok, sheet} <- Sheet.toggle_task_completed(sheet, task, date) do
       {:noreply, assign_sheet(socket, sheet)}
     end
   end
@@ -73,22 +74,13 @@ defmodule HabitsheetWeb.Live.DailyView do
     assign_sheet(socket, sheet)
   end
 
-  defp get_habit_from_socket(socket, habit_id) when is_integer(habit_id) do
-    # TODO -- should use habit_index
-    Enum.find(socket.assigns.sheet.habits, &(&1.id == habit_id))
+  defp get_habit_from_socket(socket, habit_id) do
+    Sheet.get_habit(socket.assigns.sheet, habit_id)
   end
 
-  defp get_habit_from_socket(socket, habit_id) when is_binary(habit_id) do
-    get_habit_from_socket(socket, String.to_integer(habit_id))
-  end
-
-  defp get_task_from_socket(socket, task_id) when is_integer(task_id) do
-    # TODO -- should use task_index
-    Enum.find(socket.assigns.sheet.tasks, &(&1.id == task_id))
-  end
-
-  defp get_task_from_socket(socket, task_id) when is_binary(task_id) do
-    get_task_from_socket(socket, String.to_integer(task_id))
+  defp get_task_from_socket(%{assigns: %{sheet: sheet, date: date}}, task_id) do
+    agenda = Sheet.get_agenda_for_date(sheet, date)
+    Agenda.find_task(agenda, task_id)
   end
 
   defp date_param_add(date, days) do

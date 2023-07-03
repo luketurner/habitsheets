@@ -298,17 +298,47 @@ defmodule Habitsheet.Tasks do
     end
   end
 
+  def pick_tasks_for_agenda(agenda, tasks) do
+    num_important_tasks = 2 - Enum.count(agenda.tasks, &(&1.important && !&1.urgent))
+    num_other_tasks = 2 - Enum.count(agenda.tasks, &(!&1.important && !&1.urgent))
+    applicable_tasks = Enum.filter(tasks, &(!agenda.last_checked_at || NaiveDateTime.compare(&1.inserted_at, agenda.last_checked_at)) == :gt)
+    urgent_tasks = applicable_tasks |> Enum.filter(&(&1.urgent))
+    important_tasks = if num_important_tasks > 0 do
+      applicable_tasks |> Stream.filter(&(&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(num_important_tasks)
+    else
+      []
+    end
+    other_tasks = if num_other_tasks > 0 do
+      applicable_tasks |> Stream.filter(&(!&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(num_other_tasks)
+    else
+      []
+    end
+    urgent_tasks ++ important_tasks ++ other_tasks
+  end
+
   def build_agendas(%User{} = user, %Date.Range{} = dates) do
+    now = NaiveDateTime.utc_now()
     {:ok, all_tasks} = list_incomplete_tasks_for_user(user)
     {:ok, Enum.map(dates, fn date ->
 
       if existing_agenda = Repo.one(from a in Agenda, where: a.date == ^date and a.user_id == ^user.id) do
+
+        existing_agenda = Repo.preload(existing_agenda, :tasks)
+
+        Agenda.assoc_tasks(existing_agenda, pick_tasks_for_agenda(existing_agenda, all_tasks))
+
+        {:ok, existing_agenda} = existing_agenda
+          |> Agenda.update_changeset(%{last_checked_at: now})
+          |> Repo.update()
+
         Repo.preload(existing_agenda, :tasks)
+
       else
         {:ok, agenda} = %Agenda{}
           |> Agenda.create_changeset(%{
             user_id: user.id,
-            date: date
+            date: date,
+            last_checked_at: now
           })
           |> Repo.insert(returning: true)
 
