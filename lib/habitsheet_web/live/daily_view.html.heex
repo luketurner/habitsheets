@@ -44,7 +44,7 @@
     <% end %>
   </div>
 <% end %>
-<h2 class="text-lg my-4">Agenda</h2>
+<h2 class="text-lg my-4">Agenda <UI.manpage_link to="tasks" /></h2>
 <%= if @agenda == nil do %>
   <p>An agenda hasn't been created for this date yet.</p>
   <.link class="btn btn-primary" phx-click="agenda_generate">Generate Agenda</.link>

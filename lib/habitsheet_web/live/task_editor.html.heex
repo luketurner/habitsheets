@@ -1,5 +1,5 @@
 <div>
-  <h2 class="text-lg font-bold pb-4"><%= if @live_action == :new, do: "New task", else: @task.name %></h2>
+  <h2 class="text-lg font-bold pb-4"><%= if @live_action == :new, do: "New task", else: @task.name %> <UI.manpage_link to="tasks" /></h2>
 
   <.form
     :let={f}
