@@ -39,32 +39,53 @@ defmodule Habitsheet.Agendas do
     end
   end
 
-  def pick_tasks_for_agenda(%Agenda{important_task_limit: important_task_limit, other_task_limit: other_task_limit, tasks: agenda_tasks, last_checked_at: last_checked_at}, tasks, [allow_old_tasks: allow_old_tasks] = _opts \\ []) do
+  def pick_tasks_for_agenda(%Agenda{overall_task_limit: overall_task_limit, important_task_limit: important_task_limit, other_task_limit: other_task_limit, tasks: agenda_tasks, last_checked_at: last_checked_at}, tasks, [allow_old_tasks: allow_old_tasks] = _opts \\ []) do
+    num_overall_tasks = overall_task_limit - Enum.count(agenda_tasks)
     num_important_tasks = important_task_limit - Enum.count(agenda_tasks, &(&1.important && !&1.urgent))
     num_other_tasks = other_task_limit - Enum.count(agenda_tasks, &(!&1.important && !&1.urgent))
-    applicable_tasks = Enum.filter(tasks, fn task ->
+    applicable_tasks = Stream.filter(tasks, fn task ->
       # TODO -- O(n*m)
       !Enum.any?(agenda_tasks, &(&1.id == task.id)) &&
       (allow_old_tasks || !last_checked_at || NaiveDateTime.compare(task.inserted_at, last_checked_at) == :gt)
     end)
 
-      if allow_old_tasks do
-      tasks
-    else
-      Enum.filter(tasks, &(!last_checked_at || NaiveDateTime.compare(&1.inserted_at, last_checked_at) == :gt))
-    end
-    urgent_tasks = applicable_tasks |> Enum.filter(&(&1.urgent))
-    important_tasks = if num_important_tasks > 0 do
-      applicable_tasks |> Stream.filter(&(&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(num_important_tasks)
+    # First, pick any important and urgent tasks.
+    important_and_urgent_tasks = if num_overall_tasks > 0 do
+      applicable_tasks |> Stream.filter(&(&1.important && &1.urgent)) |> Enum.shuffle() |> Enum.take(num_overall_tasks)
     else
       []
     end
-    other_tasks = if num_other_tasks > 0 do
-      applicable_tasks |> Stream.filter(&(!&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(num_other_tasks)
+    picked_tasks = important_and_urgent_tasks
+    num_overall_tasks = num_overall_tasks - Enum.count(important_and_urgent_tasks)
+
+    # If we still have space, pick any remaining urgent tasks.
+    urgent_tasks = if num_overall_tasks > 0 do
+      applicable_tasks |> Stream.filter(&(!&1.important && &1.urgent)) |> Enum.shuffle() |> Enum.take(num_overall_tasks)
     else
       []
     end
-    urgent_tasks ++ important_tasks ++ other_tasks
+    picked_tasks = picked_tasks ++ urgent_tasks
+    num_overall_tasks = num_overall_tasks - Enum.count(urgent_tasks)
+
+    # If we still have space, and we don't have 2+ important tasks already, pick any remaining important tasks.
+    important_tasks = if (num_to_take = min(num_overall_tasks, num_important_tasks)) > 0 do
+      applicable_tasks |> Stream.filter(&(&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(num_to_take)
+    else
+      []
+    end
+    picked_tasks = picked_tasks ++ important_tasks
+    num_overall_tasks = num_overall_tasks - Enum.count(important_tasks)
+
+    # If we still have space, and we don't have enough other tasks already, pick any remaining other tasks
+    other_tasks = if (num_to_take = min(num_overall_tasks, num_other_tasks)) > 0 do
+      applicable_tasks |> Stream.filter(&(!&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(num_to_take)
+    else
+      []
+    end
+    picked_tasks = picked_tasks ++ other_tasks
+    # num_overall_tasks = num_overall_tasks - Enum.count(other_tasks)
+
+    picked_tasks
   end
 
   def build_agenda(%User{} = user, %Date{} = date) do
@@ -116,7 +137,8 @@ defmodule Habitsheet.Agendas do
   def automatically_add_tasks(%Agenda{} = agenda, %{num_important_tasks: num_important_tasks, num_other_tasks: num_other_tasks}) do
     {:ok, agenda} = Agenda.update_changeset(agenda, %{
       important_task_limit: agenda.important_task_limit + num_important_tasks,
-      other_task_limit: agenda.other_task_limit + num_other_tasks
+      other_task_limit: agenda.other_task_limit + num_other_tasks,
+      overall_task_limit: agenda.overall_task_limit + num_important_tasks + num_other_tasks
     }) |> Repo.update()
     rebuild_agenda(agenda, allow_old_tasks: true)
   end
