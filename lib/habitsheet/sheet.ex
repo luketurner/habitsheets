@@ -9,6 +9,7 @@ defmodule Habitsheet.Sheet do
   Sheet.get_habits_for_date(sheet, ~D[2022-01-03])
 
   """
+  alias Habitsheet.Repo
   alias Habitsheet.Users.User
   alias Habitsheet.Habits
   alias Habitsheet.Habits.Habit
@@ -17,6 +18,7 @@ defmodule Habitsheet.Sheet do
   alias Habitsheet.Tasks
   alias Habitsheet.Tasks.Task
   alias Habitsheet.Agendas
+  alias Habitsheet.Agendas.Agenda
   alias Habitsheet.DateHelpers
 
   alias Ecto.Changeset
@@ -30,7 +32,6 @@ defmodule Habitsheet.Sheet do
     :dates,
     :reviews,
     :tasks,
-    :agendas,
     :entry_index_date_first,
     :entry_index_habit_first,
     :habit_index,
@@ -106,11 +107,11 @@ defmodule Habitsheet.Sheet do
   end
 
   def load_agendas(%__MODULE__{user: user, dates: dates} = sheet) do
-    with {:ok, agendas} <- Agendas.build_agendas_as(user, user, dates) do
-      {:ok,
-       sheet
-       |> Map.put(:agendas, agendas)
-       |> Map.put(:agenda_index, Map.new(agendas, &{&1.date, &1}))}
+    with(
+      {:ok, agendas} <- Agendas.list_agendas_for_user_as(user, user, dates),
+      agendas = Enum.map(agendas, &Repo.preload(&1, :tasks))
+    ) do
+      {:ok, Map.put(sheet, :agenda_index, Map.new(agendas, &{&1.date, &1}))}
     end
   end
 
@@ -241,5 +242,31 @@ defmodule Habitsheet.Sheet do
 
   def get_task(%__MODULE__{} = sheet, task_id) when is_binary(task_id) do
     get_task(sheet, String.to_integer(task_id))
+  end
+
+  def build_agenda(%__MODULE__{user: user} = sheet, %Date{} = date) do
+    if get_agenda_for_date(sheet, date) do
+      {:ok, sheet}
+    else
+      with {:ok, agenda} <- Agendas.build_agenda_as(user, user, date) do
+        {:ok, put_agenda(sheet, agenda)}
+      end
+    end
+  end
+
+  def agenda_add_tasks(%__MODULE__{} = sheet, %Date{} = date, %{num_important_tasks: num_important_tasks, num_other_tasks: num_other_tasks}) do
+    agenda = get_agenda_for_date(sheet, date)
+    {:ok, agenda} = Agendas.automatically_add_tasks(agenda, %{num_important_tasks: num_important_tasks, num_other_tasks: num_other_tasks})
+    {:ok, put_agenda(sheet, agenda)}
+  end
+
+  def agenda_refresh_tasks(%__MODULE__{} = sheet, %Date{} = date) do
+    agenda = get_agenda_for_date(sheet, date)
+    {:ok, agenda} = Agendas.refresh_tasks(agenda)
+    {:ok, put_agenda(sheet, agenda)}
+  end
+
+  defp put_agenda(%__MODULE__{} = sheet, %Agenda{} = agenda) do
+    Map.put(sheet, :agenda_index, Map.put(sheet.agenda_index, agenda.date, agenda))
   end
 end

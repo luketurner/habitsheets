@@ -60,12 +60,33 @@ defmodule HabitsheetWeb.Live.DailyView do
     end
   end
 
+  @impl true
+  def handle_event("agenda_generate", _params, %{assigns: %{sheet: sheet, date: date}} = socket) do
+    {:ok, sheet} = Sheet.build_agenda(sheet, date)
+    {:noreply, socket |> assign_sheet(sheet)}
+  end
+
+  @impl true
+  def handle_event("agenda_add_tasks", _params, %{assigns: %{sheet: sheet, date: date}} = socket) do
+    {:ok, sheet} = Sheet.agenda_add_tasks(sheet, date, %{
+      num_important_tasks: 1,
+      num_other_tasks: 1
+    })
+    {:noreply, socket |> assign_sheet(sheet)}
+  end
+
+  @impl true
+  def handle_event("agenda_refresh_tasks", _params, %{assigns: %{sheet: sheet, date: date}} = socket) do
+    {:ok, sheet} = Sheet.agenda_refresh_tasks(sheet, date)
+    {:noreply, socket |> assign_sheet(sheet)}
+  end
+
   defp assign_sheet(%{assigns: %{date: date}} = socket, %Sheet{} = sheet) do
     socket
     |> assign(:sheet, sheet)
     |> assign(:habits, Sheet.get_habits_for_date(sheet, date))
     |> assign(:review, Sheet.get_review(sheet, date) || %{})
-    |> assign(:tasks, Sheet.get_tasks_for_date(sheet, date))
+    |> assign(:agenda, Sheet.get_agenda_for_date(sheet, date))
   end
 
   defp assign_sheet(%{assigns: %{current_user: current_user, date: date}} = socket) do

@@ -4,7 +4,6 @@ defmodule Habitsheet.Agendas do
   """
 
   import Ecto.Query, warn: false
-  alias Ecto.Changeset
   alias Habitsheet.Repo
 
   alias Habitsheet.Tasks
@@ -40,10 +39,20 @@ defmodule Habitsheet.Agendas do
     end
   end
 
-  def pick_tasks_for_agenda(agenda, tasks) do
-    num_important_tasks = 2 - Enum.count(agenda.tasks, &(&1.important && !&1.urgent))
-    num_other_tasks = 2 - Enum.count(agenda.tasks, &(!&1.important && !&1.urgent))
-    applicable_tasks = Enum.filter(tasks, &(!agenda.last_checked_at || NaiveDateTime.compare(&1.inserted_at, agenda.last_checked_at)) == :gt)
+  def pick_tasks_for_agenda(%Agenda{important_task_limit: important_task_limit, other_task_limit: other_task_limit, tasks: agenda_tasks, last_checked_at: last_checked_at}, tasks, [allow_old_tasks: allow_old_tasks] = _opts \\ []) do
+    num_important_tasks = important_task_limit - Enum.count(agenda_tasks, &(&1.important && !&1.urgent))
+    num_other_tasks = other_task_limit - Enum.count(agenda_tasks, &(!&1.important && !&1.urgent))
+    applicable_tasks = Enum.filter(tasks, fn task ->
+      # TODO -- O(n*m)
+      !Enum.any?(agenda_tasks, &(&1.id == task.id)) &&
+      (allow_old_tasks || !last_checked_at || NaiveDateTime.compare(task.inserted_at, last_checked_at) == :gt)
+    end)
+
+      if allow_old_tasks do
+      tasks
+    else
+      Enum.filter(tasks, &(!last_checked_at || NaiveDateTime.compare(&1.inserted_at, last_checked_at) == :gt))
+    end
     urgent_tasks = applicable_tasks |> Enum.filter(&(&1.urgent))
     important_tasks = if num_important_tasks > 0 do
       applicable_tasks |> Stream.filter(&(&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(num_important_tasks)
@@ -58,45 +67,62 @@ defmodule Habitsheet.Agendas do
     urgent_tasks ++ important_tasks ++ other_tasks
   end
 
-  def build_agendas(%User{} = user, %Date.Range{} = dates) do
-    now = NaiveDateTime.utc_now()
-    {:ok, all_tasks} = Tasks.list_incomplete_tasks_for_user(user)
-    {:ok, Enum.map(dates, fn date ->
-
-      if existing_agenda = Repo.one(from a in Agenda, where: a.date == ^date and a.user_id == ^user.id) do
-
-        existing_agenda = Repo.preload(existing_agenda, :tasks)
-
-        Agenda.assoc_tasks(existing_agenda, pick_tasks_for_agenda(existing_agenda, all_tasks))
-
-        {:ok, existing_agenda} = existing_agenda
-          |> Agenda.update_changeset(%{last_checked_at: now})
-          |> Repo.update()
-
-        Repo.preload(existing_agenda, :tasks)
-
-      else
-        {:ok, agenda} = %Agenda{}
-          |> Agenda.create_changeset(%{
-            user_id: user.id,
-            date: date,
-            last_checked_at: now
-          })
-          |> Repo.insert(returning: true)
-
-        urgent_tasks = Enum.filter(all_tasks, &(&1.urgent))
-        important_tasks = all_tasks |> Enum.filter(&(&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(2)
-        other_tasks = all_tasks |> Enum.filter(&(!&1.important && !&1.urgent)) |> Enum.shuffle() |> Enum.take(2)
-        agenda_tasks = urgent_tasks ++ important_tasks ++ other_tasks
-        Agenda.assoc_tasks(agenda, agenda_tasks)
-        %{agenda | tasks: agenda_tasks}
-      end
-    end)}
+  def build_agenda(%User{} = user, %Date{} = date) do
+    if existing_agenda = Repo.one(from a in Agenda, where: a.date == ^date and a.user_id == ^user.id) do
+      rebuild_agenda(existing_agenda, allow_old_tasks: false)
+    else
+      build_new_agenda(user, date)
+    end
   end
 
-  def build_agendas_as(%User{} = current_user, %User{} = user, %Date.Range{} = dates) do
+  def rebuild_agenda(%Agenda{} = existing_agenda, [allow_old_tasks: allow_old_tasks] = _opts \\ []) do
+    existing_agenda = Repo.preload(existing_agenda, :user)
+    now = NaiveDateTime.utc_now()
+    {:ok, all_tasks} = Tasks.list_incomplete_tasks_for_user(existing_agenda.user)
+    existing_agenda = Repo.preload(existing_agenda, :tasks)
+    Agenda.assoc_tasks(existing_agenda, pick_tasks_for_agenda(existing_agenda, all_tasks, allow_old_tasks: allow_old_tasks))
+    {:ok, existing_agenda} = existing_agenda
+      |> Agenda.update_changeset(%{last_checked_at: now})
+      |> Repo.update()
+    {:ok, Repo.preload(existing_agenda, :tasks, force: true)}
+  end
+
+  def build_new_agenda(%User{} = user, %Date{} = date) do
+    now = NaiveDateTime.utc_now()
+    {:ok, all_tasks} = Tasks.list_incomplete_tasks_for_user(user)
+    {:ok, agenda} = %Agenda{}
+      |> Agenda.create_changeset(%{
+        user_id: user.id,
+        date: date,
+        last_checked_at: now
+      })
+      |> Repo.insert(returning: true)
+    agenda = Repo.preload(agenda, :tasks)
+    Agenda.assoc_tasks(agenda, pick_tasks_for_agenda(agenda, all_tasks, allow_old_tasks: true))
+    {:ok, Repo.preload(agenda, :tasks, force: true)}
+  end
+
+  def build_agenda_as(%User{} = current_user, %User{} = user, %Date{} = date) do
     with :ok <- Bodyguard.permit(__MODULE__, :build_agendas_for_user, current_user, user) do
-      build_agendas(user, dates)
+      build_agenda(user, date)
     end
+  end
+
+  def clear_tasks(%Agenda{} = agenda) do
+    Repo.delete_all(from at in "agendas_tasks", where: at.agenda_id == ^agenda.id)
+    {:ok, Ecto.reset_fields(agenda, [:tasks])}
+  end
+
+  def automatically_add_tasks(%Agenda{} = agenda, %{num_important_tasks: num_important_tasks, num_other_tasks: num_other_tasks}) do
+    {:ok, agenda} = Agenda.update_changeset(agenda, %{
+      important_task_limit: agenda.important_task_limit + num_important_tasks,
+      other_task_limit: agenda.other_task_limit + num_other_tasks
+    }) |> Repo.update()
+    rebuild_agenda(agenda, allow_old_tasks: true)
+  end
+
+  def refresh_tasks(%Agenda{} = agenda) do
+    {:ok, agenda} = clear_tasks(agenda)
+    rebuild_agenda(agenda, allow_old_tasks: true)
   end
 end

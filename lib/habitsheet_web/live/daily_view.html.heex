@@ -44,10 +44,17 @@
     <% end %>
   </div>
 <% end %>
-<%= if !Enum.empty?(@tasks) do %>
-  <h2 class="text-lg my-4">Tasks</h2>
+<h2 class="text-lg my-4">Agenda</h2>
+<%= if @agenda == nil do %>
+  <p>An agenda hasn't been created for this date yet.</p>
+  <.link class="btn btn-primary" phx-click="agenda_generate">Generate Agenda</.link>
+<% else %>
+  <div>
+    <.link class="btn btn-sm" phx-click="agenda_add_tasks">Add more tasks</.link>
+    <.link class="btn btn-sm" phx-click="agenda_refresh_tasks">Pick different tasks</.link>
+  </div>
   <div class="flex flex-col flex-nowrap">
-    <%= for task <- @tasks do %>
+    <%= for task <- @agenda.tasks do %>
       <UI.task_entry_row
         task={task}
         date={@date}
